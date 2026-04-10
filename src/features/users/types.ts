@@ -1,0 +1,85 @@
+export type UserRole = 'admin' | 'user'
+export type UserStatus = 'active' | 'inactive'
+
+export type User = {
+  id: string
+  first_name: string
+  last_name: string
+  middle_name: string | null
+  full_name: string
+  email: string
+  role: UserRole
+  status: UserStatus
+  is_active: boolean
+  last_login_at: string | null
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+}
+
+export type PaginationMeta = {
+  current_page: number
+  from: number | null
+  last_page: number
+  path: string
+  per_page: number
+  to: number | null
+  total: number
+}
+
+export type PaginationLinks = {
+  first?: string | null
+  last?: string | null
+  prev?: string | null
+  next?: string | null
+}
+
+export type PaginatedResponse<T> = {
+  data: T[]
+  meta: PaginationMeta
+  links: PaginationLinks
+}
+
+export type UserListQuery = {
+  page?: number
+  per_page?: number
+}
+
+export type CreateUserPayload = {
+  first_name: string
+  last_name: string
+  middle_name: string | null
+  email: string
+  password: string
+  role: UserRole
+  status: UserStatus
+}
+
+export type UpdateUserPayload = {
+  first_name: string
+  last_name: string
+  middle_name: string | null
+  email: string
+  password?: string
+  role: UserRole
+  status: UserStatus
+}
+
+export type UpdateUserStatusPayload = {
+  status: UserStatus
+}
+
+export type ResetPasswordPayload = {
+  password: string
+  password_confirmation: string
+}
+
+export type UserFormValues = {
+  first_name: string
+  last_name: string
+  middle_name: string
+  email: string
+  password: string
+  role: UserRole
+  status: UserStatus
+}
