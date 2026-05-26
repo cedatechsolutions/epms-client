@@ -95,7 +95,7 @@ export default function LoginPage() {
                 disabled={isAuthenticating}
                 required
                 placeholder="Enter your email"
-                className="w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b]"
+                className="w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
               />
             </div>
 
@@ -112,7 +112,7 @@ export default function LoginPage() {
                   disabled={isAuthenticating}
                   required
                   placeholder="Enter your password"
-                  className="w-full border border-[#cad5c7] bg-white px-4 py-3 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b]"
+                  className="w-full border border-[#cad5c7] bg-white px-4 py-3 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
                 />
                 <button
                   type="button"
@@ -120,7 +120,7 @@ export default function LoginPage() {
                   aria-pressed={showPassword}
                   disabled={isAuthenticating}
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
                 </button>
@@ -141,7 +141,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isAuthenticating || !isRecaptchaConfigured}
-              className="w-full border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e]"
+              className="w-full cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isAuthenticating ? 'Signing in...' : 'Sign in'}
             </button>

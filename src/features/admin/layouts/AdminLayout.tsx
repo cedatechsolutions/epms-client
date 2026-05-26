@@ -95,6 +95,7 @@ type SidebarProps = {
   collapsed?: boolean
   onToggleCollapse?: () => void
   onSignOut: () => void
+  signOutLoading?: boolean
 }
 
 function Sidebar({
@@ -104,6 +105,7 @@ function Sidebar({
   collapsed = false,
   onToggleCollapse,
   onSignOut,
+  signOutLoading = false,
 }: SidebarProps) {
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
@@ -176,10 +178,15 @@ function Sidebar({
         <button
           type="button"
           onClick={onSignOut}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+          disabled={signOutLoading}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <LogoutRoundedIcon fontSize="small" />
-          Logout
+          {signOutLoading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+          ) : (
+            <LogoutRoundedIcon fontSize="small" />
+          )}
+          {signOutLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
     </div>
@@ -194,6 +201,7 @@ export default function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [signOutLoading, setSignOutLoading] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const canAccessUserManagement = hasAnyRole(user, ADMIN_ROLES)
   const displayName = getUserDisplayName(user)
@@ -238,9 +246,17 @@ export default function AdminLayout() {
   }
 
   const handleSignOut = async () => {
-    await signOut()
-    setProfileMenuOpen(false)
-    navigate('/login', { replace: true })
+    if (signOutLoading) return
+
+    setSignOutLoading(true)
+    try {
+      await signOut()
+      setProfileMenuOpen(false)
+      setMobileOpen(false)
+      navigate('/login', { replace: true })
+    } finally {
+      setSignOutLoading(false)
+    }
   }
 
   return (
@@ -259,6 +275,7 @@ export default function AdminLayout() {
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
             onSignOut={() => void handleSignOut()}
+            signOutLoading={signOutLoading}
           />
         </aside>
 
@@ -309,10 +326,16 @@ export default function AdminLayout() {
                       </div>
                       <button
                         type="button"
+                        disabled={signOutLoading}
                         onClick={() => void handleSignOut()}
-                        className="mt-2 w-full px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                        className="mt-2 flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Sign out
+                        {signOutLoading ? (
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+                        ) : (
+                          <LogoutRoundedIcon fontSize="small" />
+                        )}
+                        {signOutLoading ? 'Signing out...' : 'Sign out'}
                       </button>
                     </div>
                   ) : null}
@@ -347,6 +370,7 @@ export default function AdminLayout() {
                 pathname={location.pathname}
                 onNavigate={handleNavigate}
                 onSignOut={() => void handleSignOut()}
+                signOutLoading={signOutLoading}
               />
             </div>
             <button
