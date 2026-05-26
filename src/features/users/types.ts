@@ -6,14 +6,16 @@ export type User = {
   first_name: string
   last_name: string
   middle_name: string | null
+  contact_number: string | null
   full_name: string
   email: string
   role: UserRole
+  roles: string[]
   status: UserStatus
   is_active: boolean
   last_login_at: string | null
-  created_at: string
-  updated_at: string
+  created_at: string | null
+  updated_at: string | null
   deleted_at: string | null
 }
 
@@ -43,26 +45,35 @@ export type PaginatedResponse<T> = {
 export type UserListQuery = {
   page?: number
   per_page?: number
+  search?: string
+  role?: 'admin' | 'user' | ''
+  status?: UserStatus | ''
+  sort?: 'lastName' | 'firstName' | 'email' | 'createdAt' | 'lastLoginAt' | 'active'
+  direction?: 'asc' | 'desc'
 }
 
 export type CreateUserPayload = {
   first_name: string
   last_name: string
   middle_name: string | null
+  contact_number?: string | null
   email: string
   password: string
+  password_confirmation?: string
   role: UserRole
-  status: UserStatus
+  status?: UserStatus
 }
 
 export type UpdateUserPayload = {
   first_name: string
   last_name: string
   middle_name: string | null
+  contact_number?: string | null
   email: string
   password?: string
+  password_confirmation?: string
   role: UserRole
-  status: UserStatus
+  status?: UserStatus
 }
 
 export type UpdateUserStatusPayload = {

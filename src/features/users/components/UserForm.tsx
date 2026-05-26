@@ -1,9 +1,13 @@
+import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import { useMemo, useState, type FormEvent } from 'react'
 import {
   Alert,
   Box,
   Button,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Paper,
@@ -61,6 +65,7 @@ export default function UserForm({
 }: UserFormProps) {
   const [values, setValues] = useState<UserFormValues>(buildInitialValues(initialValues))
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [showPassword, setShowPassword] = useState(false)
 
   const mergedFieldErrors = useMemo<FieldErrors>(() => {
     return {
@@ -202,13 +207,29 @@ export default function UserForm({
           />
           <TextField
             label={mode === 'create' ? 'Password' : 'Password (optional)'}
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             size="small"
             value={values.password}
             onChange={(event) => setValues((current) => ({ ...current, password: event.target.value }))}
             error={Boolean(mergedFieldErrors.password)}
             helperText={mergedFieldErrors.password || (mode === 'edit' ? 'Leave blank to keep current password.' : '')}
             required={mode === 'create'}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword((current) => !current)}
+                    >
+                      {showPassword ? <VisibilityOffRoundedIcon /> : <VisibilityRoundedIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
         </Box>
 
