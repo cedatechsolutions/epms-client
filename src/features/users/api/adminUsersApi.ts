@@ -7,6 +7,7 @@ import type {
   User,
   UserListQuery,
   UserRole,
+  UserStats,
   UserStatus,
 } from '../types'
 
@@ -33,7 +34,7 @@ type BackendManagedUserPayload = {
   lastName: string
   middleName: string
   contactNumber: string
-  role: 'ADMIN' | 'USER'
+  role: string
   status?: 'ACTIVE' | 'INACTIVE'
 }
 
@@ -55,12 +56,9 @@ type BackendPaginatedUsers = {
   links: Record<string, string | null>
 }
 
+// Each user is assigned exactly one domain role; take the first (roles arrive sorted).
 function mapUserRole(roles: string[]): UserRole {
-  if (roles.includes('ROLE_SUPER_ADMIN') || roles.includes('ROLE_ADMIN')) {
-    return 'admin'
-  }
-
-  return 'user'
+  return (roles[0] ?? 'faculty') as UserRole
 }
 
 function mapBackendUser(user: BackendUser): User {
@@ -93,7 +91,7 @@ function toBackendPayload(payload: CreateUserPayload | UpdateUserPayload): Backe
     lastName: payload.last_name.trim(),
     middleName: payload.middle_name?.trim() ?? '',
     contactNumber: payload.contact_number?.trim() ?? '',
-    role: payload.role === 'admin' ? 'ADMIN' : 'USER',
+    role: payload.role,
     ...(payload.status
       ? {
           status: payload.status === 'active' ? 'ACTIVE' : 'INACTIVE',
@@ -108,7 +106,7 @@ export async function listAdminUsers(query: UserListQuery = {}): Promise<Paginat
       page: query.page,
       perPage: query.per_page,
       search: query.search || undefined,
-      role: query.role ? query.role.toUpperCase() : undefined,
+      role: query.role || undefined,
       status: query.status ? query.status.toUpperCase() : undefined,
       sort: query.sort,
       direction: query.direction,
@@ -120,6 +118,10 @@ export async function listAdminUsers(query: UserListQuery = {}): Promise<Paginat
     meta: response.meta,
     links: response.links ?? {},
   }
+}
+
+export async function getUserStats(): Promise<UserStats> {
+  return getRequest<UserStats>(`${USERS_ENDPOINT}/stats`)
 }
 
 export async function printAdminUsersPdf(): Promise<Blob> {

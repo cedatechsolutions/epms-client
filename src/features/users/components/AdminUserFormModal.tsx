@@ -1,6 +1,7 @@
 import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import { useMemo, useState, type FormEvent } from 'react'
+import { ALL_ROLES, ROLE_LABELS } from '@/features/auth/types'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import type { User, UserRole } from '../types'
 import AdminDialog from './AdminDialog'
@@ -39,7 +40,7 @@ const emptyValues: UserModalFormValues = {
   lastName: '',
   contactNumber: '',
   email: '',
-  role: 'user',
+  role: 'faculty',
   password: '',
   confirmPassword: '',
 }
@@ -124,19 +125,16 @@ export default function AdminUserFormModal({
       errors.email = 'Enter a valid email address.'
     }
 
-    if (!['admin', 'user'].includes(values.role)) {
+    if (!(ALL_ROLES as readonly string[]).includes(values.role)) {
       errors.role = 'Select a valid role.'
     }
 
-    if (mode === 'create' && !values.password) {
-      errors.password = 'Password is required.'
-    } else if (values.password && values.password.length < 8) {
+    // Password is optional on create (blank → the system emails a temporary one).
+    if (values.password && values.password.length < 8) {
       errors.password = 'Password must be at least 8 characters.'
     }
 
-    if (mode === 'create' && !values.confirmPassword) {
-      errors.confirmPassword = 'Confirm password is required.'
-    } else if ((values.password || values.confirmPassword) && values.password !== values.confirmPassword) {
+    if ((values.password || values.confirmPassword) && values.password !== values.confirmPassword) {
       errors.confirmPassword = 'Confirm password must match password.'
     }
 
@@ -285,8 +283,11 @@ export default function AdminUserFormModal({
               }
               className="w-full cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              {ALL_ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {ROLE_LABELS[role]}
+                </option>
+              ))}
             </select>
             {mergedErrors.role ? <p className="text-xs text-[#b93838]">{mergedErrors.role}</p> : null}
           </label>
@@ -294,9 +295,7 @@ export default function AdminUserFormModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">
-              {mode === 'create' ? 'Password' : 'Password (optional)'}
-            </span>
+            <span className="font-medium text-[#123524]">Password (optional)</span>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -304,7 +303,7 @@ export default function AdminUserFormModal({
                 disabled={loading}
                 onChange={(event) => setValues((current) => ({ ...current, password: event.target.value }))}
                 className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
-                placeholder={mode === 'create' ? 'Create password' : 'Leave blank to keep current password'}
+                placeholder={mode === 'create' ? 'Leave blank to email a temporary password' : 'Leave blank to keep current password'}
               />
               <button
                 type="button"
@@ -321,7 +320,9 @@ export default function AdminUserFormModal({
               <p className="text-xs text-[#b93838]">{mergedErrors.password}</p>
             ) : (
               <p className="text-xs text-[#73856f]">
-                {mode === 'create' ? 'Use at least 8 characters.' : 'Only fill this in if the password should change.'}
+                {mode === 'create'
+                  ? 'Leave blank to email a temporary password the user must change on first login.'
+                  : 'Only fill this in if the password should change.'}
               </p>
             )}
           </label>

@@ -1,8 +1,9 @@
 import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
-import { useState, type FormEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { isApiError } from '@/shared/api/http'
+import { notify } from '@/shared/toast'
 import RecaptchaWidget from '../components/RecaptchaWidget'
 import { useAuthStore } from '../store/authStore'
 
@@ -24,10 +25,20 @@ export default function LoginPage() {
   const location = useLocation()
   const signIn = useAuthStore((state) => state.signIn)
   const isAuthenticating = useAuthStore((state) => state.isAuthenticating)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const locationNotice =
+    location.state && typeof location.state === 'object' && 'notice' in location.state
+      ? String((location.state as { notice?: unknown }).notice ?? '')
+      : ''
   const [showPassword, setShowPassword] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [recaptchaResetSignal, setRecaptchaResetSignal] = useState(0)
+
+  // Surface any redirect notice (e.g. after a password reset) as a toast, once.
+  useEffect(() => {
+    if (locationNotice) {
+      notify.success(locationNotice)
+    }
+  }, [locationNotice])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -36,27 +47,29 @@ export default function LoginPage() {
     const email = String(formData.get('email') ?? '').trim()
     const password = String(formData.get('password') ?? '')
 
-    setErrorMessage(null)
-
     if (recaptchaEnabled && !recaptchaSiteKey) {
-      setErrorMessage('Sign in verification is temporarily unavailable.')
+      notify.warning('Sign in verification is temporarily unavailable.')
       return
     }
 
     if (recaptchaEnabled && !captchaToken) {
-      setErrorMessage('Complete the reCAPTCHA challenge.')
+      notify.warning('Complete the reCAPTCHA challenge.')
       return
     }
 
     try {
-      await signIn({ email, password, captchaToken })
+      const result = await signIn({ email, password, captchaToken })
+      if (result.mustChangePassword) {
+        navigate('/change-password', { replace: true })
+        return
+      }
       navigate(resolveRedirectPath((location.state as { from?: unknown } | null)?.from), { replace: true })
     } catch (error) {
       if (recaptchaEnabled) {
         setCaptchaToken(null)
         setRecaptchaResetSignal((current) => current + 1)
       }
-      setErrorMessage(isApiError(error) ? error.message : 'Unable to sign in. Please try again.')
+      notify.error(isApiError(error) ? error.message : 'Unable to sign in. Please try again.')
     }
   }
 
@@ -77,12 +90,6 @@ export default function LoginPage() {
           </div>
 
           <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
-            {errorMessage ? (
-              <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
-                {errorMessage}
-              </div>
-            ) : null}
-
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#123524]">
                 Email
@@ -145,11 +152,17 @@ export default function LoginPage() {
             >
               {isAuthenticating ? 'Signing in...' : 'Sign in'}
             </button>
+
+            <p className="text-center text-sm text-[#506552]">
+              <Link to="/forgot-password" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+                Forgot your password?
+              </Link>
+            </p>
           </form>
         </section>
       </div>
 
-      <p className="mt-6 text-center text-sm text-[#8a9989]">CEDA Tech Solutions</p>
+      {/* <p className="mt-6 text-center text-sm text-[#8a9989]">CEDA Tech Solutions</p> */}
     </main>
   )
 }

@@ -2,16 +2,22 @@ import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 import { AdminLayout } from '@/features/admin'
 import {
-  ADMIN_ROLES,
+  ChangePasswordPage,
+  ForgotPasswordPage,
   LoginPage,
   PublicOnlyRoute,
   RequireAuth,
+  RequirePasswordCurrent,
   RequireRole,
+  ResetPasswordPage,
+  USER_MANAGEMENT_ROLES,
   useAuthStore,
 } from '@/features/auth'
+import { ActivityLogPage } from '@/features/activity-logs'
 import { DashboardPage } from '@/features/dashboard'
 import { AdminUsersListPage } from '@/features/users'
 import { registerUnauthorizedHandler } from '@/shared/api/http'
+import { ToastViewport } from '@/shared/toast'
 
 function AppLoader() {
   return (
@@ -46,30 +52,43 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
       <Route element={<PublicOnlyRoute />}>
         <Route path="/login" element={<LoginPage />} />
       </Route>
 
+      {/* Public password-recovery routes (reachable regardless of session). */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
       <Route element={<RequireAuth />}>
         <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<DashboardPage />} />
+        {/* Reachable even while a forced password change is pending. */}
+        <Route path="/change-password" element={<ChangePasswordPage />} />
 
-          <Route element={<RequireRole allowedRoles={ADMIN_ROLES} />}>
-            <Route path="users" element={<AdminUsersListPage />} />
-            <Route path="users/new" element={<Navigate to="/admin/users" replace />} />
-            <Route path="users/:id" element={<Navigate to="/admin/users" replace />} />
-            <Route path="users/:id/edit" element={<Navigate to="/admin/users" replace />} />
+        <Route element={<RequirePasswordCurrent />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+
+            <Route element={<RequireRole allowedRoles={USER_MANAGEMENT_ROLES} />}>
+              <Route path="users" element={<AdminUsersListPage />} />
+              <Route path="users/new" element={<Navigate to="/admin/users" replace />} />
+              <Route path="users/:id" element={<Navigate to="/admin/users" replace />} />
+              <Route path="users/:id/edit" element={<Navigate to="/admin/users" replace />} />
+              <Route path="activity-logs" element={<ActivityLogPage />} />
+            </Route>
           </Route>
         </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-    </Routes>
+      </Routes>
+      <ToastViewport />
+    </>
   )
 }

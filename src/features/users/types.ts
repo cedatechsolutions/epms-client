@@ -1,4 +1,10 @@
-export type UserRole = 'admin' | 'user'
+export type UserRole =
+  | 'admin'
+  | 'campus_admin'
+  | 'campus_extension_coordinator'
+  | 'extension_coordinator'
+  | 'faculty'
+  | 'student_volunteer'
 export type UserStatus = 'active' | 'inactive'
 
 export type User = {
@@ -46,9 +52,9 @@ export type UserListQuery = {
   page?: number
   per_page?: number
   search?: string
-  role?: 'admin' | 'user' | ''
+  role?: UserRole | ''
   status?: UserStatus | ''
-  sort?: 'lastName' | 'firstName' | 'email' | 'createdAt' | 'lastLoginAt' | 'active'
+  sort?: 'lastName' | 'firstName' | 'middleName' | 'email' | 'contactNumber' | 'createdAt' | 'lastLoginAt' | 'active'
   direction?: 'asc' | 'desc'
 }
 
@@ -85,12 +91,8 @@ export type ResetPasswordPayload = {
   password_confirmation: string
 }
 
-export type UserFormValues = {
-  first_name: string
-  last_name: string
-  middle_name: string
-  email: string
-  password: string
-  role: UserRole
-  status: UserStatus
+export type UserStats = {
+  total: number
+  active: number
+  inactive: number
 }

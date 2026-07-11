@@ -23,6 +23,21 @@ export function RequireAuth() {
   return <Outlet />
 }
 
+/**
+ * Blocks the app until a user flagged {@code mustChangePassword} sets a new password.
+ * Wrap the authenticated app (not the change-password page itself) with this.
+ */
+export function RequirePasswordCurrent() {
+  const user = useAuthStore((state) => state.user)
+  const mustChangePassword = useAuthStore((state) => state.mustChangePassword)
+
+  if (user && mustChangePassword) {
+    return <Navigate to="/change-password" replace />
+  }
+
+  return <Outlet />
+}
+
 type RequireRoleProps = {
   allowedRoles: readonly string[]
   fallbackPath?: string

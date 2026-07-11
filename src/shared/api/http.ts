@@ -1,24 +1,40 @@
 import axios from 'axios'
 import { AxiosHeaders } from 'axios'
-import type { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { clearStoredAccessToken, getStoredAccessToken } from '@/features/auth/lib/tokenStorage'
+import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import {
+  clearStoredTokens,
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  setStoredTokens,
+} from '@/features/auth/lib/tokenStorage'
 
 export type ApiValidationErrors = Record<string, string[]>
 
 export type ApiErrorPayload = {
+  code?: string
   message?: string
-  errors?: ApiValidationErrors
+  fields?: ApiValidationErrors
 }
 
 export class ApiError extends Error {
   status: number
+  code: string | null
+  fields: ApiValidationErrors | null
   data: ApiErrorPayload | null
 
-  constructor(message: string, status: number, data: ApiErrorPayload | null = null) {
+  constructor(
+    message: string,
+    status: number,
+    data: ApiErrorPayload | null = null,
+    code: string | null = null,
+    fields: ApiValidationErrors | null = null,
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.data = data
+    this.code = code
+    this.fields = fields
   }
 }
 
@@ -37,36 +53,6 @@ export const apiClient = axios.create({
 
 let unauthorizedHandler: (() => void) | null = null
 
-apiClient.interceptors.request.use((config) => {
-  const accessToken = getStoredAccessToken()
-
-  if (!accessToken) {
-    return config
-  }
-
-  if (config.headers && typeof config.headers.set === 'function') {
-    config.headers.set('Authorization', `Bearer ${accessToken}`)
-    return config
-  }
-
-  config.headers = AxiosHeaders.from(config.headers)
-  config.headers.set('Authorization', `Bearer ${accessToken}`)
-
-  return config
-})
-
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      clearStoredAccessToken()
-      unauthorizedHandler?.()
-    }
-
-    return Promise.reject(error)
-  },
-)
-
 export function registerUnauthorizedHandler(handler: (() => void) | null) {
   unauthorizedHandler = handler
 
@@ -77,14 +63,110 @@ export function registerUnauthorizedHandler(handler: (() => void) | null) {
   }
 }
 
+function applyAuthorizationHeader(config: InternalAxiosRequestConfig, accessToken: string) {
+  if (config.headers && typeof config.headers.set === 'function') {
+    config.headers.set('Authorization', `Bearer ${accessToken}`)
+    return config
+  }
+
+  config.headers = AxiosHeaders.from(config.headers)
+  config.headers.set('Authorization', `Bearer ${accessToken}`)
+  return config
+}
+
+apiClient.interceptors.request.use((config) => {
+  const accessToken = getStoredAccessToken()
+  if (!accessToken) {
+    return config
+  }
+  return applyAuthorizationHeader(config, accessToken)
+})
+
+// --- Rotating-refresh handling -------------------------------------------------
+// The access token is short-lived (15 min). On a 401 we attempt a single refresh
+// (deduped across concurrent requests), then retry the original request once.
+
+type RetriableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean }
+
+let refreshPromise: Promise<string | null> | null = null
+
+function isAuthEndpoint(url: string | undefined): boolean {
+  return Boolean(url && url.includes('/auth/'))
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getStoredRefreshToken()
+  if (!refreshToken) {
+    return null
+  }
+
+  try {
+    // Bare axios call so this request does not recurse through the interceptors.
+    const response = await axios.post<{ accessToken: string; refreshToken: string }>(
+      `${API_BASE_URL}/auth/refresh`,
+      { refreshToken },
+      { headers: { Accept: 'application/json' } },
+    )
+    setStoredTokens(response.data.accessToken, response.data.refreshToken)
+    return response.data.accessToken
+  } catch {
+    clearStoredTokens()
+    return null
+  }
+}
+
+function requestRefresh(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null
+    })
+  }
+  return refreshPromise
+}
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+      return Promise.reject(error)
+    }
+
+    const originalRequest = error.config as RetriableRequestConfig | undefined
+
+    // Do not try to refresh for auth calls (login/refresh/reset) or after one attempt.
+    if (!originalRequest || originalRequest._retry || isAuthEndpoint(originalRequest.url)) {
+      clearStoredTokens()
+      unauthorizedHandler?.()
+      return Promise.reject(error)
+    }
+
+    const newAccessToken = await requestRefresh()
+    if (!newAccessToken) {
+      clearStoredTokens()
+      unauthorizedHandler?.()
+      return Promise.reject(error)
+    }
+
+    originalRequest._retry = true
+    applyAuthorizationHeader(originalRequest, newAccessToken)
+    return apiClient(originalRequest)
+  },
+)
+
 type ApiRequestConfig<TData = unknown> = Omit<AxiosRequestConfig<TData>, 'baseURL' | 'url' | 'method'>
 
 function normalizeApiError(error: unknown): ApiError {
-  if (axios.isAxiosError<ApiErrorPayload>(error)) {
+  if (axios.isAxiosError<unknown>(error)) {
     const status = error.response?.status ?? 500
-    const data = error.response?.data ?? null
-    const message = data?.message ?? error.message ?? 'Request failed'
-    return new ApiError(message, status, data)
+    const body = error.response?.data as { error?: ApiErrorPayload } & ApiErrorPayload | undefined
+
+    // New envelope: {error:{code,message,fields}}. Fall back to legacy {message,errors}.
+    const envelope = body?.error ?? body
+    const code = envelope?.code ?? null
+    const fields = envelope?.fields ?? (body as { errors?: ApiValidationErrors } | undefined)?.errors ?? null
+    const message = envelope?.message ?? error.message ?? 'Request failed'
+
+    return new ApiError(message, status, envelope ?? null, code, fields)
   }
 
   if (error instanceof Error) {

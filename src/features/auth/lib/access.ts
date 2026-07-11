@@ -1,4 +1,4 @@
-import { ROLE_ADMIN, ROLE_SUPER_ADMIN, type AuthUser } from '../types'
+import { ROLE_LABELS, type AuthUser } from '../types'
 
 export function hasAnyRole(user: AuthUser | null | undefined, roles: readonly string[]): boolean {
   if (!user) {
@@ -36,17 +36,10 @@ export function getUserInitials(user: AuthUser | null | undefined): string {
 }
 
 export function getPrimaryRoleLabel(user: AuthUser | null | undefined): string {
-  if (!user) {
+  if (!user || user.roles.length === 0) {
     return 'Authenticated user'
   }
 
-  if (user.roles.includes(ROLE_SUPER_ADMIN)) {
-    return 'Super Admin'
-  }
-
-  if (user.roles.includes(ROLE_ADMIN)) {
-    return 'Admin'
-  }
-
-  return 'User'
+  const [primaryRole] = [...user.roles].sort()
+  return ROLE_LABELS[primaryRole] ?? primaryRole
 }

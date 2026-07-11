@@ -6,12 +6,13 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import { getPrimaryRoleLabel, getUserDisplayName, getUserInitials, hasAnyRole } from '@/features/auth/lib/access'
 import { useAuthStore } from '@/features/auth/store/authStore'
-import { ADMIN_ROLES } from '@/features/auth/types'
+import { USER_MANAGEMENT_ROLES } from '@/features/auth/types'
 
 type NavItem = {
   id: string
@@ -44,6 +45,13 @@ function getNavigationItems(canAccessUserManagement: boolean): NavItem[] {
       to: '/admin/users',
       Icon: GroupOutlinedIcon,
       matches: (currentPathname) => currentPathname.startsWith('/admin/users'),
+    })
+    items.push({
+      id: 'activity-logs',
+      label: 'Activity Log',
+      to: '/admin/activity-logs',
+      Icon: HistoryOutlinedIcon,
+      matches: (currentPathname) => currentPathname.startsWith('/admin/activity-logs'),
     })
   }
 
@@ -81,6 +89,11 @@ function getSectionCopy(pathname: string): SectionCopy {
   if (pathname.startsWith('/admin/users')) {
     return {
       eyebrow: 'Administration / User Management',
+    }
+  }
+  if (pathname.startsWith('/admin/activity-logs')) {
+    return {
+      eyebrow: 'Administration / Activity Log',
     }
   }
   return {
@@ -203,7 +216,7 @@ export default function AdminLayout() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [signOutLoading, setSignOutLoading] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
-  const canAccessUserManagement = hasAnyRole(user, ADMIN_ROLES)
+  const canAccessUserManagement = hasAnyRole(user, USER_MANAGEMENT_ROLES)
   const displayName = getUserDisplayName(user)
   const primaryRoleLabel = getPrimaryRoleLabel(user)
   const initials = getUserInitials(user)
@@ -316,7 +329,7 @@ export default function AdminLayout() {
                   </button>
 
                   {profileMenuOpen ? (
-                    <div className="absolute right-0 top-[calc(100%+8px)] z-20 min-w-[220px] border border-[#d8e1d4] bg-white p-2 shadow-[0_12px_30px_rgba(18,53,36,0.08)]">
+                    <div className="animate-pop-in absolute right-0 top-[calc(100%+8px)] z-20 min-w-[220px] border border-[#d8e1d4] bg-white p-2 shadow-[0_12px_30px_rgba(18,53,36,0.08)]">
                       <div className="border-b border-[#eef2eb] px-3 py-3">
                         <p className="text-sm font-medium text-[#123524]">{displayName}</p>
                         <p className="mt-1 text-xs text-[#6a7f6d]">{user?.email}</p>
@@ -362,9 +375,9 @@ export default function AdminLayout() {
       </div>
 
       {mobileOpen ? (
-        <div className="fixed inset-0 z-50 bg-[#123524]/20 md:hidden">
+        <div className="animate-fade-in fixed inset-0 z-50 bg-[#123524]/20 md:hidden">
           <div className="flex h-full">
-            <div className="w-[280px] border-r border-[#d8e1d4] bg-white shadow-xl">
+            <div className="animate-slide-in-right w-[280px] border-r border-[#d8e1d4] bg-white shadow-xl">
               <Sidebar
                 navigationItems={navigationItems}
                 pathname={location.pathname}

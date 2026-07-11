@@ -7,12 +7,15 @@ import PrintRoundedIcon from '@mui/icons-material/PrintRounded'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { hasAnyRole } from '@/features/auth/lib/access'
 import { useAuthStore } from '@/features/auth/store/authStore'
-import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/features/auth/types'
+import { ALL_ROLES, ROLE_LABELS, USER_MANAGEMENT_ROLES } from '@/features/auth/types'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import { isApiError } from '@/shared/api/http'
+import { notify } from '@/shared/toast'
+import { DataTable, type DataTableColumn } from '@/shared/table'
 import {
   createAdminUser,
   deleteAdminUser,
+  getUserStats,
   listAdminUsers,
   patchAdminUserStatus,
   printAdminUsersPdf,
@@ -20,6 +23,7 @@ import {
   updateAdminUser,
 } from '../api/adminUsersApi'
 import type { UserModalFormMode, UserModalFormValues } from '../components/AdminUserFormModal'
+import AdminDialog from '../components/AdminDialog'
 import AdminUserFormModal from '../components/AdminUserFormModal'
 import DeleteUserModal from '../components/DeleteUserModal'
 import ResetPasswordModal from '../components/ResetPasswordModal'
@@ -27,7 +31,7 @@ import StatusToggleConfirmModal from '../components/StatusToggleConfirmModal'
 import UserPrintPreviewModal from '../components/UserPrintPreviewModal'
 import { getUserRequestErrorMessage } from '../lib/errorMessages'
 import { formatDateTime } from '../lib/formatters'
-import type { PaginationMeta, ResetPasswordPayload, User, UserListQuery, UserRole, UserStatus } from '../types'
+import type { PaginationMeta, ResetPasswordPayload, User, UserListQuery, UserRole, UserStatus, UserStats } from '../types'
 
 const defaultMeta: PaginationMeta = {
   current_page: 1,
@@ -41,11 +45,6 @@ const defaultMeta: PaginationMeta = {
 
 type PaginationItem = number | 'ellipsis'
 
-type ToastState = {
-  message: string
-  tone: 'success' | 'error'
-}
-
 const actionButtonClassName =
   'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45'
 
@@ -58,22 +57,17 @@ const inputClassName =
 const selectClassName =
   'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
 
-const skeletonRows = Array.from({ length: 5 }, (_, index) => index)
-
 function getDisplayName(user: User): string {
   return user.full_name || [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ')
 }
 
 function formatRole(user: User): string {
-  if (user.roles.includes('ROLE_SUPER_ADMIN')) {
-    return 'Super Admin'
-  }
-
-  return user.role.charAt(0).toUpperCase() + user.role.slice(1)
+  return ROLE_LABELS[user.role] ?? user.role
 }
 
-function isProtectedUser(user: User): boolean {
-  return user.roles.includes('ROLE_SUPER_ADMIN')
+// Guard the signed-in admin's own row to prevent self lock-out (deactivate/delete/edit-role of self).
+function isProtectedUser(user: User, currentUserId: string | undefined): boolean {
+  return Boolean(currentUserId) && user.id === currentUserId
 }
 
 function ButtonSpinner({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
@@ -116,9 +110,10 @@ function getPaginationItems(currentPage: number, lastPage: number): PaginationIt
 
 export default function AdminUsersListPage() {
   const currentUser = useAuthStore((state) => state.user)
-  const canManageUsers = hasAnyRole(currentUser, SUPER_ADMIN_ROLES)
-  const canPrintUsers = hasAnyRole(currentUser, ADMIN_ROLES)
+  const canManageUsers = hasAnyRole(currentUser, USER_MANAGEMENT_ROLES)
+  const canPrintUsers = canManageUsers
   const [users, setUsers] = useState<User[]>([])
+  const [stats, setStats] = useState<UserStats | null>(null)
   const [meta, setMeta] = useState<PaginationMeta>(defaultMeta)
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(defaultMeta.per_page)
@@ -130,7 +125,9 @@ export default function AdminUsersListPage() {
   const [direction, setDirection] = useState<NonNullable<UserListQuery['direction']>>('asc')
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [toast, setToast] = useState<ToastState | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false)
 
   const [formOpen, setFormOpen] = useState(false)
   const [formMode, setFormMode] = useState<UserModalFormMode>('create')
@@ -155,6 +152,7 @@ export default function AdminUsersListPage() {
   const loadUsers = useCallback(async () => {
     setLoading(true)
     setErrorMessage(null)
+    setSelectedIds([])
 
     try {
       const response = await listAdminUsers({
@@ -169,6 +167,12 @@ export default function AdminUsersListPage() {
       setUsers(response.data)
       setMeta(response.meta)
       setPage(response.meta.current_page)
+      // Refresh summary counts alongside the list; failures here must not break the table.
+      try {
+        setStats(await getUserStats())
+      } catch {
+        setStats(null)
+      }
     } catch (error) {
       setErrorMessage(getUserRequestErrorMessage(error))
     } finally {
@@ -180,13 +184,6 @@ export default function AdminUsersListPage() {
     void loadUsers()
   }, [loadUsers])
 
-  useEffect(() => {
-    if (!toast) return undefined
-
-    const timeoutId = window.setTimeout(() => setToast(null), 3500)
-    return () => window.clearTimeout(timeoutId)
-  }, [toast])
-
   const usersCountLabel = useMemo(() => {
     if (!meta.total) return 'No user records available'
 
@@ -195,7 +192,10 @@ export default function AdminUsersListPage() {
     return `Showing ${from}-${to} of ${meta.total} user records`
   }, [meta.from, meta.to, meta.total])
 
-  const paginationItems = useMemo(() => getPaginationItems(meta.current_page, meta.last_page), [meta.current_page, meta.last_page])
+  const paginationItems = useMemo(
+    () => getPaginationItems(meta.current_page, meta.last_page),
+    [meta.current_page, meta.last_page],
+  )
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -205,6 +205,17 @@ export default function AdminUsersListPage() {
 
     return () => window.clearTimeout(timeoutId)
   }, [searchInput])
+
+  // Clicking a sortable header toggles direction on the active column, else sorts ascending.
+  const handleSortChange = (nextSort: string) => {
+    if (sort === nextSort) {
+      setDirection((current) => (current === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSort(nextSort as NonNullable<UserListQuery['sort']>)
+      setDirection('asc')
+    }
+    setPage(1)
+  }
 
   const openCreateModal = () => {
     if (!canManageUsers) return
@@ -234,7 +245,7 @@ export default function AdminUsersListPage() {
   }
 
   const openEditModal = (user: User) => {
-    if (!canManageUsers || isProtectedUser(user)) return
+    if (!canManageUsers || isProtectedUser(user, currentUser?.id)) return
 
     setFormMode('edit')
     setActiveUser(user)
@@ -284,10 +295,7 @@ export default function AdminUsersListPage() {
       }
 
       closeFormModal()
-      setToast({
-        message: formMode === 'create' ? 'User created successfully.' : 'User updated successfully.',
-        tone: 'success',
-      })
+      notify.success(formMode === 'create' ? 'User created successfully.' : 'User updated successfully.')
 
       if (formMode === 'create' && page !== 1) {
         setPage(1)
@@ -296,7 +304,7 @@ export default function AdminUsersListPage() {
       }
     } catch (error) {
       if (isApiError(error) && (error.status === 400 || error.status === 422)) {
-        setFormApiErrors(error.data?.errors ?? {})
+        setFormApiErrors(error.fields ?? {})
       } else {
         setFormErrorMessage(getUserRequestErrorMessage(error))
       }
@@ -337,10 +345,7 @@ export default function AdminUsersListPage() {
 
       const shouldStepBackOnePage = users.length === 1 && page > 1
       setDeleteTargetUser(null)
-      setToast({
-        message: `User ${getDisplayName(deleteTargetUser)} deleted successfully.`,
-        tone: 'success',
-      })
+      notify.success(`User ${getDisplayName(deleteTargetUser)} deleted successfully.`)
 
       if (shouldStepBackOnePage) {
         setPage((currentPage) => Math.max(1, currentPage - 1))
@@ -348,12 +353,27 @@ export default function AdminUsersListPage() {
         await loadUsers()
       }
     } catch (error) {
-      setToast({
-        message: getUserRequestErrorMessage(error),
-        tone: 'error',
-      })
+      notify.error(getUserRequestErrorMessage(error))
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return
+
+    setBulkDeleteLoading(true)
+    try {
+      await Promise.all(selectedIds.map((id) => deleteAdminUser(id)))
+      const count = selectedIds.length
+      setBulkDeleteOpen(false)
+      setSelectedIds([])
+      notify.success(`${count} user${count === 1 ? '' : 's'} deleted successfully.`)
+      await loadUsers()
+    } catch (error) {
+      notify.error(getUserRequestErrorMessage(error))
+    } finally {
+      setBulkDeleteLoading(false)
     }
   }
 
@@ -367,15 +387,11 @@ export default function AdminUsersListPage() {
       const updatedUser = await patchAdminUserStatus(statusTargetUser.id, nextStatus)
       setStatusTargetUser(null)
       await loadUsers()
-      setToast({
-        message: `User ${getDisplayName(updatedUser)} ${nextStatus === 'active' ? 'activated' : 'deactivated'} successfully.`,
-        tone: 'success',
-      })
+      notify.success(
+        `User ${getDisplayName(updatedUser)} ${nextStatus === 'active' ? 'activated' : 'deactivated'} successfully.`,
+      )
     } catch (error) {
-      setToast({
-        message: getUserRequestErrorMessage(error),
-        tone: 'error',
-      })
+      notify.error(getUserRequestErrorMessage(error))
     } finally {
       setStatusLoading(false)
     }
@@ -394,13 +410,10 @@ export default function AdminUsersListPage() {
       setResetTargetUser(null)
       setResetErrorMessage(null)
       setResetApiErrors(undefined)
-      setToast({
-        message: `Password reset successfully for ${getDisplayName(targetUser)}.`,
-        tone: 'success',
-      })
+      notify.success(`Password reset successfully for ${getDisplayName(targetUser)}.`)
     } catch (error) {
       if (isApiError(error) && (error.status === 400 || error.status === 422)) {
-        setResetApiErrors(error.data?.errors ?? {})
+        setResetApiErrors(error.fields ?? {})
       } else {
         setResetErrorMessage(getUserRequestErrorMessage(error))
       }
@@ -408,6 +421,121 @@ export default function AdminUsersListPage() {
       setResetLoading(false)
     }
   }
+
+  const rowActionsBusy = statusLoading || deleteLoading || resetLoading
+
+  const renderRowActions = (user: User) => {
+    if (!canManageUsers) {
+      return (
+        <div className="flex justify-end">
+          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+            Read only
+          </span>
+        </div>
+      )
+    }
+
+    if (isProtectedUser(user, currentUser?.id)) {
+      return (
+        <div className="flex justify-end">
+          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+            Your account
+          </span>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          aria-label={`${user.status === 'active' ? 'Deactivate' : 'Activate'} ${getDisplayName(user)}`}
+          title={user.status === 'active' ? 'Deactivate' : 'Activate'}
+          disabled={rowActionsBusy}
+          onClick={() => setStatusTargetUser(user)}
+          className={actionButtonClassName}
+        >
+          {user.status === 'active' ? (
+            <BlockOutlinedIcon fontSize="small" />
+          ) : (
+            <CheckCircleOutlineRoundedIcon fontSize="small" />
+          )}
+        </button>
+        <button
+          type="button"
+          aria-label={`Edit ${getDisplayName(user)}`}
+          title="Edit"
+          disabled={rowActionsBusy}
+          onClick={() => openEditModal(user)}
+          className={actionButtonClassName}
+        >
+          <EditOutlinedIcon fontSize="small" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Reset password for ${getDisplayName(user)}`}
+          title="Reset password"
+          disabled={rowActionsBusy}
+          onClick={() => {
+            setResetTargetUser(user)
+            setResetErrorMessage(null)
+            setResetApiErrors(undefined)
+          }}
+          className={actionButtonClassName}
+        >
+          <LockResetRoundedIcon fontSize="small" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Delete ${getDisplayName(user)}`}
+          title="Delete"
+          disabled={rowActionsBusy}
+          onClick={() => setDeleteTargetUser(user)}
+          className={destructiveActionButtonClassName}
+        >
+          <DeleteOutlineRoundedIcon fontSize="small" />
+        </button>
+      </div>
+    )
+  }
+
+  const columns: DataTableColumn<User>[] = [
+    { key: 'firstName', header: 'First Name', frozen: true, width: 150, sortKey: 'firstName', cellClassName: 'truncate text-[#123524]', render: (user) => user.first_name },
+    { key: 'middleName', header: 'Middle Name', frozen: true, width: 150, sortKey: 'middleName', cellClassName: 'truncate', render: (user) => user.middle_name || '-' },
+    { key: 'lastName', header: 'Last Name', frozen: true, width: 160, sortKey: 'lastName', cellClassName: 'truncate text-[#123524]', render: (user) => user.last_name },
+    { key: 'email', header: 'Email', width: 230, sortKey: 'email', cellClassName: 'text-[#123524]', render: (user) => user.email },
+    { key: 'contactNumber', header: 'Contact Number', width: 160, sortKey: 'contactNumber', render: (user) => user.contact_number || '-' },
+    {
+      key: 'role',
+      header: 'Role',
+      width: 180,
+      render: (user) => (
+        <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]">
+          {formatRole(user)}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      width: 120,
+      sortKey: 'active',
+      render: (user) => (
+        <span
+          className={[
+            'inline-flex border px-2.5 py-1 text-xs font-medium',
+            user.status === 'active'
+              ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
+              : 'border-[#d8e1d4] bg-[#f7faf6] text-[#617462]',
+          ].join(' ')}
+        >
+          {user.status === 'active' ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    { key: 'createdAt', header: 'Date Created', width: 180, sortKey: 'createdAt', cellClassName: 'whitespace-nowrap', render: (user) => formatDateTime(user.created_at) },
+    { key: 'actions', header: 'Actions', align: 'right', width: 220, render: renderRowActions },
+  ]
 
   return (
     <div className="space-y-6">
@@ -420,7 +548,7 @@ export default function AdminUsersListPage() {
           </p>
           {!canManageUsers ? (
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#7b6542]">
-              Your account has read-only access here. Only super administrators can create, edit, or delete users.
+              Your account has read-only access here. Only administrators can create, edit, or delete users.
             </p>
           ) : null}
         </div>
@@ -452,6 +580,25 @@ export default function AdminUsersListPage() {
         ) : null}
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-3">
+        {(
+          [
+            { label: 'Total users', value: stats?.total },
+            { label: 'Active', value: stats?.active },
+            { label: 'Inactive', value: stats?.inactive },
+          ] as const
+        ).map((card) => (
+          <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
+            {card.value === undefined ? (
+              <span className="mt-2 block h-8 w-16 animate-pulse bg-[#edf3ea]" />
+            ) : (
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524]">{card.value}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
       <section className="border border-[#d8e1d4] bg-white">
         <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -463,7 +610,7 @@ export default function AdminUsersListPage() {
           <p className="text-sm text-[#617462]">{usersCountLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(5,minmax(130px,auto))] md:items-end">
+        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(130px,auto))] md:items-end">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Search</span>
             <input
@@ -488,8 +635,11 @@ export default function AdminUsersListPage() {
               className={selectClassName}
             >
               <option value="">All roles</option>
-              <option value="admin">Admins</option>
-              <option value="user">Users</option>
+              {ALL_ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {ROLE_LABELS[role]}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -511,42 +661,6 @@ export default function AdminUsersListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Sort</span>
-            <select
-              value={sort}
-              disabled={loading}
-              onChange={(event) => {
-                setSort(event.target.value as NonNullable<UserListQuery['sort']>)
-                setPage(1)
-              }}
-              className={selectClassName}
-            >
-              <option value="lastName">Last name</option>
-              <option value="firstName">First name</option>
-              <option value="email">Email</option>
-              <option value="createdAt">Created date</option>
-              <option value="lastLoginAt">Last login</option>
-              <option value="active">Status</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Order</span>
-            <select
-              value={direction}
-              disabled={loading}
-              onChange={(event) => {
-                setDirection(event.target.value as NonNullable<UserListQuery['direction']>)
-                setPage(1)
-              }}
-              className={selectClassName}
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Rows</span>
             <select
               value={perPage}
@@ -564,43 +678,7 @@ export default function AdminUsersListPage() {
           </label>
         </div>
 
-        {loading ? (
-          <div aria-busy="true" aria-live="polite">
-            <div className="flex items-center gap-3 border-b border-[#e7eee3] px-5 py-3 text-sm text-[#617462]">
-              <ButtonSpinner tone="dark" />
-              Loading user records...
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-[1080px] table-auto border-collapse">
-                <thead>
-                  <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
-                    <th className="px-5 py-3">ID</th>
-                    <th className="px-5 py-3">Email</th>
-                    <th className="px-5 py-3">First Name</th>
-                    <th className="px-5 py-3">Middle Name</th>
-                    <th className="px-5 py-3">Last Name</th>
-                    <th className="px-5 py-3">Contact Number</th>
-                    <th className="px-5 py-3">Role</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3">Date Created</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {skeletonRows.map((row) => (
-                    <tr key={row} className="border-b border-[#eef2eb] last:border-b-0">
-                      {Array.from({ length: 10 }, (_, cell) => (
-                        <td key={cell} className="px-5 py-4">
-                          <span className="block h-4 w-full max-w-[150px] animate-pulse bg-[#edf3ea]" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : errorMessage ? (
+        {errorMessage ? (
           <div className="space-y-4 px-5 py-6">
             <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
             <button
@@ -613,181 +691,91 @@ export default function AdminUsersListPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-[1080px] table-auto border-collapse">
-                <thead>
-                  <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
-                    <th className="px-5 py-3">ID</th>
-                    <th className="px-5 py-3">Email</th>
-                    <th className="px-5 py-3">First Name</th>
-                    <th className="px-5 py-3">Middle Name</th>
-                    <th className="px-5 py-3">Last Name</th>
-                    <th className="px-5 py-3">Contact Number</th>
-                    <th className="px-5 py-3">Role</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3">Date Created</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.length === 0 ? (
-                    <tr>
-                      <td colSpan={10} className="px-5 py-12 text-center text-sm text-[#617462]">
-                        No user records found.
-                      </td>
-                    </tr>
-                  ) : (
-                    users.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="border-b border-[#eef2eb] text-sm text-[#445846] last:border-b-0 hover:bg-[#fbfdf9]"
+            <DataTable
+              columns={columns}
+              rows={users}
+              rowKey={(user) => user.id}
+              loading={loading}
+              loadingLabel="Loading user records..."
+              emptyMessage="No user records found."
+              minWidthClassName="min-w-[1120px]"
+              selectable={canManageUsers}
+              selectedIds={selectedIds}
+              onSelectionChange={setSelectedIds}
+              isRowSelectable={(user) => canManageUsers && !isProtectedUser(user, currentUser?.id)}
+              sortKey={sort}
+              sortDirection={direction}
+              onSortChange={handleSortChange}
+              bulkActions={(ids) => (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setBulkDeleteOpen(true)}
+                    className="inline-flex cursor-pointer items-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#832424]"
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                    Delete selected ({ids.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds([])}
+                    className="cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                  >
+                    Clear
+                  </button>
+                </>
+              )}
+            />
+
+            {meta.total > 0 ? (
+              <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <p className="text-sm text-[#617462]">
+                  Page {meta.current_page} of {meta.last_page}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={meta.current_page <= 1}
+                    onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    Previous
+                  </button>
+
+                  {paginationItems.map((item, index) =>
+                    item === 'ellipsis' ? (
+                      <span key={`ellipsis-${index}`} className="px-1 text-sm text-[#7e8d7a]">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setPage(item)}
+                        className={[
+                          'min-w-10 border px-3 py-2 text-sm font-medium transition-colors',
+                          item === meta.current_page
+                            ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
+                            : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
+                        ].join(' ')}
                       >
-                        <td className="px-5 py-4 font-mono text-xs text-[#5d705e]">{user.id}</td>
-                        <td className="px-5 py-4 text-[#123524]">{user.email}</td>
-                        <td className="px-5 py-4">{user.first_name}</td>
-                        <td className="px-5 py-4">{user.middle_name || '-'}</td>
-                        <td className="px-5 py-4">{user.last_name}</td>
-                        <td className="px-5 py-4">{user.contact_number || '-'}</td>
-                        <td className="px-5 py-4">
-                          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]">
-                            {formatRole(user)}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4">
-                          <span
-                            className={[
-                              'inline-flex border px-2.5 py-1 text-xs font-medium',
-                              user.status === 'active'
-                                ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
-                                : 'border-[#d8e1d4] bg-[#f7faf6] text-[#617462]',
-                            ].join(' ')}
-                          >
-                            {user.status === 'active' ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap">{formatDateTime(user.created_at)}</td>
-                        <td className="px-5 py-4">
-                          {canManageUsers ? (
-                            isProtectedUser(user) ? (
-                              <div className="flex justify-end">
-                                <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
-                                  Protected
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="flex justify-end gap-2">
-                                <button
-                                  type="button"
-                                  aria-label={`${user.status === 'active' ? 'Deactivate' : 'Activate'} ${getDisplayName(user)}`}
-                                  title={user.status === 'active' ? 'Deactivate' : 'Activate'}
-                                  disabled={statusLoading || deleteLoading || resetLoading}
-                                  onClick={() => setStatusTargetUser(user)}
-                                  className={actionButtonClassName}
-                                >
-                                  {user.status === 'active' ? (
-                                    <BlockOutlinedIcon fontSize="small" />
-                                  ) : (
-                                    <CheckCircleOutlineRoundedIcon fontSize="small" />
-                                  )}
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-label={`Edit ${getDisplayName(user)}`}
-                                  title="Edit"
-                                  disabled={statusLoading || deleteLoading || resetLoading}
-                                  onClick={() => openEditModal(user)}
-                                  className={actionButtonClassName}
-                                >
-                                  <EditOutlinedIcon fontSize="small" />
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-label={`Reset password for ${getDisplayName(user)}`}
-                                  title="Reset password"
-                                  disabled={statusLoading || deleteLoading || resetLoading}
-                                  onClick={() => {
-                                    setResetTargetUser(user)
-                                    setResetErrorMessage(null)
-                                    setResetApiErrors(undefined)
-                                  }}
-                                  className={actionButtonClassName}
-                                >
-                                  <LockResetRoundedIcon fontSize="small" />
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-label={`Delete ${getDisplayName(user)}`}
-                                  title="Delete"
-                                  disabled={statusLoading || deleteLoading || resetLoading}
-                                  onClick={() => setDeleteTargetUser(user)}
-                                  className={destructiveActionButtonClassName}
-                                >
-                                  <DeleteOutlineRoundedIcon fontSize="small" />
-                                </button>
-                              </div>
-                            )
-                          ) : (
-                            <div className="flex justify-end">
-                              <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
-                                Read only
-                              </span>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))
+                        {item}
+                      </button>
+                    ),
                   )}
-                </tbody>
-              </table>
-            </div>
 
-            <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-              <p className="text-sm text-[#617462]">
-                Page {meta.current_page} of {meta.last_page}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  disabled={meta.current_page <= 1}
-                  onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  Previous
-                </button>
-
-                {paginationItems.map((item, index) =>
-                  item === 'ellipsis' ? (
-                    <span key={`ellipsis-${index}`} className="px-1 text-sm text-[#7e8d7a]">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setPage(item)}
-                      className={[
-                        'min-w-10 border px-3 py-2 text-sm font-medium transition-colors',
-                        item === meta.current_page
-                          ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
-                          : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
-                      ].join(' ')}
-                    >
-                      {item}
-                    </button>
-                  ),
-                )}
-
-                <button
-                  type="button"
-                  disabled={meta.current_page >= meta.last_page}
-                  onClick={() => setPage((currentPage) => Math.min(meta.last_page, currentPage + 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  Next
-                </button>
+                  <button
+                    type="button"
+                    disabled={meta.current_page >= meta.last_page}
+                    onClick={() => setPage((currentPage) => Math.min(meta.last_page, currentPage + 1))}
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : null}
           </>
         )}
       </section>
@@ -811,6 +799,42 @@ export default function AdminUsersListPage() {
         onClose={closeDeleteModal}
         onConfirm={handleDeleteUser}
       />
+
+      <AdminDialog
+        open={bulkDeleteOpen}
+        title="Delete selected users"
+        description={`This will permanently remove ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}.`}
+        maxWidthClassName="max-w-xl"
+        closeDisabled={bulkDeleteLoading}
+        onClose={() => {
+          if (!bulkDeleteLoading) setBulkDeleteOpen(false)
+        }}
+        footer={
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setBulkDeleteOpen(false)}
+              disabled={bulkDeleteLoading}
+              className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleBulkDelete()}
+              disabled={bulkDeleteLoading}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {bulkDeleteLoading ? <ButtonSpinner /> : null}
+              {bulkDeleteLoading ? 'Deleting...' : `Delete ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`}
+            </button>
+          </div>
+        }
+      >
+        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#8a2d2d]">
+          Deleted users are removed from the list but their historical records are preserved. This action cannot be undone.
+        </div>
+      </AdminDialog>
 
       <StatusToggleConfirmModal
         open={Boolean(statusTargetUser)}
@@ -839,21 +863,6 @@ export default function AdminUsersListPage() {
         onClose={closePrintPreview}
         onRetry={handlePrintUsers}
       />
-
-      {toast ? (
-        <div className="fixed bottom-6 right-6 z-40 max-w-sm border border-[#d8e1d4] bg-white shadow-[0_18px_40px_rgba(18,53,36,0.12)]">
-          <div
-            className={[
-              'border-l-4 px-4 py-3 text-sm',
-              toast.tone === 'success'
-                ? 'border-[#1f5d3b] text-[#123524]'
-                : 'border-[#9f2f2f] text-[#8a2d2d]',
-            ].join(' ')}
-          >
-            {toast.message}
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }

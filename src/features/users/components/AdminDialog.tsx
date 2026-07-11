@@ -51,7 +51,7 @@ export default function AdminDialog({
         type="button"
         aria-label="Close dialog"
         tabIndex={-1}
-        className="fixed inset-0 cursor-default bg-[#123524]/45 backdrop-blur-[1px]"
+        className="animate-fade-in fixed inset-0 cursor-default bg-[#123524]/45 backdrop-blur-[1px]"
         disabled={closeDisabled}
         onClick={onClose}
       />
@@ -63,7 +63,7 @@ export default function AdminDialog({
           aria-labelledby={titleId}
           aria-describedby={description ? descriptionId : undefined}
           className={[
-            'my-6 max-h-[calc(100vh-3rem)] w-full overflow-hidden border border-[#d8e1d4] bg-white shadow-[0_28px_80px_rgba(18,53,36,0.18)]',
+            'animate-pop-in my-6 max-h-[calc(100vh-3rem)] w-full overflow-hidden border border-[#d8e1d4] bg-white shadow-[0_28px_80px_rgba(18,53,36,0.18)]',
             maxWidthClassName,
           ].join(' ')}
         >
