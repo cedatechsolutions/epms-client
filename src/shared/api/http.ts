@@ -176,6 +176,45 @@ function normalizeApiError(error: unknown): ApiError {
   return new ApiError('Request failed', 500, null)
 }
 
+/**
+ * Error bodies come back as a Blob when the request asked for one, so the `{error:{...}}` envelope
+ * is unreadable synchronously. Read it back to text first, then normalize as usual — otherwise a
+ * 409 ("Finalize the results before...") would surface as "Request failed with status code 409".
+ */
+async function normalizeBlobApiError(error: unknown): Promise<ApiError> {
+  if (axios.isAxiosError<unknown>(error) && error.response?.data instanceof Blob) {
+    try {
+      const text = await error.response.data.text()
+      error.response.data = JSON.parse(text) as unknown
+    } catch {
+      // Not JSON (or unreadable) — fall through to the generic message.
+    }
+  }
+
+  return normalizeApiError(error)
+}
+
+async function blobRequest<TData = unknown>(
+  method: NonNullable<AxiosRequestConfig<TData>['method']>,
+  path: string,
+  data?: TData,
+  config: ApiRequestConfig<TData> = {},
+): Promise<Blob> {
+  try {
+    const response = await apiClient.request<Blob, AxiosResponse<Blob>, TData>({
+      ...config,
+      url: path,
+      method,
+      data,
+      responseType: 'blob',
+    })
+
+    return response.data
+  } catch (error) {
+    throw await normalizeBlobApiError(error)
+  }
+}
+
 async function request<TResponse, TData = unknown>(
   method: NonNullable<AxiosRequestConfig<TData>['method']>,
   path: string,
@@ -201,10 +240,15 @@ export function getRequest<TResponse>(path: string, config: ApiRequestConfig = {
 }
 
 export function getBlobRequest(path: string, config: ApiRequestConfig = {}): Promise<Blob> {
-  return request<Blob>('GET', path, undefined, {
-    ...config,
-    responseType: 'blob',
-  })
+  return blobRequest('GET', path, undefined, config)
+}
+
+export function postBlobRequest<TData = unknown>(
+  path: string,
+  data?: TData,
+  config: ApiRequestConfig<TData> = {},
+): Promise<Blob> {
+  return blobRequest<TData>('POST', path, data, config)
 }
 
 export function postRequest<TResponse, TData = unknown>(

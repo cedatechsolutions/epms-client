@@ -161,7 +161,18 @@ Conventions: headings use negative tracking; all-caps labels use wide positive t
 
 Centered card on the app background: `max-w-[420px] border border-[#d8e1d4] bg-white p-8 md:p-10 shadow-[0_12px_30px_rgba(18,53,36,0.05)]`, with eyebrow → title → description → form (`mt-4 space-y-5`).
 
-### 5.4 Breakpoints
+### 5.4 Public survey layout (`/s/:token`)
+
+The public needs-assessment form is the one screen served to **unauthenticated respondents on a phone**. It deliberately sits outside the `AdminLayout` shell and outside `RequireAuth`.
+
+- Shell: `min-h-screen bg-[#f4f7f1] px-4 py-8`, single centered column `mx-auto w-full max-w-[640px] space-y-6`. **No sidebar, no header chrome, no profile menu.**
+- A small bordered white card at the top carries the campus eyebrow + "Community Needs Assessment"; every subsequent block (intro, demographic block, each question, privacy notice) is its own `border border-[#d8e1d4] bg-white px-5 py-5` section.
+- **Touch targets are larger than in the admin UI**: body/inputs step up from `text-sm` to `text-base`, inputs use `py-3`, and radio/checkbox choices are full-width bordered rows (`flex items-center gap-3 border border-[#d8e1d4] px-4 py-3 hover:bg-[#f6faf5]`) rather than bare inputs. The primary submit is full-width (`w-full ... py-3`).
+- Rating (1–5) renders as a `grid grid-cols-5 gap-2` of square toggle buttons; the selected value is primary-filled (`border-[#1f5d3b] bg-[#1f5d3b] text-white`), with "1 — Very poor" / "5 — Very good" anchors beneath.
+- Terminal states (closed, not found, already responded, thank-you) render as a single centered `Notice` card with an `@mui/icons-material` icon (`fontSize="large"`), title, and one explanatory paragraph — never a toast, since the respondent has no app shell to return to.
+- Palette, square corners, and Google Sans are unchanged — this is the same design system at a larger touch scale, not a second one.
+
+### 5.5 Breakpoints
 
 Standard Tailwind breakpoints. Conventions: `md` = sidebar/desktop-header threshold; `sm`/`lg`/`xl` for progressive grid/flex expansion; body has `min-width: 320px`. Tables never squeeze — wrap in `overflow-x-auto` with a `min-w-[1080px]` table.
 
@@ -213,6 +224,17 @@ All buttons: square corners, `text-sm font-medium`, `transition-colors`, `cursor
 
 `inline-flex border px-2.5 py-1 text-xs font-medium` — neutral: `border-[#d8e1d4] bg-[#f7faf6] text-[#123524]`; active/success: `border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]`; inactive: neutral border/bg with `text-[#617462]`. Status placeholders in action columns ("Protected", "Read only") use `px-3 py-2`.
 
+**Priority chips** (need-assessment priorities, and any future four-level severity scale) use the same base classes with these tones, ordered by descending visual weight — no new colors, all four values come from §3:
+
+| Priority | Classes |
+|---|---|
+| Critical | `border-[#e3c9c9] bg-[#fff5f5] text-[#8a2d2d]` |
+| High | `border-[#d8e1d4] bg-[#f7faf6] text-[#7b6542]` |
+| Moderate | `border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]` |
+| Low | `border-[#d8e1d4] bg-[#f7faf6] text-[#617462]` |
+
+**Decision-status chips** (recommendation pending/accepted/modified/rejected, and any future decision state) reuse exactly these four tones — rejected takes the critical tone, modified the high tone, accepted the moderate/success tone, pending the low/neutral tone. Do not introduce a fifth colour for a status.
+
 ### 6.5 Modals — `AdminDialog`
 
 All dialogs MUST use `src/features/users/components/AdminDialog.tsx` (or follow it exactly):
@@ -239,6 +261,16 @@ Anchored `absolute right-0 top-[calc(100%+8px)] z-20 min-w-[220px]` white panel 
 ### 6.8 z-index scale
 
 `z-20` dropdowns · `z-40` toasts · `z-50` modals & mobile drawer. Do not introduce other layers.
+
+### 6.9 Score meter (`ScoreBar`)
+
+For 0–100 scores (recommendation match scores, and any future normalized score), use the shared `ScoreBar` (`src/features/recommendations/components/ScoreBar.tsx`) — never a hand-rolled progress bar.
+
+- **Segmented, not continuous:** 20 equal segments (`flex h-2 w-full gap-px`, each `flex-1`), filled left to right. This is deliberate, not a compromise — Tailwind v4 extracts classes statically, so a computed `w-[73.33%]` would never be generated, and inline `style` is reserved for `DataTable`'s sticky offsets (§1). It also reads as flat and square, in keeping with §2.
+- **Tones:** filled `bg-[#1f5d3b]` (primary) or `bg-[#9caf9a]` (muted — for scores on rejected/superseded records); unfilled always `bg-[#edf3ea]`.
+- **The number is the source of truth.** A meter must always sit next to its exact value rendered as text (stat-value scale, `tabular-nums`); segments round to the nearest 5% and are an at-a-glance indicator only.
+- **Accessibility:** `role="progressbar"` with `aria-label`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-valuenow`, and an `aria-valuetext` carrying the precise value.
+- No labels, ticks, or gradients inside the meter. Where a score needs justifying, pair it with an explainer dialog (§6.5) rather than annotating the bar.
 
 ---
 

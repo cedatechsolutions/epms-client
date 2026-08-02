@@ -1,16 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
+import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import PollOutlinedIcon from '@mui/icons-material/PollOutlined'
 import { getPrimaryRoleLabel, getUserDisplayName, getUserInitials, hasAnyRole } from '@/features/auth/lib/access'
+import { ASSESSMENT_VIEW_ROLES } from '@/features/surveys'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { USER_MANAGEMENT_ROLES } from '@/features/auth/types'
 
@@ -27,7 +31,7 @@ type SectionCopy = {
   eyebrow: string
 }
 
-function getNavigationItems(canAccessUserManagement: boolean): NavItem[] {
+function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessments: boolean): NavItem[] {
   const items: NavItem[] = [
     {
       id: 'dashboard',
@@ -36,7 +40,33 @@ function getNavigationItems(canAccessUserManagement: boolean): NavItem[] {
       Icon: DashboardOutlinedIcon,
       matches: (currentPathname) => currentPathname === '/admin/dashboard',
     },
+    {
+      id: 'communities',
+      label: 'Communities',
+      to: '/admin/communities',
+      Icon: Diversity3OutlinedIcon,
+      matches: (currentPathname) => currentPathname.startsWith('/admin/communities'),
+    },
   ]
+
+  if (canAccessAssessments) {
+    items.push({
+      id: 'surveys',
+      label: 'Needs Assessment',
+      to: '/admin/surveys',
+      Icon: PollOutlinedIcon,
+      matches: (currentPathname) => currentPathname.startsWith('/admin/surveys'),
+    })
+    items.push({
+      id: 'program-types',
+      label: 'Program Library',
+      to: '/admin/program-types',
+      Icon: CategoryOutlinedIcon,
+      matches: (currentPathname) =>
+        currentPathname.startsWith('/admin/program-types') ||
+        currentPathname.startsWith('/admin/scoring-matrix'),
+    })
+  }
 
   if (canAccessUserManagement) {
     items.push({
@@ -94,6 +124,11 @@ function getSectionCopy(pathname: string): SectionCopy {
   if (pathname.startsWith('/admin/activity-logs')) {
     return {
       eyebrow: 'Administration / Activity Log',
+    }
+  }
+  if (pathname.startsWith('/admin/program-types') || pathname.startsWith('/admin/scoring-matrix')) {
+    return {
+      eyebrow: 'Administration / Program Library',
     }
   }
   return {
@@ -217,13 +252,14 @@ export default function AdminLayout() {
   const [signOutLoading, setSignOutLoading] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const canAccessUserManagement = hasAnyRole(user, USER_MANAGEMENT_ROLES)
+  const canAccessAssessments = hasAnyRole(user, ASSESSMENT_VIEW_ROLES)
   const displayName = getUserDisplayName(user)
   const primaryRoleLabel = getPrimaryRoleLabel(user)
   const initials = getUserInitials(user)
 
   const navigationItems = useMemo(
-    () => getNavigationItems(canAccessUserManagement),
-    [canAccessUserManagement],
+    () => getNavigationItems(canAccessUserManagement, canAccessAssessments),
+    [canAccessUserManagement, canAccessAssessments],
   )
   const sectionCopy = useMemo(() => getSectionCopy(location.pathname), [location.pathname])
 
