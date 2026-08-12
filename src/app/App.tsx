@@ -16,7 +16,7 @@ import {
 import { ActivityLogPage } from '@/features/activity-logs'
 import { CommunitiesListPage, CommunityDetailPage } from '@/features/communities'
 import { DashboardPage } from '@/features/dashboard'
-import { PublicSurveyPage } from '@/features/public-survey'
+import { PrivacyNoticePage, PublicSurveyPage } from '@/features/public-survey'
 import {
   ProgramTypesPage,
   RecommendationsPage,
@@ -79,6 +79,9 @@ export default function App() {
 
       {/* Public tokenized survey form — no auth, no admin chrome (spec Module 3 §3). */}
       <Route path="/s/:token" element={<PublicSurveyPage />} />
+
+      {/* Public privacy notice — RA 10173 (spec §5.3); linked from login and the survey form. */}
+      <Route path="/privacy" element={<PrivacyNoticePage />} />
 
       <Route element={<RequireAuth />}>
         <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />

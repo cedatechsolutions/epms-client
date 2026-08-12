@@ -1,9 +1,10 @@
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded'
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { isApiError } from '@/shared/api/http'
 import { getPublicSurvey, submitSurveyResponse } from '../api/publicSurveyApi'
+import PublicShell from '../components/PublicShell'
 import { getRespondentToken, hasSubmitted, markSubmitted } from '../lib/respondentToken'
 import {
   AGE_GROUP_OPTIONS,
@@ -21,23 +22,6 @@ const inputClassName =
   'w-full border border-[#cad5c7] bg-white px-4 py-3 text-base text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b]'
 const selectClassName = `${inputClassName} cursor-pointer`
 const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
-
-/** Mobile-first shell — no sidebar, no auth chrome (spec: public form is a standalone page). */
-function PublicShell({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="min-h-screen bg-[#f4f7f1] px-4 py-8 text-[#123524]">
-      <div className="mx-auto w-full max-w-[640px] space-y-6">
-        <header className="border border-[#d8e1d4] bg-white px-5 py-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
-            Cavite State University – Bacoor Campus
-          </p>
-          <p className="mt-1 text-sm font-medium text-[#123524]">Community Needs Assessment</p>
-        </header>
-        {children}
-      </div>
-    </main>
-  )
-}
 
 function Notice({
   icon,
@@ -353,7 +337,15 @@ export default function PublicSurveyPage() {
             Your answers are collected by Cavite State University – Bacoor Campus solely to plan community
             extension programs. We do not collect your name or contact details, and results are reported only
             as anonymous, aggregated statistics. Your data is processed under the Data Privacy Act of 2012
-            (RA 10173).
+            (RA 10173).{' '}
+            <Link
+              to="/privacy"
+              target="_blank"
+              className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]"
+            >
+              Read the full privacy notice
+            </Link>
+            .
           </p>
           <label className="mt-4 flex cursor-pointer items-start gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5]">
             <input

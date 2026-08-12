@@ -141,7 +141,6 @@ type SidebarProps = {
   pathname: string
   onNavigate: (to: string) => void
   collapsed?: boolean
-  onToggleCollapse?: () => void
   onSignOut: () => void
   signOutLoading?: boolean
 }
@@ -151,7 +150,6 @@ function Sidebar({
   pathname,
   onNavigate,
   collapsed = false,
-  onToggleCollapse,
   onSignOut,
   signOutLoading = false,
 }: SidebarProps) {
@@ -161,7 +159,7 @@ function Sidebar({
         <div className={['flex items-center', collapsed ? 'justify-center' : 'gap-3'].join(' ')}>
           <img src="/logo.png" alt="Cavite State University logo" className="h-11 w-11 shrink-0 object-contain" />
           <div className={['min-w-0', collapsed ? 'hidden' : 'block'].join(' ')}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black">
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black">
               Cavite State University
             </p>
             <p className="text-[8px] font-semibold uppercase tracking-[0.18em] text-[#60755f]">
@@ -172,22 +170,7 @@ function Sidebar({
       </div>
 
       <div className={['min-h-0 flex-1 overflow-y-auto py-6', collapsed ? 'px-3' : 'px-6'].join(' ')}>
-        <div className={['flex items-center', collapsed ? 'justify-center' : 'justify-between gap-3'].join(' ')}>
-          <p className={['text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]', collapsed ? 'sr-only' : 'block'].join(' ')}>
-            Navigation
-          </p>
-          {onToggleCollapse ? (
-            <button
-              type="button"
-              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              onClick={onToggleCollapse}
-              className="hidden h-9 w-9 items-center justify-center border border-[#cad5c7] text-[#445846] transition-colors hover:bg-[#f6faf5] hover:text-[#123524] md:inline-flex"
-            >
-              {collapsed ? <ChevronRightRoundedIcon fontSize="small" /> : <ChevronLeftRoundedIcon fontSize="small" />}
-            </button>
-          ) : null}
-        </div>
-        <nav className="mt-4 space-y-1">
+        <nav className="space-y-1">
           {navigationItems.map((item) => {
             const isActive = item.matches(pathname)
             const Icon = item.Icon
@@ -205,7 +188,7 @@ function Sidebar({
                 }}
                 disabled={item.disabled}
                 className={[
-                  'flex w-full items-center border-l-2 text-sm font-medium transition-colors',
+                  'flex w-full items-center border-l-2 text-sm font-medium transition-colors cursor-pointer rounded-md',
                   collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3 text-left',
                   isActive
                     ? 'border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]'
@@ -222,19 +205,26 @@ function Sidebar({
         </nav>
       </div>
 
-      <div className={['shrink-0 border-t border-[#d8e1d4] px-6 py-5', collapsed ? 'hidden' : 'block'].join(' ')}>
+      <div className={['shrink-0 border-t border-[#d8e1d4] py-5', collapsed ? 'px-3' : 'px-6'].join(' ')}>
         <button
           type="button"
           onClick={onSignOut}
           disabled={signOutLoading}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label={collapsed ? (signOutLoading ? 'Logging out' : 'Logout') : undefined}
+          title={collapsed ? (signOutLoading ? 'Logging out' : 'Logout') : undefined}
+          className={[
+            'flex w-full cursor-pointer items-center justify-center py-2.5 text-sm font-medium text-[#123524] transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md hover:bg-red-100 hover:text-red-600 hover:border-transparent',
+            collapsed ? 'px-2 ' : 'gap-2 px-4 border border-[#d8e1d4]',
+          ].join(' ')}
         >
           {signOutLoading ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
           ) : (
             <LogoutRoundedIcon fontSize="small" />
           )}
-          {signOutLoading ? 'Logging out...' : 'Logout'}
+          <span className={collapsed ? 'sr-only' : undefined}>
+            {signOutLoading ? 'Logging out...' : 'Logout'}
+          </span>
         </button>
       </div>
     </div>
@@ -310,8 +300,9 @@ export default function AdminLayout() {
 
   return (
     <div className="h-screen overflow-hidden bg-[#f4f7f1] text-[#123524]">
-      <div className="mx-auto flex h-screen max-w-[1600px] overflow-hidden">
+      <div className="mx-auto flex h-screen overflow-hidden">
         <aside
+          id="admin-sidebar"
           className={[
             'hidden h-screen shrink-0 border-r border-[#d8e1d4] bg-white transition-[width] duration-200 md:block',
             sidebarCollapsed ? 'w-[88px]' : 'w-[280px]',
@@ -322,7 +313,6 @@ export default function AdminLayout() {
             pathname={location.pathname}
             onNavigate={handleNavigate}
             collapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
             onSignOut={() => void handleSignOut()}
             signOutLoading={signOutLoading}
           />
@@ -330,14 +320,32 @@ export default function AdminLayout() {
 
         <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
           <header className="shrink-0 border-b border-[#d8e1d4] bg-white">
-            <div className="flex items-center justify-between px-4 py-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
-                  {sectionCopy.eyebrow}
-                </p>
-                <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#123524] md:text-lg">
-                  Extension Projects Management System
-                </h2>
+            <div className="flex items-center justify-between gap-3 px-4 py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <button
+                  type="button"
+                  aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                  title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                  aria-expanded={!sidebarCollapsed}
+                  aria-controls="admin-sidebar"
+                  onClick={() => setSidebarCollapsed((current) => !current)}
+                  className="hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center border border-[#D7E0D5] rounded text-[#123524] transition-colors hover:bg-[#f6faf5] md:inline-flex"
+                >
+                  {sidebarCollapsed ? (
+                    <ChevronRightRoundedIcon fontSize="small" />
+                  ) : (
+                    <ChevronLeftRoundedIcon fontSize="small" />
+                  )}
+                </button>
+
+                <div className="min-w-0 leading-2">
+                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+                    {sectionCopy.eyebrow}
+                  </p>
+                  <p className="truncate text-base font-semibold tracking-[-0.02em] text-[#123524] md:text-lg">
+                    Extension Projects Management System
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -345,7 +353,7 @@ export default function AdminLayout() {
                   <button
                     type="button"
                     onClick={() => setProfileMenuOpen((current) => !current)}
-                    className="hidden items-center gap-3 border border-[#cad5c7] px-3 py-2 transition-colors hover:bg-[#f6faf5] md:inline-flex"
+                    className="hidden items-center gap-3 rounded-lg cursor-pointer px-3 py-2 transition-colors hover:bg-[#f6faf5] md:inline-flex"
                   >
                     <span className="flex h-9 w-9 items-center justify-center bg-[#1f5d3b] text-sm font-semibold text-white rounded-full">
                       {initials}
@@ -365,7 +373,7 @@ export default function AdminLayout() {
                   </button>
 
                   {profileMenuOpen ? (
-                    <div className="animate-pop-in absolute right-0 top-[calc(100%+8px)] z-20 min-w-[220px] border border-[#d8e1d4] bg-white p-2 shadow-[0_12px_30px_rgba(18,53,36,0.08)]">
+                    <div className="animate-pop-in absolute right-0 top-[calc(100%+8px)] z-20 min-w-[300px] border border-[#E5EAE3] rounded-md bg-white p-2 shadow-[0_12px_30px_rgba(18,53,36,0.08)] ">
                       <div className="border-b border-[#eef2eb] px-3 py-3">
                         <p className="text-sm font-medium text-[#123524]">{displayName}</p>
                         <p className="mt-1 text-xs text-[#6a7f6d]">{user?.email}</p>
@@ -377,7 +385,7 @@ export default function AdminLayout() {
                         type="button"
                         disabled={signOutLoading}
                         onClick={() => void handleSignOut()}
-                        className="mt-2 flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mt-2 flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:bg-red-50 hover:text-red-600 rounded-md"
                       >
                         {signOutLoading ? (
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
@@ -403,7 +411,7 @@ export default function AdminLayout() {
           </header>
 
           <main className="min-h-0 flex-1 overflow-y-auto p-4">
-            <div className="min-h-full border border-[#d8e1d4] bg-white p-4 md:p-6">
+            <div className="min-h-full border border-[#d8e1d4] bg-white p-4 md:p-6 rounded-md">
               <Outlet />
             </div>
           </main>

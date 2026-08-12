@@ -28,7 +28,9 @@ The system is a flat, sharp-cornered, institutional green theme for Cavite State
 
 Core rules:
 
-1. **No rounded corners.** Containers, buttons, inputs, tables, chips, and modals all have square edges. Never add `rounded-*` to them. The ONLY exceptions: `rounded-full` on avatar circles and loading spinners.
+1. **No rounded corners.** Containers, buttons, inputs, tables, chips, and modals all have square edges. Never add `rounded-*` to them. The exceptions are:
+   - `rounded-full` on avatar circles and loading spinners.
+   - **Auth screens only** — form controls (text inputs and buttons) on the authentication pages use a soft `rounded-lg` radius (see §5.3 and §6.10). Containers, panels, and cards on those pages stay square. This exception does NOT extend to the admin shell, tables, modals, chips, or the public survey.
 2. **Flat surfaces, 1px borders.** Depth comes from borders and the occasional soft green-tinted shadow (section 3.4) — never from gradients or heavy elevation.
 3. **Light theme only.** `color-scheme: light` is set in `globals.css`. Do not add dark mode styling.
 4. **Whitespace over dividers.** Use `space-y-*` / `gap-*` for rhythm; borders mark container boundaries and table rows.
@@ -146,8 +148,10 @@ Conventions: headings use negative tracking; all-caps labels use wide positive t
 - Shell: `h-screen overflow-hidden`; only `<main>` scrolls (`min-h-0 flex-1 overflow-y-auto`).
 - **Sidebar:** white, `border-r border-[#d8e1d4]`; width `w-[280px]`, collapsed `w-[88px]` (`transition-[width] duration-200`). Hidden below `md`; mobile uses a full-screen drawer (same 280px sidebar) over a `bg-[#123524]/20` overlay at `z-50`.
 - Sidebar structure: campus logo block (logo `h-11 w-11`) → scrollable nav → bordered logout footer.
+- **Collapsing hides labels, never controls.** When `collapsed`, the sidebar keeps every actionable item reachable and only drops its text: nav items and the logout button center their icon (`justify-center`, padding narrows to `px-2`/`px-3`) and move their label into a `sr-only` span, gaining `aria-label` + `title` so the icon still announces itself and shows a tooltip. Do not `hidden` a control to make it fit the 88px rail — a collapsed sidebar that drops sign-out strands the user.
 - Nav items: `border-l-2` accent; active = `border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]`; rest = `border-transparent text-[#445846] hover:bg-[#f7faf6] hover:text-[#123524]`; disabled = `text-[#8a9989]`.
-- **Header:** white, `border-b border-[#d8e1d4]`, `px-4 py-4`; left side = eyebrow breadcrumb ("Administration / Section") over the system title; right side = profile button (avatar circle `h-9 w-9 rounded-full bg-[#1f5d3b]` with initials) and mobile menu button.
+- **Header:** white, `border-b border-[#d8e1d4]`, `px-4 py-4`; left side = the sidebar collapse toggle followed by the eyebrow breadcrumb ("Administration / Section") over the system title; right side = profile button (avatar circle `h-9 w-9 rounded-full bg-[#1f5d3b]` with initials) and mobile menu button.
+- **Sidebar collapse toggle lives in the header, not the sidebar.** `hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center border border-[#cad5c7] text-[#123524] transition-colors hover:bg-[#f6faf5] md:inline-flex`, with `ChevronLeftRounded` when expanded / `ChevronRightRounded` when collapsed. It sits `md:`-only (its mobile counterpart is the menu button on the right, at the same `h-10 w-10`), and carries `aria-label` + `title` plus `aria-expanded` and `aria-controls="admin-sidebar"` pointing at the `<aside>`. The title block beside it is `min-w-0` with a `truncate` heading so a narrow header shortens the title rather than displacing the toggle.
 - All routed pages render inside the white content panel via `<Outlet />`.
 
 ### 5.2 Page composition
@@ -159,7 +163,48 @@ Conventions: headings use negative tracking; all-caps labels use wide positive t
 
 ### 5.3 Auth pages
 
-Centered card on the app background: `max-w-[420px] border border-[#d8e1d4] bg-white p-8 md:p-10 shadow-[0_12px_30px_rgba(18,53,36,0.05)]`, with eyebrow → title → description → form (`mt-4 space-y-5`).
+#### 5.3.1 Login — split screen
+
+The login screen (`/login`) uses a **full-bleed two-column split**; it is the only screen with this layout.
+
+```
+┌────────────────────────┬────────────────────────┐
+│  White form column     │  Green brand panel     │
+│  bg-white              │  campus photo + wash   │
+│                        │                        │
+│  logo + wordmark       │  Vision                │
+│  "Sign in" h1          │  Mission               │
+│  form (space-y-5)      │  Core Values (chips)   │
+│                        │  Quality Policy        │
+│                        │  ─── Privacy notice    │
+└────────────────────────┴────────────────────────┘
+   lg:grid-cols-2 · below lg the columns stack, panel second
+```
+
+- Shell: `<main className="min-h-screen bg-white text-[#123524] lg:grid lg:grid-cols-2">` — no page padding on the shell; each column owns its own padding. No outer card, no shadow, no border between the columns (the color change is the seam).
+- **Form column:** `flex flex-col justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-16`, inner `mx-auto w-full max-w-[400px]`. Order: logo + wordmark block → `h1` title → description → form (`mt-8 space-y-5`).
+  - Title on this screen is the short action ("Sign in"), not the system name — the system name lives in the wordmark above it.
+  - `min-h-screen` is applied only from `lg`, so on phones the column sizes to its content.
+- **Brand panel (`LoginBrandPanel`):** `relative flex flex-col justify-center bg-[#123524] px-6 py-12 text-white sm:px-10 lg:px-16`, inner `mx-auto w-full max-w-[400px] space-y-7 lg:mx-0 lg:max-w-lg`.
+  - Carries the university's Vision, Mission, Core Values and Quality Policy, closing with a link to the public privacy notice (`/privacy`). Institutional copy is quoted verbatim from the university's published wording — do not paraphrase or "fix" it (the Quality Policy's mid-sentence capitals and its three-value list against the four Core Values are both as published).
+  - **It renders at every breakpoint** and stacks below the form column on phones. It holds the only login-screen link to the privacy notice, so it must not be `hidden` at any size.
+  - **The section must not clip.** `overflow-hidden` belongs on the decorative wrapper (`absolute inset-0 overflow-hidden`, `aria-hidden="true"`), never on the section — the copy is long enough to be cut off at short viewport heights otherwise.
+  - Structure: heading per block is an `h2` at eyebrow scale; body `mt-2 text-sm leading-6`; Core Values render as a `ul` of square chips (`inline-flex border border-white/25 px-2.5 py-1 text-xs font-medium`), matching §6.4 chip geometry in white tints.
+  - **Text tints are set by measured contrast, not taste.** Against the brightest point of the washed photo (~`rgb(65,93,79)`), pure white measures 7.2:1 and `text-white/80` 5.4:1 — both clear WCAG AA for normal text. `text-white/60` measures 3.8:1 and **fails**; do not use it here or on any text over the photo. Re-measure if the photograph or the wash changes.
+- **Photograph** (`public/cvsubacoor.jpg`): `absolute inset-x-0 top-0 h-[135%] w-full object-cover object-[90%_top] opacity-60` over the `bg-[#123524]` ground, under a `bg-[#123524]/80` wash.
+  - The source is landscape and carries a white "BACOOR CAMPUS" caption banner across its foot. `object-cover` in this column fits it vertically, which would put that banner on screen as a pale band. The image box is therefore oversized to `h-[135%]` and anchored `object-top` so the wrapper's `overflow-hidden` clips the banner away. **`h-[135%]`, `object-top`, and the wrapper's `overflow-hidden` must stay together.** The visible vertical slice is `1/1.35 ≈ 74%` at any viewport size, which is what keeps the banner out at every breakpoint including the stacked layout.
+  - `object-[90%_top]` frames the "I ♥ CvSU / Bacoor City Campus" signage. The horizontal crop tightens as the column gets taller and narrower — expect the sign to clip slightly at tall viewports. That is inherent to a landscape source in a portrait column, not a bug to chase.
+  - Photo `opacity` and the wash are a pair, and they now also carry the text contrast above. Changing either one requires re-checking both legibility and tone.
+- **Line-work:** absolutely-positioned `rotate-45` squares bled off the edges (`border-white/10`, `border-white/[0.07]`, `border-white/[0.06]`) echoing the diamond of the CvSU seal. Square corners are preserved — these are rotated squares, not circles. Static `rotate-45` for decoration is permitted here; §7's ban on transforms still applies to interaction states.
+- Colors on green come from white opacity tints only. Never introduce new hex values or §3 light-surface colors here.
+- A previous treatment used the seal itself as a ghosted watermark via `grayscale invert mix-blend-screen` (`public/logo.png` is an opaque palette PNG with no alpha, so plain `opacity` shows its white backing as a pale rectangle). If that is ever revived, all three classes are required together.
+- An alternative panel — survey-code entry, contact block, privacy link on a plain green field — is kept at `src/features/auth/components/LoginPublicPanel.tsx`. It is self-contained and not mounted; swapping it in is a one-line change in `LoginPage`. Do not let both render.
+
+**Reachability rule for the login screen.** Anything an account-less visitor needs — the privacy notice, and the survey-code entry if it is restored — must render at every breakpoint. Community survey respondents are on phones by definition (spec Module 3 §3), so a `hidden … lg:` wrapper around any of it is a defect, not a style choice.
+
+#### 5.3.2 Other auth pages
+
+Forgot password, reset password, and change password keep the centered-card layout: `max-w-[420px] border border-[#d8e1d4] bg-white p-8 md:p-10 shadow-[0_12px_30px_rgba(18,53,36,0.05)]` on the `#f4f7f1` background, with eyebrow → title → description → form (`mt-4 space-y-5`).
 
 ### 5.4 Public survey layout (`/s/:token`)
 
@@ -170,7 +215,9 @@ The public needs-assessment form is the one screen served to **unauthenticated r
 - **Touch targets are larger than in the admin UI**: body/inputs step up from `text-sm` to `text-base`, inputs use `py-3`, and radio/checkbox choices are full-width bordered rows (`flex items-center gap-3 border border-[#d8e1d4] px-4 py-3 hover:bg-[#f6faf5]`) rather than bare inputs. The primary submit is full-width (`w-full ... py-3`).
 - Rating (1–5) renders as a `grid grid-cols-5 gap-2` of square toggle buttons; the selected value is primary-filled (`border-[#1f5d3b] bg-[#1f5d3b] text-white`), with "1 — Very poor" / "5 — Very good" anchors beneath.
 - Terminal states (closed, not found, already responded, thank-you) render as a single centered `Notice` card with an `@mui/icons-material` icon (`fontSize="large"`), title, and one explanatory paragraph — never a toast, since the respondent has no app shell to return to.
-- Palette, square corners, and Google Sans are unchanged — this is the same design system at a larger touch scale, not a second one.
+- Palette, square corners, and Google Sans are unchanged — this is the same design system at a larger touch scale, not a second one. **The §6.10 auth radius does not apply here** — public-survey controls stay square.
+- The shell is the shared `PublicShell` (`src/features/public-survey/components/PublicShell.tsx`); its `subtitle` prop names the page under the campus eyebrow. Every public page reuses it rather than re-declaring the layout — currently the survey form (`/s/:token`) and the privacy notice (`/privacy`).
+- **Public privacy notice (`/privacy`)** — required by §5.3 (RA 10173). Renders in `PublicShell` as a stack of `border border-[#d8e1d4] bg-white px-5 py-5` sections, one per topic (what we collect / how we use it / who can see it / your rights / contact), closing with a "Back to sign in" link. The survey form keeps its short inline notice above the consent checkbox and links here for the long form; the two must not contradict each other — edit both together.
 
 ### 5.5 Breakpoints
 
@@ -182,7 +229,7 @@ Standard Tailwind breakpoints. Conventions: `md` = sidebar/desktop-header thresh
 
 ### 6.1 Buttons
 
-All buttons: square corners, `text-sm font-medium`, `transition-colors`, `cursor-pointer`, and `disabled:cursor-not-allowed disabled:opacity-60` (icon buttons and pagination use `opacity-45`).
+All buttons: square corners (**except on auth screens** — see §6.10), `text-sm font-medium`, `transition-colors`, `cursor-pointer`, and `disabled:cursor-not-allowed disabled:opacity-60` (icon buttons and pagination use `opacity-45`).
 
 | Variant | Classes |
 |---|---|
@@ -200,6 +247,7 @@ All buttons: square corners, `text-sm font-medium`, `transition-colors`, `cursor
 
 - Text input: `w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]` (compact filter variant: `h-10 px-3`, border `#d8e1d4`).
 - Selects: same as compact input plus `cursor-pointer`.
+- Corners are square **except on auth screens** — see §6.10.
 - Focus = border color change to `#1f5d3b` only. No focus rings, no shadows.
 - Labels: block label above the field, `mb-2 text-sm font-medium text-[#123524]` (forms) or stacked `flex flex-col gap-1.5` with the uppercase `text-xs` label (filters).
 - Password fields: relative wrapper, `pr-12`, absolute right visibility-toggle button using MUI `VisibilityRounded`/`VisibilityOffRounded`.
@@ -272,11 +320,51 @@ For 0–100 scores (recommendation match scores, and any future normalized score
 - **Accessibility:** `role="progressbar"` with `aria-label`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-valuenow`, and an `aria-valuetext` carrying the precise value.
 - No labels, ticks, or gradients inside the meter. Where a score needs justifying, pair it with an explainer dialog (§6.5) rather than annotating the bar.
 
+### 6.10 Auth control radius
+
+On the authentication pages only, text inputs and buttons carry a soft radius so the sign-in screen reads as a welcoming front door rather than an admin grid.
+
+- **Radius:** `rounded-lg` (0.5rem). One value only — do not mix `rounded-md`/`rounded-xl`, and do not pick a radius per control.
+- **Applies to:** text/email/password inputs and their password-visibility affordance, and buttons (primary submit, secondary, links styled as buttons). This includes the inverted controls in the login public column (§5.3.1).
+- **Does NOT apply to:** the page/columns themselves, cards, alerts, checkboxes, the reCAPTCHA widget, or anything outside the auth pages — including the public survey and privacy notice (§5.4). Everything else stays square per §2.
+- The password field's absolute visibility toggle keeps `rounded-r-lg` so it does not overhang the input's rounded corner.
+- Currently adopted on: `LoginPage`. Other auth pages keep square controls until they are migrated in a later change — when they are, update this list rather than adding a second radius.
+
+### 6.11 Split meter (`SplitMeter`)
+
+For **part-to-whole counts** — above all the sex-disaggregated figures the GAD rule requires on every
+count surface — use the shared `SplitMeter` (`src/shared/meter`). `ScoreBar` (§6.9) stays the meter
+for a single 0–100 score; this one shows how a total divides.
+
+- **Same geometry as `ScoreBar`:** 20 fixed segments (`flex h-2 w-full gap-px`, each `flex-1`), for
+  the same reason — Tailwind v4 extracts classes statically, so a computed `w-[50.6%]` would never be
+  generated, and inline `style` is reserved for `DataTable` (§1). Segments are allocated by
+  **largest remainder**, with a floor of one segment for any non-zero part, so they always total 20
+  and a small minority never rounds away to nothing.
+- **Tones** are a single-hue lightness ramp, applied in this order: `primary` `#1f5d3b` →
+  `muted` `#9caf9a` → `neutral` `#617462`; unfilled is `#edf3ea`. `#617462` is §3.3's muted-text
+  colour used as a fill — that is its only non-text usage, and there is no fourth tone. **A split
+  with more than three parts is not a meter** — use a table.
+- **Why lightness and not hue:** the palette is mono-green by §3, so separation has to come from
+  lightness. Measured on the adjacent pairs, the ramp gives ΔE ≈ 19.5 under protanopia, deuteranopia
+  and tritanopia (target ≥ 8), so it is safe under every colour-vision deficiency. `#9caf9a` sits at
+  2.33:1 against white, below the 3:1 mark for a mark carrying meaning alone — **which is why the
+  legend is mandatory, not optional.** Re-measure if a tone changes.
+- **The legend is always rendered** and names every part with its exact count and share. Identity is
+  therefore never carried by colour alone, and the numbers — not the segments — are the source of
+  truth.
+- **Accessibility:** the bar is `role="img"` with an `aria-label` spelling out the whole split
+  ("Respondents by sex: Female 18 (60.0%), Male 12 (40.0%)"). It is not a `progressbar` — there is no
+  single value to report.
+- Pass the page's own number formatter via `formatValue` so grouping matches the surrounding copy.
+  Where part of the population has no split recorded, say so in text beside the meter rather than
+  inventing a bucket for it.
+
 ---
 
 ## 7. Interaction & Motion
 
-- Interactive elements use only `transition-colors` (default duration); the sidebar collapse uses `transition-[width] duration-200`; loaders use `animate-spin`/`animate-pulse`. **No hover scale/translate effects.**
+- Interactive elements use only `transition-colors` (default duration); the sidebar collapse uses `transition-[width] duration-200`; loaders use `animate-spin`/`animate-pulse`. **No hover scale/translate effects.** Static transforms on purely decorative, `aria-hidden` elements are exempt (see the login brand panel, §5.3.1) — the ban is on transforms as interaction feedback.
 - **Entrance motion for overlays** is allowed via four shared utility classes defined in `globals.css` (all ease-out, 160–220 ms, both-fill, and disabled under `prefers-reduced-motion`). Do not write bespoke keyframes elsewhere — reuse these:
   - `animate-fade-in` — backdrops/overlays (modal scrim, drawer scrim).
   - `animate-pop-in` — modal panels and dropdown/popover menus (subtle fade + rise + scale).

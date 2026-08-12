@@ -4,8 +4,12 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { isApiError } from '@/shared/api/http'
 import { notify } from '@/shared/toast'
+import LoginBrandPanel from '../components/LoginBrandPanel'
 import RecaptchaWidget from '../components/RecaptchaWidget'
 import { useAuthStore } from '../store/authStore'
+
+const inputClassName =
+  'w-full rounded-lg border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
 
 function resolveRedirectPath(from: unknown): string {
   if (!from || typeof from !== 'object' || !('pathname' in from) || typeof from.pathname !== 'string') {
@@ -74,22 +78,23 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f4f7f1] px-4 py-10 text-[#123524] md:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-1 items-center justify-center">
-        <section className="w-full max-w-[420px] border border-[#d8e1d4] bg-white p-8 shadow-[0_12px_30px_rgba(18,53,36,0.05)] md:p-10">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#123524]">
-              Cavite State University
-            </p>
-            <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-[#123524]">
-              Extension Projects Management System
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-[#506552]">
-              Sign in to continue to the administrative workspace.
-            </p>
+    <main className="min-h-screen bg-white text-[#123524] lg:grid lg:grid-cols-2">
+      <section className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-16">
+        <div className="mx-auto w-full max-w-[400px]">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Cavite State University logo" className="h-14 w-14 shrink-0 object-contain" />
+            <div>
+              <p className="text-md font-semibold tracking-[-0.02em] text-[#123524]">Cavite State University - Bacoor City</p>
+              <p className="text-xs text-[#6a7f6d]">Extension Projects Management System</p>
+            </div>
           </div>
 
-          <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
+          <h1 className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#123524]">Sign in</h1>
+          <p className="text-sm leading-6 text-[#506552]">
+            Sign in to continue to your account.
+          </p>
+
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#123524]">
                 Email
@@ -102,7 +107,7 @@ export default function LoginPage() {
                 disabled={isAuthenticating}
                 required
                 placeholder="Enter your email"
-                className="w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
+                className={inputClassName}
               />
             </div>
 
@@ -119,7 +124,7 @@ export default function LoginPage() {
                   disabled={isAuthenticating}
                   required
                   placeholder="Enter your password"
-                  className="w-full border border-[#cad5c7] bg-white px-4 py-3 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
+                  className={`${inputClassName} pr-12`}
                 />
                 <button
                   type="button"
@@ -127,14 +132,32 @@ export default function LoginPage() {
                   aria-pressed={showPassword}
                   disabled={isAuthenticating}
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center rounded-r-lg text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
                 </button>
               </div>
             </div>
 
-            {recaptchaEnabled ? (
+           
+            <div>
+              <button
+                type="submit"
+                disabled={isAuthenticating || !isRecaptchaConfigured}
+                className="w-full cursor-pointer rounded-lg border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isAuthenticating ? 'Signing in...' : 'Sign in'}
+              </button>
+
+              <p className="text- mt-2 text-sm text-[#506552]">
+                <Link to="/forgot-password" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+                  Forgot your password?
+                </Link>
+              </p>
+            </div>
+            
+
+             {recaptchaEnabled ? (
               <div>
                 <p className="mb-2 block text-sm font-medium text-[#123524]">Verification</p>
                 <RecaptchaWidget
@@ -144,25 +167,17 @@ export default function LoginPage() {
                 />
               </div>
             ) : null}
-
-            <button
-              type="submit"
-              disabled={isAuthenticating || !isRecaptchaConfigured}
-              className="w-full cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isAuthenticating ? 'Signing in...' : 'Sign in'}
-            </button>
-
-            <p className="text-center text-sm text-[#506552]">
-              <Link to="/forgot-password" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
-                Forgot your password?
-              </Link>
-            </p>
           </form>
-        </section>
-      </div>
 
-      {/* <p className="mt-6 text-center text-sm text-[#8a9989]">CEDA Tech Solutions</p> */}
+          {/* The public entry points (survey-code entry, privacy notice, campus contact)
+              are currently not rendered here. A working copy lives in
+              `../components/LoginPublicPanel.tsx` — restore from there rather than
+              re-writing it. Note that with them absent, `/privacy` is reachable only from
+              the public survey form. */}
+        </div>
+      </section>
+
+      <LoginBrandPanel />
     </main>
   )
 }
