@@ -10,8 +10,8 @@
 const SEGMENT_COUNT = 20
 
 const TONE_CLASSES = {
-  primary: 'bg-[#1f5d3b]',
-  muted: 'bg-[#9caf9a]',
+  primary: 'bg-primary',
+  muted: 'bg-meter-muted',
 } as const
 
 export type ScoreBarTone = keyof typeof TONE_CLASSES
@@ -40,7 +40,7 @@ export default function ScoreBar({ score, tone = 'primary', label = 'Match score
       {Array.from({ length: SEGMENT_COUNT }, (_, index) => (
         <span
           key={index}
-          className={['flex-1', index < filled ? TONE_CLASSES[tone] : 'bg-[#edf3ea]'].join(' ')}
+          className={['flex-1', index < filled ? TONE_CLASSES[tone] : 'bg-skeleton'].join(' ')}
         />
       ))}
     </div>

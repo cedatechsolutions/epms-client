@@ -42,18 +42,18 @@ import {
 
 function InfoRow({ label, value }: { label: string; value: string | number | null }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-[#eef2eb] py-3 last:border-b-0 sm:flex-row sm:items-baseline sm:justify-between">
-      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">{label}</span>
-      <span className="text-sm text-[#123524] sm:text-right">{value === null || value === '' ? '-' : value}</span>
+    <div className="flex flex-col gap-1 border-b border-row-divider py-3 last:border-b-0 sm:flex-row sm:items-baseline sm:justify-between">
+      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">{label}</span>
+      <span className="text-sm text-ink sm:text-right">{value === null || value === '' ? '-' : value}</span>
     </div>
   )
 }
 
 function SectionCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="border border-[#d8e1d4] bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-[#e7eee3] px-5 py-4">
-        <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">{title}</h3>
+    <section className="rounded-lg overflow-hidden border border-line bg-surface">
+      <div className="flex items-center justify-between gap-3 border-b border-divider px-5 py-4">
+        <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">{title}</h3>
         {action}
       </div>
       <div className="px-5 py-4">{children}</div>
@@ -66,7 +66,7 @@ function ButtonSpinner({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
     <span
       className={[
         'h-4 w-4 animate-spin rounded-full border-2',
-        tone === 'light' ? 'border-white/35 border-t-white' : 'border-[#d8e1d4] border-t-[#1f5d3b]',
+        tone === 'light' ? 'border-white/35 border-t-white' : 'border-line border-t-primary-accent',
       ].join(' ')}
     />
   )
@@ -214,8 +214,8 @@ export default function CommunityDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 border border-[#d8e1d4] bg-white px-5 py-4 text-sm text-[#506552]">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-sm text-body">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
         Loading community...
       </div>
     )
@@ -226,18 +226,18 @@ export default function CommunityDetailPage() {
       <div className="space-y-4">
         <Link
           to="/admin/communities"
-          className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
         >
           <ArrowBackRoundedIcon fontSize="small" />
           Back to communities
         </Link>
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage ?? 'Community not found.'}
         </div>
         <button
           type="button"
           onClick={() => void loadCommunity()}
-          className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+          className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
         >
           Retry
         </button>
@@ -251,7 +251,7 @@ export default function CommunityDetailPage() {
     <div className="space-y-6">
       <Link
         to="/admin/communities"
-        className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
       >
         <ArrowBackRoundedIcon fontSize="small" />
         Back to communities
@@ -259,9 +259,9 @@ export default function CommunityDetailPage() {
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Community profile</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">{community.name}</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">{location}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Community profile</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">{community.name}</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">{location}</p>
         </div>
 
         {canManage ? (
@@ -273,7 +273,7 @@ export default function CommunityDetailPage() {
                 setFormApiErrors(undefined)
                 setFormOpen(true)
               }}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               <EditOutlinedIcon fontSize="small" />
               Edit
@@ -281,7 +281,7 @@ export default function CommunityDetailPage() {
             <button
               type="button"
               onClick={() => setDeleteOpen(true)}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] rounded-md"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-danger bg-danger px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-danger-hover rounded-md"
             >
               <DeleteOutlineRoundedIcon fontSize="small" />
               Delete
@@ -291,8 +291,8 @@ export default function CommunityDetailPage() {
       </div>
 
       {community.warnings.length > 0 ? (
-        <div className="flex items-start gap-3 border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#7b6542]">
-          <WarningAmberRoundedIcon fontSize="small" className="mt-0.5 text-[#7b6542]" />
+        <div className="flex items-start gap-3 border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-sm text-warning">
+          <WarningAmberRoundedIcon fontSize="small" className="mt-0.5 text-warning" />
           <div className="space-y-1">
             {community.warnings.map((warning) => (
               <p key={warning}>{warning}</p>
@@ -304,7 +304,7 @@ export default function CommunityDetailPage() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           <SectionCard title="Basic information">
-            <div className="divide-y divide-[#eef2eb]">
+            <div className="divide-y divide-row-divider">
               <InfoRow label="Name" value={community.name} />
               <InfoRow label="Barangay code" value={community.barangayCode} />
               <InfoRow label="Municipality" value={community.municipality} />
@@ -324,7 +324,7 @@ export default function CommunityDetailPage() {
                   setUploadErrorMessage(null)
                   setUploadOpen(true)
                 }}
-                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
               >
                 <UploadFileRoundedIcon fontSize="small" />
                 Upload
@@ -332,14 +332,14 @@ export default function CommunityDetailPage() {
             ) : undefined
           }>
             {documents.length === 0 ? (
-              <p className="py-6 text-center text-sm text-[#617462]">No documents uploaded yet.</p>
+              <p className="py-6 text-center text-sm text-muted">No documents uploaded yet.</p>
             ) : (
-              <ul className="divide-y divide-[#eef2eb]">
+              <ul className="divide-y divide-row-divider">
                 {documents.map((document_) => (
                   <li key={document_.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-[#123524]">{document_.originalFilename}</p>
-                      <p className="mt-0.5 text-xs text-[#6a7f6d]">
+                      <p className="truncate text-sm font-medium text-ink">{document_.originalFilename}</p>
+                      <p className="mt-0.5 text-xs text-muted-alt">
                         {DOC_TYPE_LABELS[document_.docType]} · {formatFileSize(document_.sizeBytes)} ·{' '}
                         {formatDateTime(document_.createdAt)}
                       </p>
@@ -351,7 +351,7 @@ export default function CommunityDetailPage() {
                         title="Download"
                         disabled={downloadingId === document_.id}
                         onClick={() => void handleDownload(document_)}
-                        className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                       >
                         {downloadingId === document_.id ? <ButtonSpinner tone="dark" /> : <DownloadRoundedIcon fontSize="small" />}
                       </button>
@@ -362,7 +362,7 @@ export default function CommunityDetailPage() {
                           title="Delete"
                           disabled={deletingDocId === document_.id}
                           onClick={() => void handleDeleteDocument(document_.id)}
-                          className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                          className="flex h-9 w-9 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                         >
                           {deletingDocId === document_.id ? <ButtonSpinner tone="dark" /> : <DeleteOutlineRoundedIcon fontSize="small" />}
                         </button>
@@ -377,7 +377,7 @@ export default function CommunityDetailPage() {
 
         <div className="space-y-6">
           <SectionCard title="Socio-economic profile">
-            <div className="divide-y divide-[#eef2eb]">
+            <div className="divide-y divide-row-divider">
               <InfoRow label="Classification" value={CLASSIFICATION_LABELS[community.classification]} />
               <InfoRow label="Estimated population" value={formatNumber(community.estimatedPopulation)} />
               <InfoRow label="Household count" value={formatNumber(community.householdCount)} />
@@ -385,15 +385,15 @@ export default function CommunityDetailPage() {
               <InfoRow label="Female population" value={formatNumber(community.populationFemale)} />
             </div>
             <div className="mt-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Sectors served</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-label">Sectors served</p>
               {community.sectors.length === 0 ? (
-                <p className="text-sm text-[#617462]">No sectors tagged.</p>
+                <p className="text-sm text-muted">No sectors tagged.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {community.sectors.map((sector) => (
                     <span
                       key={sector.id}
-                      className="inline-flex border border-[#bfd3c0] bg-[#f3f9f2] px-2.5 py-1 text-xs font-medium text-[#1f5d3b]"
+                      className="inline-flex rounded-md border border-success-border bg-success-bg px-2.5 py-1 text-xs font-medium text-primary-accent"
                     >
                       {sector.name}
                     </span>
@@ -405,16 +405,16 @@ export default function CommunityDetailPage() {
 
           <SectionCard title="Extension history">
             {history.length === 0 ? (
-              <p className="py-6 text-center text-sm text-[#617462]">
+              <p className="py-6 text-center text-sm text-muted">
                 No extension programs recorded yet. This timeline is populated automatically once programs
                 run in this community.
               </p>
             ) : (
               <ul className="space-y-3">
                 {history.map((entry) => (
-                  <li key={entry.programId} className="border-l-2 border-[#1f5d3b] pl-3">
-                    <p className="text-sm font-medium text-[#123524]">{entry.programTitle}</p>
-                    <p className="text-xs text-[#6a7f6d]">
+                  <li key={entry.programId} className="border-l-2 border-primary pl-3">
+                    <p className="text-sm font-medium text-ink">{entry.programTitle}</p>
+                    <p className="text-xs text-muted-alt">
                       {entry.status} · {formatDateTime(entry.date)} · {entry.beneficiaryCount} beneficiaries
                     </p>
                   </li>

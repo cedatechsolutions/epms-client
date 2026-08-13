@@ -14,7 +14,7 @@ type DecisionModalProps = {
 }
 
 const textareaClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm leading-6 text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm leading-6 text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const DECISION_COPY: Record<DecisionKind, { title: string; description: string; noteLabel: string; hint: string }> = {
   accept: {
@@ -83,7 +83,7 @@ export default function DecisionModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -94,8 +94,8 @@ export default function DecisionModal({
             className={[
               'inline-flex cursor-pointer items-center justify-center gap-2 border px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md',
               destructive
-                ? 'border-[#9f2f2f] bg-[#9f2f2f] hover:bg-[#832424]'
-                : 'border-[#1f5d3b] bg-[#1f5d3b] hover:bg-[#18492e]',
+                ? 'border-danger bg-danger hover:bg-danger-hover'
+                : 'border-primary bg-primary hover:bg-primary-hover',
             ].join(' ')}
           >
             {loading ? <ButtonSpinner /> : null}
@@ -106,22 +106,22 @@ export default function DecisionModal({
     >
       <div className="space-y-5">
         {recommendation ? (
-          <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3">
-            <p className="text-sm font-medium text-[#123524]">{recommendation.programTypeName}</p>
-            <p className="mt-1 text-xs text-[#6a7f6d]">
+          <div className="rounded-md border border-line bg-surface-tint px-4 py-3">
+            <p className="text-sm font-medium text-ink">{recommendation.programTypeName}</p>
+            <p className="mt-1 text-xs text-muted-alt">
               Rank #{recommendation.rank} · Match score {formatDecimal(recommendation.matchScore)} / 100
             </p>
           </div>
         ) : null}
 
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage}
           </div>
         ) : null}
 
         <div>
-          <label htmlFor={noteId} className="mb-2 block text-sm font-medium text-[#123524]">
+          <label htmlFor={noteId} className="mb-2 block text-sm font-medium text-ink">
             {copy.noteLabel}
           </label>
           <textarea
@@ -135,13 +135,13 @@ export default function DecisionModal({
             className={textareaClassName}
           />
           {touched && noteMissing ? (
-            <p className="mt-2 text-sm text-[#8a2d2d]">A reason is required when rejecting a recommendation.</p>
+            <p className="mt-2 text-sm text-danger-text">A reason is required when rejecting a recommendation.</p>
           ) : (
-            <p className="mt-2 text-xs text-[#6a7f6d]">{copy.hint}</p>
+            <p className="mt-2 text-xs text-muted-alt">{copy.hint}</p>
           )}
         </div>
 
-        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-sm text-danger-text">
           A decision cannot be changed once recorded. Regenerating the recommendations for this
           assessment keeps decided entries exactly as they are.
         </div>

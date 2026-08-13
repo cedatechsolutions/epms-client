@@ -1,6 +1,211 @@
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
 @import "tailwindcss";
 
+/*
+ * Design tokens (UI_GUIDELINES §3). Every color in the app resolves through one of these —
+ * components never carry a raw hex, because a raw hex cannot follow the theme.
+ *
+ * Tailwind v4 emits each `--color-*` here as a CSS custom property on `:root` and compiles
+ * `bg-surface` to `background-color: var(--color-surface)`. That indirection is what makes
+ * theming a runtime swap: the dark block below redefines the same properties on the <html>
+ * element, and every utility in the app follows without a second class.
+ *
+ * The light values are the exact palette the app already shipped — this half is a rename,
+ * not a redesign, so light rendering is unchanged.
+ */
+@theme {
+  /* Base surfaces */
+  --color-app: #f4f7f1;
+  --color-surface: #ffffff;
+  --color-surface-tint: #f7faf6;
+  --color-surface-alt: #f1f6f0;
+  --color-hover-tint: #f6faf5;
+  --color-row-hover: #fbfdf9;
+  --color-skeleton: #edf3ea;
+
+  /* Brand green. `primary` fills a surface (buttons, avatars, meter fill); `primary-accent`
+     is the same green as *ink on a surface* (link text, icons, focus borders, checkboxes).
+     They are identical in light and deliberately diverge in dark, where a fill green and a
+     readable-text green cannot be the same value. */
+  --color-primary: #1f5d3b;
+  --color-primary-hover: #18492e;
+  --color-primary-accent: #1f5d3b;
+  --color-ink: #123524;
+
+  /* Text */
+  --color-body: #506552;
+  --color-cell: #445846;
+  --color-cell-strong: #5d705e;
+  --color-muted: #617462;
+  --color-muted-alt: #6a7f6d;
+  --color-muted-strong: #7d8d7c;
+  --color-muted-soft: #91a091;
+  --color-muted-faint: #7e8d7a;
+  --color-eyebrow: #73856f;
+  --color-label: #6d7f6b;
+  --color-disabled: #8a9989;
+  --color-placeholder: #819181;
+  --color-icon-muted: #60755f;
+
+  /* Borders */
+  --color-line: #d8e1d4;
+  --color-divider: #e7eee3;
+  --color-row-divider: #eef2eb;
+  --color-control-border: #cad5c7;
+
+  /* Meters */
+  --color-meter-muted: #9caf9a;
+
+  /* Semantic — danger */
+  --color-danger: #9f2f2f;
+  --color-danger-hover: #832424;
+  --color-danger-text: #8a2d2d;
+  --color-danger-strong: #b93838;
+  --color-danger-border: #e3c9c9;
+  --color-danger-border-soft: #ead7d7;
+  --color-danger-border-dashed: #d5c4c4;
+  --color-danger-bg: #fff5f5;
+  --color-danger-bg-soft: #fff7f7;
+  --color-danger-bg-faint: #fff8f8;
+
+  /* Semantic — success / warning / info */
+  --color-success-border: #bfd3c0;
+  --color-success-bg: #f3f9f2;
+  --color-warning: #7b6542;
+  --color-info-border: #c8e0ef;
+  --color-info-bg: #eef8fd;
+  --color-info-text: #075274;
+
+}
+
+/*
+ * Elevation. Green-tinted in light; in dark, a green tint carries no depth, so it goes black
+ * and deeper.
+ *
+ * These deliberately sit OUTSIDE `@theme`. A `--shadow-*` declared in `@theme` gets compiled
+ * into the utility with its color extracted to a literal (`0 12px 30px var(--tw-shadow-color,
+ * #1235240d)`), which means overriding the variable per theme does nothing. Declared as plain
+ * custom properties and read back by `@utility`, they stay a runtime lookup and follow the
+ * theme like every color does.
+ */
+:root {
+  --shadow-card: 0 12px 30px rgba(18, 53, 36, 0.05);
+  --shadow-dropdown: 0 12px 30px rgba(18, 53, 36, 0.08);
+  --shadow-toast: 0 18px 40px rgba(18, 53, 36, 0.12);
+  --shadow-modal: 0 28px 80px rgba(18, 53, 36, 0.18);
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-dropdown {
+  box-shadow: var(--shadow-dropdown);
+}
+
+@utility shadow-toast {
+  box-shadow: var(--shadow-toast);
+}
+
+@utility shadow-modal {
+  box-shadow: var(--shadow-modal);
+}
+
+/*
+ * University seal. `public/logo.png` is an 8-bit palette PNG with no tRNS chunk — fully opaque,
+ * with a white backing baked in. On a light surface that is invisible; on a dark one it reads as
+ * a raw white square. Rather than fake transparency (the seal is multi-color line art, so no
+ * blend mode recovers it cleanly), dark mode makes the backing deliberate: a padded white plate,
+ * which is also how the seal appears on printed university letterhead.
+ *
+ * Unlayered on purpose, so it wins over the Tailwind utilities layer without an `!important`.
+ */
+.brand-mark {
+  border-radius: 0.375rem;
+}
+
+[data-theme="dark"] .brand-mark {
+  background-color: #ffffff;
+  padding: 2px;
+}
+
+/*
+ * Dark theme. Applied by ThemeProvider as `data-theme="dark"` on <html>.
+ *
+ * Built as a desaturated dark green, not neutral grey and not black: the institutional green
+ * is the brand, and a green-tinted ground keeps the identity when the surfaces go dark. Every
+ * text/background pair below was contrast-checked against WCAG AA (see UI_GUIDELINES §3.6).
+ *
+ * The two rules that shaped it:
+ *   1. Surfaces get *lighter* as they come forward (app → surface → tint), the inverse of
+ *      light mode, because on a dark ground elevation reads as added light.
+ *   2. `primary` and `primary-accent` split. #1f5d3b as text on a dark surface measures 1.5:1
+ *      and is unreadable, so accents lift to a bright green while fills stay deep enough for
+ *      white button text to clear AA. 060B09 0b1410
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-app: #030705;
+  --color-surface: #060B09; 
+  --color-surface-tint: #111c16;
+  --color-surface-alt: #152218;
+  --color-hover-tint: #131f17;
+  --color-row-hover: #0e1712;
+  --color-skeleton: #18261d;
+
+  --color-primary: #2f7a4f;
+  /* Hover lightens (dark-mode convention) but stops at #348254: white button text measures
+     4.70:1 here and only 3.85:1 at the #3a9260 this started as. Do not lighten further. */
+  --color-primary-hover: #348254;
+  --color-primary-accent: #74cf97;
+  --color-ink: #f2f8f3;
+
+  --color-body: #cddbd0;
+  --color-cell: #c3d3c7;
+  --color-cell-strong: #bccbc0;
+  --color-muted: #adc0b1;
+  --color-muted-alt: #a8bcac;
+  --color-muted-strong: #b3c5b6;
+  --color-muted-soft: #a4b8a8;
+  --color-muted-faint: #aabfae;
+  --color-eyebrow: #a3b8a7;
+  --color-label: #a9bdad;
+  --color-disabled: #869b8a;
+  --color-placeholder: #96ab9a;
+  --color-icon-muted: #b0c6b3;
+
+  --color-line: #28402f;
+  --color-divider: #203127;
+  --color-row-divider: #1c2c22;
+  --color-control-border: #3a5c46;
+
+  --color-meter-muted: #7a9781;
+
+  --color-danger: #b04545;
+  --color-danger-hover: #c25555;
+  --color-danger-text: #f5b8b8;
+  --color-danger-strong: #f8c4c4;
+  --color-danger-border: #5c3232;
+  --color-danger-border-soft: #4f2c2c;
+  --color-danger-border-dashed: #513434;
+  --color-danger-bg: #1f1414;
+  --color-danger-bg-soft: #1a1010;
+  --color-danger-bg-faint: #180f0f;
+
+  --color-success-border: #2e4b37;
+  --color-success-bg: #102217;
+  --color-warning: #e3caa0;
+  --color-info-border: #2f4a5c;
+  --color-info-bg: #0e1a21;
+  --color-info-text: #b0dcf2;
+
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-dropdown: 0 12px 30px rgba(0, 0, 0, 0.45);
+  --shadow-toast: 0 18px 40px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 28px 80px rgba(0, 0, 0, 0.6);
+}
+
 :root {
   font-family: "Google Sans", sans-serif;
   line-height: 1.5;
@@ -18,8 +223,8 @@ body {
   margin: 0;
   min-width: 320px;
   font-family: "Google Sans", sans-serif;
-  color: #0f172a;
-  background-color: #f4f7f1;
+  color: var(--color-ink);
+  background-color: var(--color-app);
 }
 
 #root {

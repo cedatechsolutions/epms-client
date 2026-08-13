@@ -9,7 +9,7 @@ import RecaptchaWidget from '../components/RecaptchaWidget'
 import { useAuthStore } from '../store/authStore'
 
 const inputClassName =
-  'w-full rounded-lg border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'w-full rounded-lg border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong'
 
 function resolveRedirectPath(from: unknown): string {
   if (!from || typeof from !== 'object' || !('pathname' in from) || typeof from.pathname !== 'string') {
@@ -78,25 +78,25 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-[#123524] lg:grid lg:grid-cols-2">
+    <main className="min-h-screen bg-surface text-ink lg:grid lg:grid-cols-2">
       <section className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-16">
         <div className="mx-auto w-full max-w-[400px]">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Cavite State University logo" className="h-14 w-14 shrink-0 object-contain" />
+            <img src="/logo.png" alt="Cavite State University logo" className="brand-mark h-14 w-14 shrink-0 object-contain" />
             <div>
-              <p className="text-md font-semibold tracking-[-0.02em] text-[#123524]">Cavite State University - Bacoor City</p>
-              <p className="text-xs text-[#6a7f6d]">Extension Projects Management System</p>
+              <p className="text-md font-semibold tracking-[-0.02em] text-ink">Cavite State University - Bacoor City</p>
+              <p className="text-xs text-muted-alt">Extension Projects Management System</p>
             </div>
           </div>
 
-          <h1 className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#123524]">Sign in</h1>
-          <p className="text-sm leading-6 text-[#506552]">
+          <h1 className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-ink">Sign in</h1>
+          <p className="text-sm leading-6 text-body">
             Sign in to continue to your account.
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#123524]">
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-ink">
                 Email
               </label>
               <input
@@ -112,7 +112,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-medium text-[#123524]">
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-ink">
                 Password
               </label>
               <div className="relative">
@@ -132,7 +132,7 @@ export default function LoginPage() {
                   aria-pressed={showPassword}
                   disabled={isAuthenticating}
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center rounded-r-lg text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center rounded-r-lg text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
                 </button>
@@ -144,13 +144,13 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isAuthenticating || !isRecaptchaConfigured}
-                className="w-full cursor-pointer rounded-lg border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full cursor-pointer rounded-lg border border-primary bg-primary px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isAuthenticating ? 'Signing in...' : 'Sign in'}
               </button>
 
-              <p className="text- mt-2 text-sm text-[#506552]">
-                <Link to="/forgot-password" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+              <p className="text- mt-2 text-sm text-body">
+                <Link to="/forgot-password" className="font-medium text-primary-accent transition-colors hover:text-primary-hover">
                   Forgot your password?
                 </Link>
               </p>
@@ -159,7 +159,7 @@ export default function LoginPage() {
 
              {recaptchaEnabled ? (
               <div>
-                <p className="mb-2 block text-sm font-medium text-[#123524]">Verification</p>
+                <p className="mb-2 block text-sm font-medium text-ink">Verification</p>
                 <RecaptchaWidget
                   siteKey={recaptchaSiteKey}
                   resetSignal={recaptchaResetSignal}

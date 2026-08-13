@@ -24,9 +24,9 @@ type QuestionFormModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 const selectClassName = `${inputClassName} cursor-pointer`
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
 
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -106,7 +106,7 @@ export default function QuestionFormModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -114,7 +114,7 @@ export default function QuestionFormModal({
             type="submit"
             form="question-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Saving...' : question ? 'Save Question' : 'Add Question'}
@@ -124,7 +124,7 @@ export default function QuestionFormModal({
     >
       <form id="question-form" onSubmit={handleSubmit} className="space-y-5">
         {errorMessage || localError ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage ?? localError}
           </div>
         ) : null}
@@ -143,7 +143,7 @@ export default function QuestionFormModal({
             className={inputClassName}
           />
           {fieldError('questionText') ? (
-            <p className="mt-1 text-xs text-[#8a2d2d]">{fieldError('questionText')}</p>
+            <p className="mt-1 text-xs text-danger-text">{fieldError('questionText')}</p>
           ) : null}
         </div>
 
@@ -206,7 +206,7 @@ export default function QuestionFormModal({
         </div>
 
         {questionType !== 'rating' ? (
-          <p className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-xs text-[#6a7f6d]">
+          <p className="rounded-md border border-line bg-surface-tint px-4 py-3 text-xs text-muted-alt">
             This question type is not scored in v1 — its answers are collected and shown as a distribution,
             but the weight does not affect the need ranking.
           </p>
@@ -236,7 +236,7 @@ export default function QuestionFormModal({
                     title="Remove option"
                     disabled={loading || optionLabels.length <= 2}
                     onClick={() => setOptionLabels(optionLabels.filter((_, i) => i !== index))}
-                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     <CloseRoundedIcon fontSize="small" />
                   </button>
@@ -247,7 +247,7 @@ export default function QuestionFormModal({
               type="button"
               disabled={loading}
               onClick={() => setOptionLabels([...optionLabels, ''])}
-              className="mt-2 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+              className="mt-2 inline-flex cursor-pointer items-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               <AddRoundedIcon fontSize="small" />
               Add option
@@ -261,9 +261,9 @@ export default function QuestionFormModal({
             checked={required}
             disabled={loading}
             onChange={(event) => setRequired(event.target.checked)}
-            className="h-4 w-4 cursor-pointer accent-[#1f5d3b]"
+            className="h-4 w-4 cursor-pointer accent-primary-accent"
           />
-          <span className="text-sm text-[#123524]">Required</span>
+          <span className="text-sm text-ink">Required</span>
         </label>
       </form>
     </AdminDialog>

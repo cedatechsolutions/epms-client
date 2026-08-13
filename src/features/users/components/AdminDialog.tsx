@@ -63,18 +63,18 @@ export default function AdminDialog({
           aria-labelledby={titleId}
           aria-describedby={description ? descriptionId : undefined}
           className={[
-            'animate-pop-in my-6 max-h-[calc(100vh-3rem)] w-full overflow-hidden border border-[#d8e1d4] bg-white shadow-[0_28px_80px_rgba(18,53,36,0.18)]',
+            'animate-pop-in my-6 max-h-[calc(100vh-3rem)] w-full overflow-hidden rounded-lg border border-line bg-surface shadow-modal',
             maxWidthClassName,
           ].join(' ')}
         >
-          <header className="border-b border-[#e7eee3] px-5 py-4 sm:px-6">
+          <header className="border-b border-divider px-5 py-4 sm:px-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 id={titleId} className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">
+                <h2 id={titleId} className="text-lg font-semibold tracking-[-0.02em] text-ink">
                   {title}
                 </h2>
                 {description ? (
-                  <p id={descriptionId} className="mt-1 text-sm leading-6 text-[#617462]">
+                  <p id={descriptionId} className="mt-1 text-sm leading-6 text-muted">
                     {description}
                   </p>
                 ) : null}
@@ -84,7 +84,7 @@ export default function AdminDialog({
                 type="button"
                 onClick={onClose}
                 disabled={closeDisabled}
-                className="cursor-pointer border border-[#d8e1d4] px-3 py-1.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+                className="cursor-pointer border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 Close
               </button>
@@ -93,7 +93,7 @@ export default function AdminDialog({
 
           <div className="max-h-[calc(100vh-15rem)] overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
 
-          {footer ? <footer className="border-t border-[#e7eee3] bg-[#fbfdf9] px-5 py-4 sm:px-6">{footer}</footer> : null}
+          {footer ? <footer className="border-t border-divider bg-row-hover px-5 py-4 sm:px-6">{footer}</footer> : null}
         </section>
       </div>
     </div>

@@ -20,16 +20,16 @@ import {
 } from '../types'
 
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 function ButtonSpinner({ tone = 'dark' }: { tone?: 'light' | 'dark' }) {
   return (
     <span
       className={[
         'h-4 w-4 animate-spin rounded-full border-2',
-        tone === 'light' ? 'border-white/35 border-t-white' : 'border-[#d8e1d4] border-t-[#1f5d3b]',
+        tone === 'light' ? 'border-white/35 border-t-white' : 'border-line border-t-primary-accent',
       ].join(' ')}
     />
   )
@@ -116,8 +116,8 @@ export default function RecommendationsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 border border-[#d8e1d4] bg-white px-5 py-4 text-sm text-[#506552]">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-sm text-body">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
         Loading recommendations...
       </div>
     )
@@ -128,12 +128,12 @@ export default function RecommendationsPage() {
       <div className="space-y-4">
         <Link
           to="/admin/surveys"
-          className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
         >
           <ArrowBackRoundedIcon fontSize="small" />
           Back to surveys
         </Link>
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage ?? 'Recommendations not found.'}
         </div>
         <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
@@ -161,7 +161,7 @@ export default function RecommendationsPage() {
     <div className="space-y-6">
       <Link
         to={`/admin/surveys/${results.surveyId}/results`}
-        className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
       >
         <ArrowBackRoundedIcon fontSize="small" />
         Back to assessment results
@@ -169,11 +169,11 @@ export default function RecommendationsPage() {
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
             Program recommendations
           </p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">{results.title}</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">{results.title}</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             {results.communityName} ·{' '}
             {results.finalized
               ? `Assessment finalized ${formatDateTime(results.finalizedAt)}`
@@ -200,8 +200,8 @@ export default function RecommendationsPage() {
       </div>
 
       {results.finalized ? (
-        <div className="flex items-start gap-3 border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
-          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-[#7b6542]" />
+        <div className="flex items-start gap-3 border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
+          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-warning" />
           <p>
             Scores come from a transparent weighting matrix, not a prediction model — every one can be
             traced back to the assessment figures through &quot;Why this score?&quot;. Regenerating replaces
@@ -209,7 +209,7 @@ export default function RecommendationsPage() {
           </p>
         </div>
       ) : (
-        <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
+        <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           Recommendations are generated from finalized figures so a decision can never rest on scores
           that later move. Finalize the assessment results first.
         </div>
@@ -218,9 +218,9 @@ export default function RecommendationsPage() {
       {recommendations.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summaryCards.map((card) => (
-            <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524] tabular-nums">
+            <div key={card.label} className="rounded-lg border border-line bg-surface px-5 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">{card.label}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-ink tabular-nums">
                 {card.value}
               </p>
             </div>
@@ -229,8 +229,8 @@ export default function RecommendationsPage() {
       ) : null}
 
       {recommendations.length === 0 ? (
-        <div className="border border-[#d8e1d4] bg-white px-5 py-12 text-center">
-          <p className="text-sm text-[#617462]">
+        <div className="rounded-lg border border-line bg-surface px-5 py-12 text-center">
+          <p className="text-sm text-muted">
             {results.finalized
               ? canDecide
                 ? 'No recommendations yet. Generate them to score every active program type against this assessment.'

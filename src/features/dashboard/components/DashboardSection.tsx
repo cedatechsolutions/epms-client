@@ -16,11 +16,11 @@ export default function DashboardSection({
   children: ReactNode
 }) {
   return (
-    <section className="border border-[#d8e1d4] bg-white">
-      <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <section className="rounded-lg overflow-hidden border border-line bg-surface">
+      <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">{title}</h3>
-          {description ? <p className="mt-1 text-sm text-[#617462]">{description}</p> : null}
+          <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">{title}</h3>
+          {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
         </div>
         {action}
       </div>

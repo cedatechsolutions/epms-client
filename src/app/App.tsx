@@ -35,9 +35,9 @@ import { ToastViewport } from '@/shared/toast'
 
 function AppLoader() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f4f7f1] px-4 text-[#123524]">
-      <div className="flex items-center gap-3 border border-[#d8e1d4] bg-white px-5 py-4 shadow-[0_12px_30px_rgba(18,53,36,0.05)]">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+    <main className="flex min-h-screen items-center justify-center bg-app px-4 text-ink">
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 shadow-card">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
         <span className="text-sm font-medium">Loading your session...</span>
       </div>
     </main>

@@ -26,7 +26,7 @@ export default function DeleteUserModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Cancel
       </button>
@@ -34,7 +34,7 @@ export default function DeleteUserModal({
         type="button"
         onClick={() => void onConfirm()}
         disabled={loading}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-danger bg-danger px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-danger-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         {loading ? <ButtonSpinner /> : null}
         {loading ? 'Deleting...' : 'Delete User'}
@@ -52,13 +52,13 @@ export default function DeleteUserModal({
       closeDisabled={loading}
       onClose={onClose}
     >
-      <div className="space-y-4 text-sm leading-6 text-[#506552]">
+      <div className="space-y-4 text-sm leading-6 text-body">
         <p>
           {user
             ? `Delete ${user.full_name} (${user.email}) from the user management module.`
             : 'Delete this user record.'}
         </p>
-        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-[#8a2d2d]">
+        <div className="rounded-md border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-danger-text">
           This cannot be undone from the current screen.
         </div>
       </div>

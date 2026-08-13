@@ -5,7 +5,7 @@ import { requestPasswordReset } from '../api/authApi'
 import AuthCard from '../components/AuthCard'
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 export default function ForgotPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -36,21 +36,21 @@ export default function ForgotPasswordPage() {
       title="Reset your password"
       description="Enter the email associated with your account and we'll send a link to reset your password."
       footer={
-        <Link to="/login" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+        <Link to="/login" className="font-medium text-primary-accent transition-colors hover:text-primary-hover">
           Back to sign in
         </Link>
       }
     >
       <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="rounded-lg border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
         {successMessage ? (
-          <div className="border border-[#bfd3c0] bg-[#f3f9f2] px-4 py-3 text-sm text-[#1f5d3b]">{successMessage}</div>
+          <div className="rounded-lg border border-success-border bg-success-bg px-4 py-3 text-sm text-primary-accent">{successMessage}</div>
         ) : null}
 
         <div>
-          <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#123524]">
+          <label htmlFor="email" className="mb-2 block text-sm font-medium text-ink">
             Email
           </label>
           <input
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+          className="w-full cursor-pointer border border-primary bg-primary px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           {isSubmitting ? 'Sending link...' : 'Send reset link'}
         </button>

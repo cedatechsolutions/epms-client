@@ -31,8 +31,8 @@ export default function ConfirmModal({
   onConfirm,
 }: ConfirmModalProps) {
   const confirmClassName = destructive
-    ? 'border-[#9f2f2f] bg-[#9f2f2f] hover:bg-[#832424]'
-    : 'border-[#1f5d3b] bg-[#1f5d3b] hover:bg-[#18492e]'
+    ? 'border-danger bg-danger hover:bg-danger-hover'
+    : 'border-primary bg-primary hover:bg-primary-hover'
 
   return (
     <AdminDialog
@@ -48,7 +48,7 @@ export default function ConfirmModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>

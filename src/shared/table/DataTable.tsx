@@ -43,7 +43,7 @@ export type DataTableProps<T> = {
 const CHECKBOX_COLUMN_WIDTH = 44
 const DEFAULT_FROZEN_WIDTH = 160
 
-const checkboxClassName = 'h-4 w-4 cursor-pointer accent-[#1f5d3b] disabled:cursor-not-allowed disabled:opacity-40'
+const checkboxClassName = 'h-4 w-4 cursor-pointer accent-primary-accent disabled:cursor-not-allowed disabled:opacity-40'
 
 // Sticky offsets/widths must be computed (Tailwind can't express dynamic arbitrary values),
 // so frozen cells use a small inline style — the one documented exception (UI guidelines §1/§8).
@@ -123,8 +123,8 @@ export default function DataTable<T>({
   const headerCellClass = (column: DataTableColumn<T>) => {
     const base = ['px-5 py-3', column.align === 'right' ? 'text-right' : 'text-left']
     if (column.frozen) {
-      base.push('sticky z-20 bg-[#f7faf6]')
-      if (column.key === lastFrozenKey) base.push('border-r border-[#e7eee3]')
+      base.push('sticky z-20 bg-surface-tint')
+      if (column.key === lastFrozenKey) base.push('border-r border-divider')
     }
     if (column.headerClassName) base.push(column.headerClassName)
     return base.join(' ')
@@ -133,8 +133,8 @@ export default function DataTable<T>({
   const bodyCellClass = (column: DataTableColumn<T>) => {
     const base = ['px-5 py-4', column.align === 'right' ? 'text-right' : '']
     if (column.frozen) {
-      base.push('sticky z-10 bg-white group-hover:bg-[#fbfdf9]')
-      if (column.key === lastFrozenKey) base.push('border-r border-[#e7eee3]')
+      base.push('sticky z-10 bg-surface group-hover:bg-row-hover')
+      if (column.key === lastFrozenKey) base.push('border-r border-divider')
     }
     if (column.cellClassName) base.push(column.cellClassName)
     return base.join(' ')
@@ -167,11 +167,11 @@ export default function DataTable<T>({
         className={[
           'inline-flex cursor-pointer items-center gap-1 uppercase tracking-[0.12em] transition-colors rounded-md',
           column.align === 'right' ? 'flex-row-reverse' : '',
-          active ? 'text-[#123524]' : 'hover:text-[#123524]',
+          active ? 'text-ink' : 'hover:text-ink',
         ].join(' ')}
       >
         <span>{column.header}</span>
-        <SortIcon fontSize="small" className={active ? 'text-[#1f5d3b]' : 'text-[#9caf9a]'} />
+        <SortIcon fontSize="small" className={active ? 'text-primary-accent' : 'text-meter-muted'} />
       </button>
     )
   }
@@ -181,8 +181,8 @@ export default function DataTable<T>({
   return (
     <div>
       {selectable && bulkActions && selectedCount > 0 ? (
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] bg-[#f7faf6] px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-medium text-[#123524]">{selectedCount} selected</p>
+        <div className="flex flex-col gap-3 border-b border-divider bg-surface-tint px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-medium text-ink">{selectedCount} selected</p>
           <div className="flex flex-wrap items-center gap-2">{bulkActions(selectedIds)}</div>
         </div>
       ) : null}
@@ -190,9 +190,9 @@ export default function DataTable<T>({
       <div className="overflow-x-auto">
         <table className={['table-auto border-collapse', minWidthClassName].join(' ')}>
           <thead>
-            <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+            <tr className="border-b border-divider bg-surface-tint text-left text-xs font-semibold uppercase tracking-[0.12em] text-label">
               {selectable ? (
-                <th className="sticky left-0 z-20 bg-[#f7faf6] px-5 py-3" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
+                <th className="sticky left-0 z-20 bg-surface-tint px-5 py-3" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
                   <input
                     ref={selectAllRef}
                     type="checkbox"
@@ -214,22 +214,22 @@ export default function DataTable<T>({
           <tbody>
             {loading ? (
               Array.from({ length: 5 }, (_, rowIndex) => (
-                <tr key={rowIndex} className="group border-b border-[#eef2eb] last:border-b-0">
+                <tr key={rowIndex} className="group border-b border-row-divider last:border-b-0">
                   {selectable ? (
-                    <td className="sticky left-0 z-10 bg-white px-5 py-4" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
-                      <span className="block h-4 w-4 animate-pulse bg-[#edf3ea]" />
+                    <td className="sticky left-0 z-10 bg-surface px-5 py-4" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
+                      <span className="block h-4 w-4 animate-pulse bg-skeleton" />
                     </td>
                   ) : null}
                   {columns.map((column) => (
                     <td key={column.key} className={bodyCellClass(column)} style={cellStyle(column)}>
-                      <span className="block h-4 w-full max-w-[150px] animate-pulse bg-[#edf3ea]" />
+                      <span className="block h-4 w-full max-w-[150px] animate-pulse bg-skeleton" />
                     </td>
                   ))}
                 </tr>
               ))
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={totalColumnCount} className="px-5 py-12 text-center text-sm text-[#617462]">
+                <td colSpan={totalColumnCount} className="px-5 py-12 text-center text-sm text-muted">
                   {emptyMessage}
                 </td>
               </tr>
@@ -240,10 +240,10 @@ export default function DataTable<T>({
                 return (
                   <tr
                     key={id}
-                    className="group border-b border-[#eef2eb] text-sm text-[#445846] last:border-b-0 hover:bg-[#fbfdf9]"
+                    className="group border-b border-row-divider text-sm text-cell last:border-b-0 hover:bg-row-hover"
                   >
                     {selectable ? (
-                      <td className="sticky left-0 z-10 bg-white px-5 py-4 group-hover:bg-[#fbfdf9]" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
+                      <td className="sticky left-0 z-10 bg-surface px-5 py-4 group-hover:bg-row-hover" style={frozenCellStyle(0, CHECKBOX_COLUMN_WIDTH)}>
                         <input
                           type="checkbox"
                           aria-label="Select row"

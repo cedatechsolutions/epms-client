@@ -1,10 +1,9 @@
-import { Link } from 'react-router'
 import { CAMPUS_CONTACT } from '@/shared/config/campusContact'
 import PublicShell from '../components/PublicShell'
 
-const sectionClassName = 'border border-[#d8e1d4] bg-white px-5 py-5'
-const headingClassName = 'text-lg font-semibold tracking-[-0.02em] text-[#123524]'
-const bodyClassName = 'mt-2 text-sm leading-7 text-[#506552]'
+const sectionClassName = 'rounded-lg border border-line bg-surface px-5 py-5'
+const headingClassName = 'text-lg font-semibold tracking-[-0.02em] text-ink'
+const bodyClassName = 'mt-2 text-sm leading-7 text-body'
 
 /**
  * Standalone privacy notice (RA 10173 — spec §5.3). The survey form carries a short
@@ -13,9 +12,9 @@ const bodyClassName = 'mt-2 text-sm leading-7 text-[#506552]'
  */
 export default function PrivacyNoticePage() {
   return (
-    <PublicShell subtitle="Privacy Notice">
+    <PublicShell subtitle="Privacy Notice" backTo="/login" backLabel="Back to sign in">
       <section className={sectionClassName}>
-        <h1 className="text-xl font-semibold tracking-[-0.03em] text-[#123524]">Privacy notice</h1>
+        <h1 className="text-xl font-semibold tracking-[-0.03em] text-ink">Privacy notice</h1>
         <p className={bodyClassName}>
           This notice explains how {CAMPUS_CONTACT.campusName} handles the information you give us
           through the Community Needs Assessment survey. Your data is processed under the Data Privacy
@@ -31,7 +30,7 @@ export default function PrivacyNoticePage() {
           and the sector you belong to.
         </p>
         <p className={bodyClassName}>
-          <strong className="font-medium text-[#123524]">We do not collect your name or contact details.</strong>{' '}
+          <strong className="font-medium text-ink">We do not collect your name or contact details.</strong>{' '}
           The survey does not ask for them and does not accept file uploads.
         </p>
       </section>
@@ -77,25 +76,16 @@ export default function PrivacyNoticePage() {
           <br />
           {CAMPUS_CONTACT.address}
         </p>
-        <p className="mt-2 text-sm leading-7 text-[#506552]">
+        <p className="mt-2 text-sm leading-7 text-body">
           <a
             href={`mailto:${CAMPUS_CONTACT.email}`}
-            className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]"
+            className="font-medium text-primary-accent transition-colors hover:text-primary-hover"
           >
             {CAMPUS_CONTACT.email}
           </a>
           <br />
           {CAMPUS_CONTACT.phone}
         </p>
-      </section>
-
-      <section className={sectionClassName}>
-        <Link
-          to="/login"
-          className="text-sm font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]"
-        >
-          Back to sign in
-        </Link>
       </section>
     </PublicShell>
   )

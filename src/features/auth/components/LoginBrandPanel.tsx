@@ -67,7 +67,7 @@ export default function LoginBrandPanel() {
             {CORE_VALUES.map((value) => (
               <li
                 key={value}
-                className="inline-flex border border-white/25 px-2.5 py-1 text-xs font-medium text-white"
+                className="inline-flex rounded-md border border-white/25 px-2.5 py-1 text-xs font-medium text-white"
               >
                 {value}
               </li>

@@ -15,9 +15,9 @@ const SEGMENT_COUNT = 20
 
 /** Ordered darkest → lightest → mid; adjacent pairs are separated by lightness, not hue. */
 const TONE_CLASSES = {
-  primary: 'bg-[#1f5d3b]',
-  muted: 'bg-[#9caf9a]',
-  neutral: 'bg-[#617462]',
+  primary: 'bg-primary',
+  muted: 'bg-meter-muted',
+  neutral: 'bg-muted',
 } as const
 
 export type SplitMeterTone = keyof typeof TONE_CLASSES
@@ -96,7 +96,7 @@ export default function SplitMeter({
     <div className="space-y-3">
       <div role="img" aria-label={`${label}: ${total > 0 ? summary : 'no data recorded'}`} className="flex h-2 w-full gap-px">
         {Array.from({ length: SEGMENT_COUNT }, (_, index) => (
-          <span key={index} className={['flex-1', filled[index] ?? 'bg-[#edf3ea]'].join(' ')} />
+          <span key={index} className={['flex-1', filled[index] ?? 'bg-skeleton'].join(' ')} />
         ))}
       </div>
 
@@ -104,9 +104,9 @@ export default function SplitMeter({
         {parts.map((part) => (
           <li key={part.label} className="flex items-center gap-2">
             <span aria-hidden="true" className={['h-2.5 w-2.5 shrink-0', TONE_CLASSES[part.tone]].join(' ')} />
-            <span className="text-xs text-[#617462]">{part.label}</span>
-            <span className="text-sm font-medium tabular-nums text-[#123524]">{formatValue(part.value)}</span>
-            <span className="text-xs tabular-nums text-[#6a7f6d]">{formatShare(part.value, total)}</span>
+            <span className="text-xs text-muted">{part.label}</span>
+            <span className="text-sm font-medium tabular-nums text-ink">{formatValue(part.value)}</span>
+            <span className="text-xs tabular-nums text-muted-alt">{formatShare(part.value, total)}</span>
           </li>
         ))}
       </ul>

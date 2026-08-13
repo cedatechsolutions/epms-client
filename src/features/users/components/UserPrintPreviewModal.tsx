@@ -159,7 +159,7 @@ export default function UserPrintPreviewModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Close
       </button>
@@ -168,7 +168,7 @@ export default function UserPrintPreviewModal({
           type="button"
           onClick={onRetry}
           disabled={loading}
-          className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+          className="cursor-pointer border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           Retry
         </button>
@@ -179,7 +179,7 @@ export default function UserPrintPreviewModal({
             download={PDF_FILENAME}
             aria-disabled={!pdfUrl || loading}
             className={[
-              'border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md',
+              'border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md',
               !pdfUrl || loading ? 'pointer-events-none cursor-not-allowed opacity-60' : 'cursor-pointer',
             ].join(' ')}
           >
@@ -189,7 +189,7 @@ export default function UserPrintPreviewModal({
             type="button"
             onClick={handlePrintPdf}
             disabled={!pdfUrl || loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             <PrintRoundedIcon fontSize="small" />
             Print PDF
@@ -211,20 +211,20 @@ export default function UserPrintPreviewModal({
     >
       {loading ? (
         <div className="flex items-center justify-center px-5 py-16">
-          <div className="flex items-center gap-3 text-sm text-[#617462]">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+          <div className="flex items-center gap-3 text-sm text-muted">
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
             Preparing PDF preview...
           </div>
         </div>
       ) : errorMessage ? (
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage}
         </div>
       ) : (
         <div className="space-y-3">
           {pdfBlob ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-[#617462]">
+              <p className="text-sm text-muted">
                 Page {pageNumber} of {pageCount}
               </p>
               <div className="flex items-center gap-2">
@@ -232,7 +232,7 @@ export default function UserPrintPreviewModal({
                   type="button"
                   disabled={pageNumber <= 1 || rendering}
                   onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
+                  className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 >
                   Previous
                 </button>
@@ -240,7 +240,7 @@ export default function UserPrintPreviewModal({
                   type="button"
                   disabled={pageNumber >= pageCount || rendering}
                   onClick={() => setPageNumber((current) => Math.min(pageCount, current + 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
+                  className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 >
                   Next
                 </button>
@@ -249,20 +249,20 @@ export default function UserPrintPreviewModal({
           ) : null}
 
           {rendering ? (
-            <div className="flex items-center gap-3 text-sm text-[#617462]">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+            <div className="flex items-center gap-3 text-sm text-muted">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
               Rendering preview...
             </div>
           ) : null}
 
           {renderError ? (
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
               {renderError}
             </div>
           ) : null}
 
-          <div ref={previewContainerRef} className="overflow-auto border border-[#d8e1d4] bg-[#f4f7f1] p-4">
-            <canvas ref={canvasRef} className="mx-auto block bg-white shadow-[0_12px_30px_rgba(18,53,36,0.10)]" />
+          <div ref={previewContainerRef} className="overflow-auto rounded-md border border-line bg-app p-4">
+            <canvas ref={canvasRef} className="mx-auto block bg-surface shadow-[0_12px_30px_rgba(18,53,36,0.10)]" />
           </div>
         </div>
       )}

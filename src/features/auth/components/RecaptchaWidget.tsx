@@ -169,7 +169,7 @@ export default function RecaptchaWidget({ siteKey, resetSignal, onTokenChange }:
   if (!siteKey) {
     return (
       <div className="space-y-2">
-        <div className="min-h-[78px] border border-dashed border-[#d5c4c4] bg-[#fff8f8] px-3 py-4 text-sm text-[#8a2d2d]">
+        <div className="min-h-[78px] border border-dashed border-danger-border-dashed bg-danger-bg-faint px-3 py-4 text-sm text-danger-text">
           Sign in verification is temporarily unavailable.
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function RecaptchaWidget({ siteKey, resetSignal, onTokenChange }:
   return (
     <div className="space-y-2 w-full">
       <div ref={containerRef} className='w-full'/>
-      {loadError ? <p className="text-xs text-[#b93838]">{loadError}</p> : null}
+      {loadError ? <p className="text-xs text-danger-strong">{loadError}</p> : null}
     </div>
   )
 }

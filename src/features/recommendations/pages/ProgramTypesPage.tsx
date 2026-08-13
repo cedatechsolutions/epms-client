@@ -19,9 +19,9 @@ import { formatDecimal, getRecommendationErrorMessage } from '../lib/format'
 import { SCORING_MATRIX_ROLES, type ProgramType, type ProgramTypePayload, type Sector } from '../types'
 
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const chipClassName = 'inline-flex border px-2.5 py-1 text-xs font-medium'
 
 export default function ProgramTypesPage() {
@@ -104,7 +104,7 @@ export default function ProgramTypesPage() {
       header: 'Program type',
       frozen: true,
       width: 260,
-      cellClassName: 'truncate text-[#123524] font-medium',
+      cellClassName: 'truncate text-ink font-medium',
       render: (row) => row.name,
     },
     {
@@ -126,17 +126,17 @@ export default function ProgramTypesPage() {
       render: (row) => {
         const weighted = row.weights.filter((weight) => weight.weight > 0)
         if (weighted.length === 0) {
-          return <span className="text-[#617462]">Not weighted yet</span>
+          return <span className="text-muted">Not weighted yet</span>
         }
         return (
           <span className="flex flex-wrap gap-1.5">
             {weighted.map((weight) => (
               <span
                 key={weight.needCategoryId}
-                className={`${chipClassName} border-[#d8e1d4] bg-[#f7faf6] text-[#123524]`}
+                className={`${chipClassName} border-line bg-surface-tint text-ink`}
               >
                 {weight.needCategoryName}
-                <span className="ml-1.5 font-normal text-[#617462]">{formatDecimal(weight.weight, 1)}</span>
+                <span className="ml-1.5 font-normal text-muted">{formatDecimal(weight.weight, 1)}</span>
               </span>
             ))}
           </span>
@@ -149,13 +149,13 @@ export default function ProgramTypesPage() {
       width: 260,
       render: (row) =>
         row.sectors.length === 0 ? (
-          <span className="text-[#617462]">-</span>
+          <span className="text-muted">-</span>
         ) : (
           <span className="flex flex-wrap gap-1.5">
             {row.sectors.map((sector) => (
               <span
                 key={sector.id}
-                className={`${chipClassName} border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]`}
+                className={`${chipClassName} border-success-border bg-success-bg text-primary-accent`}
               >
                 {sector.name}
               </span>
@@ -172,8 +172,8 @@ export default function ProgramTypesPage() {
           className={[
             chipClassName,
             row.active
-              ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
-              : 'border-[#d8e1d4] bg-[#f7faf6] text-[#617462]',
+              ? 'border-success-border bg-success-bg text-primary-accent'
+              : 'border-line bg-surface-tint text-muted',
           ].join(' ')}
         >
           {row.active ? 'Active' : 'Inactive'}
@@ -192,12 +192,12 @@ export default function ProgramTypesPage() {
             aria-label={`Edit ${row.name}`}
             title="Edit"
             onClick={() => openEdit(row)}
-            className="ml-auto flex h-9 w-9 items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+            className="ml-auto flex h-9 w-9 items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint rounded-md"
           >
             <EditOutlinedIcon fontSize="small" />
           </button>
         ) : (
-          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+          <span className="inline-flex rounded-md border border-line bg-surface-tint px-3 py-2 text-xs font-medium text-muted">
             Read only
           </span>
         ),
@@ -223,11 +223,11 @@ export default function ProgramTypesPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
             Recommendation engine
           </p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">Program Library</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Program Library</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             The catalogue of extension program types the engine matches assessed community needs
             against. How strongly each one addresses a need is set in the scoring matrix.
           </p>
@@ -249,7 +249,7 @@ export default function ProgramTypesPage() {
 
       {errorMessage ? (
         <div className="space-y-3">
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
           <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
             Retry
           </button>
@@ -258,21 +258,21 @@ export default function ProgramTypesPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
-          <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524] tabular-nums">
+          <div key={card.label} className="rounded-lg border border-line bg-surface px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">{card.label}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-ink tabular-nums">
               {card.value}
             </p>
-            {card.hint ? <p className="mt-1 text-xs text-[#6a7f6d]">{card.hint}</p> : null}
+            {card.hint ? <p className="mt-1 text-xs text-muted-alt">{card.hint}</p> : null}
           </div>
         ))}
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">Program types</h3>
-            <p className="mt-1 text-sm text-[#617462]">
+            <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">Program types</h3>
+            <p className="mt-1 text-sm text-muted">
               Deactivate a type instead of deleting it — recommendations already generated keep naming it.
             </p>
           </div>

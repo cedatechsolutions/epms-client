@@ -19,9 +19,9 @@ import {
 type PageState = 'loading' | 'ready' | 'closed' | 'notfound' | 'error' | 'submitted' | 'already'
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-base text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-base text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent rounded-md'
 const selectClassName = `${inputClassName} cursor-pointer`
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
 
 function Notice({
   icon,
@@ -33,10 +33,10 @@ function Notice({
   body: string
 }) {
   return (
-    <section className="border border-[#d8e1d4] bg-white px-5 py-8 text-center">
-      <div className="flex justify-center text-[#1f5d3b]">{icon}</div>
-      <h1 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-[#123524]">{title}</h1>
-      <p className="mt-2 text-sm leading-7 text-[#506552]">{body}</p>
+    <section className="rounded-lg border border-line bg-surface px-5 py-8 text-center">
+      <div className="flex justify-center text-primary-accent">{icon}</div>
+      <h1 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-ink">{title}</h1>
+      <p className="mt-2 text-sm leading-7 text-body">{body}</p>
     </section>
   )
 }
@@ -162,9 +162,9 @@ export default function PublicSurveyPage() {
   if (state === 'loading') {
     return (
       <PublicShell>
-        <section className="flex items-center justify-center gap-3 border border-[#d8e1d4] bg-white px-5 py-10">
-          <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
-          <span className="text-sm text-[#506552]">Loading survey...</span>
+        <section className="flex items-center justify-center gap-3 rounded-lg border border-line bg-surface px-5 py-10">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
+          <span className="text-sm text-body">Loading survey...</span>
         </section>
       </PublicShell>
     )
@@ -221,14 +221,14 @@ export default function PublicSurveyPage() {
   if (state === 'error' || !survey) {
     return (
       <PublicShell>
-        <section className="border border-[#d8e1d4] bg-white px-5 py-8">
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <section className="rounded-lg border border-line bg-surface px-5 py-8">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage ?? 'Something went wrong.'}
           </div>
           <button
             type="button"
             onClick={() => void load()}
-            className="mt-4 w-full cursor-pointer border border-[#d8e1d4] px-4 py-3 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+            className="mt-4 w-full cursor-pointer border border-line px-4 py-3 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
           >
             Try again
           </button>
@@ -239,31 +239,31 @@ export default function PublicSurveyPage() {
 
   return (
     <PublicShell>
-      <section className="border border-[#d8e1d4] bg-white px-5 py-5">
-        <h1 className="text-xl font-semibold tracking-[-0.03em] text-[#123524]">{survey.title}</h1>
-        <p className="mt-1 text-sm text-[#617462]">{survey.communityName}</p>
+      <section className="rounded-lg border border-line bg-surface px-5 py-5">
+        <h1 className="text-xl font-semibold tracking-[-0.03em] text-ink">{survey.title}</h1>
+        <p className="mt-1 text-sm text-muted">{survey.communityName}</p>
         {survey.description ? (
-          <p className="mt-3 text-sm leading-7 text-[#506552]">{survey.description}</p>
+          <p className="mt-3 text-sm leading-7 text-body">{survey.description}</p>
         ) : null}
       </section>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* GAD demographic block — always first, sex required (spec Module 3 §2). */}
-        <section className="border border-[#d8e1d4] bg-white px-5 py-5">
-          <h2 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">About you</h2>
-          <p className="mt-1 text-sm text-[#617462]">
+        <section className="rounded-lg border border-line bg-surface px-5 py-5">
+          <h2 className="text-lg font-semibold tracking-[-0.02em] text-ink">About you</h2>
+          <p className="mt-1 text-sm text-muted">
             This helps us make sure programs reach everyone fairly.
           </p>
 
           <fieldset className="mt-4">
             <legend className={labelClassName}>
-              Sex <span className="text-[#9f2f2f]">*</span>
+              Sex <span className="text-danger">*</span>
             </legend>
             <div className="space-y-2">
               {SEX_OPTIONS.map((option) => (
                 <label
                   key={option.value}
-                  className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
+                  className="flex cursor-pointer items-center gap-3 border border-line px-4 py-3 transition-colors hover:bg-hover-tint rounded-md"
                 >
                   <input
                     type="radio"
@@ -271,9 +271,9 @@ export default function PublicSurveyPage() {
                     value={option.value}
                     checked={sex === option.value}
                     onChange={() => setSex(option.value)}
-                    className="h-4 w-4 cursor-pointer accent-[#1f5d3b]"
+                    className="h-4 w-4 cursor-pointer accent-primary-accent"
                   />
-                  <span className="text-base text-[#123524]">{option.label}</span>
+                  <span className="text-base text-ink">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -281,7 +281,7 @@ export default function PublicSurveyPage() {
 
           <div className="mt-4">
             <label htmlFor="age-group" className={labelClassName}>
-              Age group <span className="text-[#617462]">(optional)</span>
+              Age group <span className="text-muted">(optional)</span>
             </label>
             <select
               id="age-group"
@@ -300,7 +300,7 @@ export default function PublicSurveyPage() {
 
           <div className="mt-4">
             <label htmlFor="sector" className={labelClassName}>
-              Sector <span className="text-[#617462]">(optional)</span>
+              Sector <span className="text-muted">(optional)</span>
             </label>
             <select
               id="sector"
@@ -331,9 +331,9 @@ export default function PublicSurveyPage() {
         ))}
 
         {/* Privacy notice + consent — RA 10173 (Data Privacy Act). */}
-        <section className="border border-[#d8e1d4] bg-white px-5 py-5">
-          <h2 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">Privacy notice</h2>
-          <p className="mt-2 text-sm leading-7 text-[#506552]">
+        <section className="rounded-lg border border-line bg-surface px-5 py-5">
+          <h2 className="text-lg font-semibold tracking-[-0.02em] text-ink">Privacy notice</h2>
+          <p className="mt-2 text-sm leading-7 text-body">
             Your answers are collected by Cavite State University – Bacoor Campus solely to plan community
             extension programs. We do not collect your name or contact details, and results are reported only
             as anonymous, aggregated statistics. Your data is processed under the Data Privacy Act of 2012
@@ -341,34 +341,34 @@ export default function PublicSurveyPage() {
             <Link
               to="/privacy"
               target="_blank"
-              className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]"
+              className="font-medium text-primary-accent transition-colors hover:text-primary-hover"
             >
               Read the full privacy notice
             </Link>
             .
           </p>
-          <label className="mt-4 flex cursor-pointer items-start gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md">
+          <label className="mt-4 flex cursor-pointer items-start gap-3 border border-line px-4 py-3 transition-colors hover:bg-hover-tint rounded-md">
             <input
               type="checkbox"
               checked={consent}
               onChange={(event) => setConsent(event.target.checked)}
-              className="mt-1 h-4 w-4 cursor-pointer accent-[#1f5d3b]"
+              className="mt-1 h-4 w-4 cursor-pointer accent-primary-accent"
             />
-            <span className="text-sm leading-6 text-[#123524]">
+            <span className="text-sm leading-6 text-ink">
               I have read the privacy notice and I consent to my answers being collected and used as described.{' '}
-              <span className="text-[#9f2f2f]">*</span>
+              <span className="text-danger">*</span>
             </span>
           </label>
         </section>
 
         {formError ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{formError}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{formError}</div>
         ) : null}
 
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-base font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-3 text-base font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           {submitting ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -396,10 +396,10 @@ function QuestionField({
   const selected = Array.isArray(value) ? value : []
 
   return (
-    <section className="border border-[#d8e1d4] bg-white px-5 py-5">
-      <p className="text-base font-medium text-[#123524]">
+    <section className="rounded-lg border border-line bg-surface px-5 py-5">
+      <p className="text-base font-medium text-ink">
         {index + 1}. {question.questionText}
-        {question.required ? <span className="text-[#9f2f2f]"> *</span> : null}
+        {question.required ? <span className="text-danger"> *</span> : null}
       </p>
 
       {question.questionType === 'rating' ? (
@@ -416,8 +416,8 @@ function QuestionField({
                   className={[
                     'cursor-pointer border px-2 py-3 text-base font-medium transition-colors rounded-md',
                     active
-                      ? 'border-[#1f5d3b] bg-[#1f5d3b] text-white'
-                      : 'border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-line text-ink hover:bg-hover-tint',
                   ].join(' ')}
                 >
                   {rating}
@@ -425,7 +425,7 @@ function QuestionField({
               )
             })}
           </div>
-          <div className="mt-2 flex justify-between text-xs text-[#6a7f6d]">
+          <div className="mt-2 flex justify-between text-xs text-muted-alt">
             <span>1 — Very poor</span>
             <span>5 — Very good</span>
           </div>
@@ -437,7 +437,7 @@ function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="flex cursor-pointer items-center gap-3 border border-line px-4 py-3 transition-colors hover:bg-hover-tint rounded-md"
             >
               <input
                 type="radio"
@@ -445,9 +445,9 @@ function QuestionField({
                 value={option.value}
                 checked={value === option.value}
                 onChange={() => onChange(question.id, option.value)}
-                className="h-4 w-4 cursor-pointer accent-[#1f5d3b]"
+                className="h-4 w-4 cursor-pointer accent-primary-accent"
               />
-              <span className="text-base text-[#123524]">{option.label}</span>
+              <span className="text-base text-ink">{option.label}</span>
             </label>
           ))}
         </div>
@@ -458,15 +458,15 @@ function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="flex cursor-pointer items-center gap-3 border border-line px-4 py-3 transition-colors hover:bg-hover-tint rounded-md"
             >
               <input
                 type="checkbox"
                 checked={selected.includes(option.value)}
                 onChange={() => onToggleCheckbox(question.id, option.value)}
-                className="h-4 w-4 cursor-pointer accent-[#1f5d3b]"
+                className="h-4 w-4 cursor-pointer accent-primary-accent"
               />
-              <span className="text-base text-[#123524]">{option.label}</span>
+              <span className="text-base text-ink">{option.label}</span>
             </label>
           ))}
         </div>

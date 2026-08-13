@@ -2,7 +2,7 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 
-const CARD_CLASS_NAME = 'block border border-[#d8e1d4] bg-white p-5 rounded-md'
+const CARD_CLASS_NAME = 'block border border-line bg-surface p-5 rounded-lg'
 
 type StatCardProps = {
   label: string
@@ -22,13 +22,13 @@ export default function StatCard({ label, value, hint, icon, to }: StatCardProps
   const body = (
     <>
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-[#617462]">{label}</p>
-        <span className="text-[#60755f]" aria-hidden="true">
+        <p className="text-sm text-muted">{label}</p>
+        <span className="text-icon-muted" aria-hidden="true">
           {icon}
         </span>
       </div>
-      <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-[#123524]">{value}</p>
-      {hint ? <p className="mt-2 text-xs text-[#6a7f6d]">{hint}</p> : null}
+      <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-ink">{value}</p>
+      {hint ? <p className="mt-2 text-xs text-muted-alt">{hint}</p> : null}
     </>
   )
 
@@ -37,9 +37,9 @@ export default function StatCard({ label, value, hint, icon, to }: StatCardProps
   }
 
   return (
-    <Link to={to} className={`${CARD_CLASS_NAME} transition-colors hover:bg-[#fbfdf9]`}>
+    <Link to={to} className={`${CARD_CLASS_NAME} transition-colors hover:bg-row-hover`}>
       {body}
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#1f5d3b]">
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary-accent">
         View all
         <ArrowForwardRoundedIcon fontSize="small" />
       </span>

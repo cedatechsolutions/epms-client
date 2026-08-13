@@ -5,6 +5,31 @@
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Extension Projects Management System</title>
+    <script>
+      /*
+       * Paint the correct theme before first render. Without this, a dark-theme user gets a
+       * white flash on every load: the bundle has to parse and mount before React could set
+       * the attribute. Kept inline and dependency-free for that reason — it must run first.
+       *
+       * The key and the resolution rule are mirrored from src/shared/theme/themeStore.ts;
+       * change them together.
+       */
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('cems-theme')
+          var preference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+          var theme =
+            preference === 'system'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : preference
+          document.documentElement.dataset.theme = theme
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

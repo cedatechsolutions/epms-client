@@ -37,19 +37,19 @@ const defaultMeta: PaginationMeta = {
 type CommunityOption = { id: string; name: string }
 
 const actionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 const destructiveActionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 cursor-pointer border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 function StatusBadge({ status }: { status: SurveyStatus }) {
   const tone =
     status === 'deployed'
-      ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
-      : 'border-[#d8e1d4] bg-[#f7faf6] text-[#617462]'
+      ? 'border-success-border bg-success-bg text-primary-accent'
+      : 'border-line bg-surface-tint text-muted'
   return (
     <span className={['inline-flex border px-2.5 py-1 text-xs font-medium', tone].join(' ')}>
       {SURVEY_STATUS_LABELS[status]}
@@ -172,12 +172,12 @@ export default function SurveysListPage() {
       frozen: true,
       width: 260,
       sortKey: 'title',
-      cellClassName: 'text-[#123524]',
+      cellClassName: 'text-ink',
       render: (survey) => (
         <button
           type="button"
           onClick={() => navigate(`/admin/surveys/${survey.id}/build`)}
-          className="cursor-pointer text-left font-medium text-[#1f5d3b] hover:underline rounded-md"
+          className="cursor-pointer text-left font-medium text-primary-accent hover:underline rounded-md"
         >
           {survey.title}
         </button>
@@ -242,9 +242,9 @@ export default function SurveysListPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Assessment</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">Needs assessment surveys</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Assessment</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Needs assessment surveys</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             Build a survey for a partner community, deploy it to collect sex-disaggregated responses via a
             public link, then rank the community's needs from the results.
           </p>
@@ -259,25 +259,25 @@ export default function SurveysListPage() {
               setFormOpen(true)
             }}
             disabled={loading || communities.length === 0}
-            className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Create New Survey
           </button>
         ) : null}
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-[#123524]">Surveys</p>
-            <p className="mt-1 text-sm text-[#617462]">Draft surveys are editable; deployed surveys are locked.</p>
+            <p className="text-sm font-medium text-ink">Surveys</p>
+            <p className="mt-1 text-sm text-muted">Draft surveys are editable; deployed surveys are locked.</p>
           </div>
-          <p className="text-sm text-[#617462]">{countLabel}</p>
+          <p className="text-sm text-muted">{countLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-[minmax(220px,1fr)_minmax(150px,auto)] md:items-end">
+        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_minmax(150px,auto)] md:items-end">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Search</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
               type="search"
               value={searchInput}
@@ -289,7 +289,7 @@ export default function SurveysListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Status</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Status</span>
             <select
               value={statusFilter}
               disabled={loading}
@@ -309,11 +309,11 @@ export default function SurveysListPage() {
 
         {errorMessage ? (
           <div className="space-y-4 px-5 py-6">
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
             <button
               type="button"
               onClick={() => void loadSurveys()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               Retry
             </button>
@@ -331,8 +331,8 @@ export default function SurveysListPage() {
             />
 
             {meta.total > 0 && meta.last_page > 1 ? (
-              <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-                <p className="text-sm text-[#617462]">
+              <div className="flex flex-col gap-4 border-t border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <p className="text-sm text-muted">
                   Page {meta.current_page} of {meta.last_page}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -340,7 +340,7 @@ export default function SurveysListPage() {
                     type="button"
                     disabled={meta.current_page <= 1}
                     onClick={() => setPage((current) => Math.max(1, current - 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Previous
                   </button>
@@ -348,7 +348,7 @@ export default function SurveysListPage() {
                     type="button"
                     disabled={meta.current_page >= meta.last_page}
                     onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Next
                   </button>
@@ -387,7 +387,7 @@ export default function SurveysListPage() {
         }}
         onConfirm={handleDelete}
       >
-        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-sm text-danger-text">
           Deleting a survey is a soft delete — it is hidden from the list but its responses and history are
           preserved. This action cannot be undone from the interface.
         </div>

@@ -18,27 +18,27 @@ type ToneStyle = {
 const TONE_STYLES: Record<ToastTone, ToneStyle> = {
   success: {
     Icon: CheckCircleOutlineRoundedIcon,
-    accent: 'border-l-[#1f5d3b]',
-    icon: 'text-[#1f5d3b]',
-    text: 'text-[#123524]',
+    accent: 'border-l-primary-accent',
+    icon: 'text-primary-accent',
+    text: 'text-ink',
   },
   error: {
     Icon: ErrorOutlineRoundedIcon,
-    accent: 'border-l-[#9f2f2f]',
-    icon: 'text-[#9f2f2f]',
-    text: 'text-[#8a2d2d]',
+    accent: 'border-l-danger',
+    icon: 'text-danger',
+    text: 'text-danger-text',
   },
   warning: {
     Icon: WarningAmberRoundedIcon,
-    accent: 'border-l-[#7b6542]',
-    icon: 'text-[#7b6542]',
-    text: 'text-[#7b6542]',
+    accent: 'border-l-warning',
+    icon: 'text-warning',
+    text: 'text-warning',
   },
   info: {
     Icon: InfoOutlinedIcon,
-    accent: 'border-l-[#123524]',
-    icon: 'text-[#506552]',
-    text: 'text-[#123524]',
+    accent: 'border-l-ink',
+    icon: 'text-body',
+    text: 'text-ink',
   },
 }
 
@@ -55,7 +55,7 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
     <div
       role="status"
       aria-live="polite"
-      className="animate-slide-in-up pointer-events-auto w-full max-w-sm border border-[#d8e1d4] bg-white shadow-[0_18px_40px_rgba(18,53,36,0.12)]"
+      className="animate-slide-in-up pointer-events-auto w-full max-w-sm rounded-lg overflow-hidden border border-line bg-surface shadow-toast"
     >
       <div className={['flex items-start gap-3 border-l-4 px-4 py-3', style.accent].join(' ')}>
         <Icon fontSize="small" className={['mt-0.5 shrink-0', style.icon].join(' ')} />
@@ -65,7 +65,7 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
           aria-label="Dismiss notification"
           title="Dismiss"
           onClick={onDismiss}
-          className="-mr-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] rounded-md"
+          className="-mr-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink rounded-md"
         >
           <CloseRoundedIcon fontSize="small" />
         </button>

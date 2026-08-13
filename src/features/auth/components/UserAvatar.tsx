@@ -26,7 +26,7 @@ export default function UserAvatar({ initials, imageUrl, name, size = 'sm' }: Us
   return (
     <span
       className={[
-        'flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#1f5d3b] font-semibold text-white',
+        'flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary font-semibold text-white',
         sizeClassNames[size],
       ].join(' ')}
     >

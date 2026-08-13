@@ -272,7 +272,7 @@ export default function AdminUserFormModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Cancel
       </button>
@@ -280,7 +280,7 @@ export default function AdminUserFormModal({
         type="submit"
         form="admin-user-form"
         disabled={loading}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         {loading ? <ButtonSpinner /> : null}
         {loading ? 'Saving...' : mode === 'create' ? 'Create User' : 'Save Changes'}
@@ -304,10 +304,10 @@ export default function AdminUserFormModal({
     >
       <form id="admin-user-form" className="space-y-5" aria-busy={loading} onSubmit={handleSubmit}>
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
 
-        <div className="space-y-3 border border-[#e7eee3] bg-[#fbfdf9] px-4 py-4">
+        <div className="space-y-3 rounded-md border border-divider bg-row-hover px-4 py-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <UserAvatar
               initials={buildInitials(values.firstName, values.lastName, values.email)}
@@ -318,8 +318,8 @@ export default function AdminUserFormModal({
 
             <div className="space-y-2">
               <div>
-                <p className="text-sm font-medium text-[#123524]">Profile Photo (optional)</p>
-                <p className="text-xs text-[#73856f]">
+                <p className="text-sm font-medium text-ink">Profile Photo (optional)</p>
+                <p className="text-xs text-eyebrow">
                   JPG or PNG, up to 2 MB. Without one, the account shows its initials.
                 </p>
               </div>
@@ -338,7 +338,7 @@ export default function AdminUserFormModal({
                   htmlFor="admin-user-avatar"
                   aria-disabled={loading}
                   className={[
-                    'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md',
+                    'inline-flex cursor-pointer items-center justify-center gap-2 border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md',
                     loading ? 'pointer-events-none opacity-60' : '',
                   ].join(' ')}
                 >
@@ -351,7 +351,7 @@ export default function AdminUserFormModal({
                     type="button"
                     disabled={loading}
                     onClick={handleAvatarRemove}
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#e3c9c9] px-4 py-2.5 text-sm font-medium text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 border border-danger-border px-4 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
                   >
                     <DeleteOutlineRoundedIcon fontSize="small" />
                     Remove photo
@@ -359,82 +359,82 @@ export default function AdminUserFormModal({
                 ) : null}
               </div>
 
-              {avatarError ? <p className="text-xs text-[#b93838]">{avatarError}</p> : null}
+              {avatarError ? <p className="text-xs text-danger-strong">{avatarError}</p> : null}
             </div>
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">First Name</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">First Name</span>
             <input
               autoFocus
               type="text"
               value={values.firstName}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, firstName: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter first name"
             />
-            {mergedErrors.firstName ? <p className="text-xs text-[#b93838]">{mergedErrors.firstName}</p> : null}
+            {mergedErrors.firstName ? <p className="text-xs text-danger-strong">{mergedErrors.firstName}</p> : null}
           </label>
 
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Middle Name (optional)</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Middle Name (optional)</span>
             <input
               type="text"
               value={values.middleName}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, middleName: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter middle name"
             />
-            {mergedErrors.middleName ? <p className="text-xs text-[#b93838]">{mergedErrors.middleName}</p> : null}
+            {mergedErrors.middleName ? <p className="text-xs text-danger-strong">{mergedErrors.middleName}</p> : null}
           </label>
 
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Last Name</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Last Name</span>
             <input
               type="text"
               value={values.lastName}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, lastName: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter last name"
             />
-            {mergedErrors.lastName ? <p className="text-xs text-[#b93838]">{mergedErrors.lastName}</p> : null}
+            {mergedErrors.lastName ? <p className="text-xs text-danger-strong">{mergedErrors.lastName}</p> : null}
           </label>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Contact Number (optional)</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Contact Number (optional)</span>
             <input
               type="tel"
               value={values.contactNumber}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, contactNumber: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter contact number"
             />
-            {mergedErrors.contactNumber ? <p className="text-xs text-[#b93838]">{mergedErrors.contactNumber}</p> : null}
+            {mergedErrors.contactNumber ? <p className="text-xs text-danger-strong">{mergedErrors.contactNumber}</p> : null}
           </label>
 
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Email Address</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Email Address</span>
             <input
               type="email"
               value={values.email}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, email: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter email address"
             />
-            {mergedErrors.email ? <p className="text-xs text-[#b93838]">{mergedErrors.email}</p> : null}
+            {mergedErrors.email ? <p className="text-xs text-danger-strong">{mergedErrors.email}</p> : null}
           </label>
 
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Role</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Role</span>
             <select
               value={values.role}
               disabled={loading}
@@ -444,7 +444,7 @@ export default function AdminUserFormModal({
                   role: event.target.value as UserRole,
                 }))
               }
-              className="w-full cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2.5 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full cursor-pointer border border-line bg-surface px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
             >
               {ALL_ROLES.map((role) => (
                 <option key={role} value={role}>
@@ -452,20 +452,20 @@ export default function AdminUserFormModal({
                 </option>
               ))}
             </select>
-            {mergedErrors.role ? <p className="text-xs text-[#b93838]">{mergedErrors.role}</p> : null}
+            {mergedErrors.role ? <p className="text-xs text-danger-strong">{mergedErrors.role}</p> : null}
           </label>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Password (optional)</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Password (optional)</span>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={values.password}
                 disabled={loading}
                 onChange={(event) => setValues((current) => ({ ...current, password: event.target.value }))}
-                className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+                className="w-full border border-line px-3 py-2.5 pr-12 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
                 placeholder={mode === 'create' ? 'Leave blank to email a temporary password' : 'Leave blank to keep current password'}
               />
               <button
@@ -474,15 +474,15 @@ export default function AdminUserFormModal({
                 aria-pressed={showPassword}
                 disabled={loading}
                 onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
               >
                 {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
               </button>
             </div>
             {mergedErrors.password ? (
-              <p className="text-xs text-[#b93838]">{mergedErrors.password}</p>
+              <p className="text-xs text-danger-strong">{mergedErrors.password}</p>
             ) : (
-              <p className="text-xs text-[#73856f]">
+              <p className="text-xs text-eyebrow">
                 {mode === 'create'
                   ? 'Leave blank to email a temporary password the user must change on first login.'
                   : 'Only fill this in if the password should change.'}
@@ -490,15 +490,15 @@ export default function AdminUserFormModal({
             )}
           </label>
 
-          <label className="space-y-2 text-sm text-[#445846]">
-            <span className="font-medium text-[#123524]">Confirm Password</span>
+          <label className="space-y-2 text-sm text-cell">
+            <span className="font-medium text-ink">Confirm Password</span>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={values.confirmPassword}
                 disabled={loading}
                 onChange={(event) => setValues((current) => ({ ...current, confirmPassword: event.target.value }))}
-                className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+                className="w-full border border-line px-3 py-2.5 pr-12 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
                 placeholder={mode === 'create' ? 'Confirm password' : 'Confirm new password'}
               />
               <button
@@ -507,7 +507,7 @@ export default function AdminUserFormModal({
                 aria-pressed={showConfirmPassword}
                 disabled={loading}
                 onClick={() => setShowConfirmPassword((current) => !current)}
-                className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
               >
                 {showConfirmPassword ? (
                   <VisibilityOffRoundedIcon fontSize="small" />
@@ -517,9 +517,9 @@ export default function AdminUserFormModal({
               </button>
             </div>
             {mergedErrors.confirmPassword ? (
-              <p className="text-xs text-[#b93838]">{mergedErrors.confirmPassword}</p>
+              <p className="text-xs text-danger-strong">{mergedErrors.confirmPassword}</p>
             ) : (
-              <p className="text-xs text-[#73856f]">
+              <p className="text-xs text-eyebrow">
                 {mode === 'create'
                   ? 'Password confirmation must match the password.'
                   : 'Only required when a new password is provided.'}
@@ -529,8 +529,8 @@ export default function AdminUserFormModal({
         </div>
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-[#617462]" role="status" aria-live="polite">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+          <div className="flex items-center gap-2 text-sm text-muted" role="status" aria-live="polite">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
             Saving user details...
           </div>
         ) : null}

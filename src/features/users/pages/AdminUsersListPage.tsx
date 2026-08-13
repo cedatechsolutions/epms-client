@@ -48,16 +48,16 @@ const defaultMeta: PaginationMeta = {
 type PaginationItem = number | 'ellipsis'
 
 const actionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const destructiveActionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 cursor-pointer border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 function getDisplayName(user: User): string {
   return user.full_name || [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ')
@@ -77,7 +77,7 @@ function ButtonSpinner({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
     <span
       className={[
         'h-4 w-4 animate-spin rounded-full border-2',
-        tone === 'light' ? 'border-white/35 border-t-white' : 'border-[#d8e1d4] border-t-[#1f5d3b]',
+        tone === 'light' ? 'border-white/35 border-t-white' : 'border-line border-t-primary-accent',
       ].join(' ')}
     />
   )
@@ -458,7 +458,7 @@ export default function AdminUsersListPage() {
     if (!canManageUsers) {
       return (
         <div className="flex justify-end">
-          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+          <span className="inline-flex rounded-md border border-line bg-surface-tint px-3 py-2 text-xs font-medium text-muted">
             Read only
           </span>
         </div>
@@ -468,7 +468,7 @@ export default function AdminUsersListPage() {
     if (isProtectedUser(user, currentUser?.id)) {
       return (
         <div className="flex justify-end">
-          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+          <span className="inline-flex rounded-md border border-line bg-surface-tint px-3 py-2 text-xs font-medium text-muted">
             Your account
           </span>
         </div>
@@ -530,17 +530,17 @@ export default function AdminUsersListPage() {
   }
 
   const columns: DataTableColumn<User>[] = [
-    { key: 'firstName', header: 'First Name', frozen: true, width: 150, sortKey: 'firstName', cellClassName: 'truncate text-[#123524]', render: (user) => user.first_name },
+    { key: 'firstName', header: 'First Name', frozen: true, width: 150, sortKey: 'firstName', cellClassName: 'truncate text-ink', render: (user) => user.first_name },
     { key: 'middleName', header: 'Middle Name', frozen: true, width: 150, sortKey: 'middleName', cellClassName: 'truncate', render: (user) => user.middle_name || '-' },
-    { key: 'lastName', header: 'Last Name', frozen: true, width: 160, sortKey: 'lastName', cellClassName: 'truncate text-[#123524]', render: (user) => user.last_name },
-    { key: 'email', header: 'Email', width: 230, sortKey: 'email', cellClassName: 'text-[#123524]', render: (user) => user.email },
+    { key: 'lastName', header: 'Last Name', frozen: true, width: 160, sortKey: 'lastName', cellClassName: 'truncate text-ink', render: (user) => user.last_name },
+    { key: 'email', header: 'Email', width: 230, sortKey: 'email', cellClassName: 'text-ink', render: (user) => user.email },
     { key: 'contactNumber', header: 'Contact Number', width: 160, sortKey: 'contactNumber', render: (user) => user.contact_number || '-' },
     {
       key: 'role',
       header: 'Role',
       width: 180,
       render: (user) => (
-        <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]">
+        <span className="inline-flex rounded-md border border-line bg-surface-tint px-2.5 py-1 text-xs font-medium text-ink">
           {formatRole(user)}
         </span>
       ),
@@ -555,8 +555,8 @@ export default function AdminUsersListPage() {
           className={[
             'inline-flex border px-2.5 py-1 text-xs font-medium',
             user.status === 'active'
-              ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
-              : 'border-[#d8e1d4] bg-[#f7faf6] text-[#617462]',
+              ? 'border-success-border bg-success-bg text-primary-accent'
+              : 'border-line bg-surface-tint text-muted',
           ].join(' ')}
         >
           {user.status === 'active' ? 'Active' : 'Inactive'}
@@ -571,13 +571,13 @@ export default function AdminUsersListPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Accounts</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">User management table</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Accounts</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">User management table</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             Manage account access, roles, status, and password resets for administrative users.
           </p>
           {!canManageUsers ? (
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#7b6542]">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-warning">
               Your account has read-only access here. Only administrators can create, edit, or delete users.
             </p>
           ) : null}
@@ -590,7 +590,7 @@ export default function AdminUsersListPage() {
                 type="button"
                 onClick={openCreateModal}
                 disabled={loading || formLoading}
-                className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+                className="cursor-pointer border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 Create New User
               </button>
@@ -600,7 +600,7 @@ export default function AdminUsersListPage() {
                 type="button"
                 onClick={() => void handlePrintUsers()}
                 disabled={printLoading}
-                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 {printLoading ? <ButtonSpinner tone="dark" /> : <PrintRoundedIcon fontSize="small" />}
                 {printLoading ? 'Preparing...' : 'Print'}
@@ -618,31 +618,31 @@ export default function AdminUsersListPage() {
             { label: 'Inactive', value: stats?.inactive },
           ] as const
         ).map((card) => (
-          <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
+          <div key={card.label} className="rounded-lg border border-line bg-surface px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">{card.label}</p>
             {card.value === undefined ? (
-              <span className="mt-2 block h-8 w-16 animate-pulse bg-[#edf3ea]" />
+              <span className="mt-2 block h-8 w-16 animate-pulse bg-skeleton" />
             ) : (
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524]">{card.value}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-ink">{card.value}</p>
             )}
           </div>
         ))}
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-[#123524]">User records</p>
-            <p className="mt-1 text-sm text-[#617462]">
+            <p className="text-sm font-medium text-ink">User records</p>
+            <p className="mt-1 text-sm text-muted">
               Review account details and manage permitted actions from this table.
             </p>
           </div>
-          <p className="text-sm text-[#617462]">{usersCountLabel}</p>
+          <p className="text-sm text-muted">{usersCountLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(130px,auto))] md:items-end">
+        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(130px,auto))] md:items-end">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Search</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
               type="search"
               value={searchInput}
@@ -654,7 +654,7 @@ export default function AdminUsersListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Role</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Role</span>
             <select
               value={roleFilter}
               disabled={loading}
@@ -674,7 +674,7 @@ export default function AdminUsersListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Status</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Status</span>
             <select
               value={statusFilter}
               disabled={loading}
@@ -691,7 +691,7 @@ export default function AdminUsersListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Rows</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Rows</span>
             <select
               value={perPage}
               disabled={loading}
@@ -710,11 +710,11 @@ export default function AdminUsersListPage() {
 
         {errorMessage ? (
           <div className="space-y-4 px-5 py-6">
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
             <button
               type="button"
               onClick={() => void loadUsers()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               Retry
             </button>
@@ -741,7 +741,7 @@ export default function AdminUsersListPage() {
                   <button
                     type="button"
                     onClick={() => setBulkDeleteOpen(true)}
-                    className="inline-flex cursor-pointer items-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#832424] rounded-md"
+                    className="inline-flex cursor-pointer items-center gap-2 border border-danger bg-danger px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-danger-hover rounded-md"
                   >
                     <DeleteOutlineRoundedIcon fontSize="small" />
                     Delete selected ({ids.length})
@@ -749,7 +749,7 @@ export default function AdminUsersListPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedIds([])}
-                    className="cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                    className="cursor-pointer border border-line bg-surface px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
                   >
                     Clear
                   </button>
@@ -758,8 +758,8 @@ export default function AdminUsersListPage() {
             />
 
             {meta.total > 0 ? (
-              <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-                <p className="text-sm text-[#617462]">
+              <div className="flex flex-col gap-4 border-t border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <p className="text-sm text-muted">
                   Page {meta.current_page} of {meta.last_page}
                 </p>
 
@@ -768,14 +768,14 @@ export default function AdminUsersListPage() {
                     type="button"
                     disabled={meta.current_page <= 1}
                     onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Previous
                   </button>
 
                   {paginationItems.map((item, index) =>
                     item === 'ellipsis' ? (
-                      <span key={`ellipsis-${index}`} className="px-1 text-sm text-[#7e8d7a]">
+                      <span key={`ellipsis-${index}`} className="px-1 text-sm text-muted-faint">
                         ...
                       </span>
                     ) : (
@@ -786,8 +786,8 @@ export default function AdminUsersListPage() {
                         className={[
                           'min-w-10 border px-3 py-2 text-sm font-medium transition-colors rounded-md',
                           item === meta.current_page
-                            ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
-                            : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
+                            ? 'cursor-default border-primary bg-primary text-white'
+                            : 'cursor-pointer border-line text-ink hover:bg-hover-tint',
                         ].join(' ')}
                       >
                         {item}
@@ -799,7 +799,7 @@ export default function AdminUsersListPage() {
                     type="button"
                     disabled={meta.current_page >= meta.last_page}
                     onClick={() => setPage((currentPage) => Math.min(meta.last_page, currentPage + 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Next
                   </button>
@@ -845,7 +845,7 @@ export default function AdminUsersListPage() {
               type="button"
               onClick={() => setBulkDeleteOpen(false)}
               disabled={bulkDeleteLoading}
-              className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+              className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               Cancel
             </button>
@@ -853,7 +853,7 @@ export default function AdminUsersListPage() {
               type="button"
               onClick={() => void handleBulkDelete()}
               disabled={bulkDeleteLoading}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-danger bg-danger px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-danger-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               {bulkDeleteLoading ? <ButtonSpinner /> : null}
               {bulkDeleteLoading ? 'Deleting...' : `Delete ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`}
@@ -861,7 +861,7 @@ export default function AdminUsersListPage() {
           </div>
         }
       >
-        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-sm text-danger-text">
           Deleted users are removed from the list but their historical records are preserved. This action cannot be undone.
         </div>
       </AdminDialog>

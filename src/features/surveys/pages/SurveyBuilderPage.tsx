@@ -52,9 +52,9 @@ function SectionCard({
   children: React.ReactNode
 }) {
   return (
-    <section className="border border-[#d8e1d4] bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-[#e7eee3] px-5 py-4">
-        <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">{title}</h3>
+    <section className="rounded-lg overflow-hidden border border-line bg-surface">
+      <div className="flex items-center justify-between gap-3 border-b border-divider px-5 py-4">
+        <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">{title}</h3>
         {action}
       </div>
       <div className="px-5 py-4">{children}</div>
@@ -63,9 +63,9 @@ function SectionCard({
 }
 
 const iconButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 const destructiveIconButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 export default function SurveyBuilderPage() {
   const { id = '' } = useParams()
@@ -261,8 +261,8 @@ export default function SurveyBuilderPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 border border-[#d8e1d4] bg-white px-5 py-4 text-sm text-[#506552]">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-sm text-body">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
         Loading survey...
       </div>
     )
@@ -273,12 +273,12 @@ export default function SurveyBuilderPage() {
       <div className="space-y-4">
         <Link
           to="/admin/surveys"
-          className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
         >
           <ArrowBackRoundedIcon fontSize="small" />
           Back to surveys
         </Link>
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage ?? 'Survey not found.'}
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function SurveyBuilderPage() {
     <div className="space-y-6">
       <Link
         to="/admin/surveys"
-        className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
       >
         <ArrowBackRoundedIcon fontSize="small" />
         Back to surveys
@@ -299,9 +299,9 @@ export default function SurveyBuilderPage() {
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Survey builder</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">{survey.title}</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Survey builder</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">{survey.title}</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             {survey.communityName} · {SURVEY_STATUS_LABELS[survey.status]}
           </p>
         </div>
@@ -311,7 +311,7 @@ export default function SurveyBuilderPage() {
           {!isDraft ? (
             <Link
               to={`/admin/surveys/${survey.id}/results`}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               <InsightsOutlinedIcon fontSize="small" />
               View results
@@ -326,7 +326,7 @@ export default function SurveyBuilderPage() {
                   onClick={() => setDeployOpen(true)}
                   disabled={orderedQuestions.length === 0}
                   title={orderedQuestions.length === 0 ? 'Add at least one question first' : undefined}
-                  className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+                  className="cursor-pointer border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
                 >
                   Deploy Survey
                 </button>
@@ -335,7 +335,7 @@ export default function SurveyBuilderPage() {
                 <button
                   type="button"
                   onClick={() => setCloseOpen(true)}
-                  className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                  className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
                 >
                   Close Survey
                 </button>
@@ -346,8 +346,8 @@ export default function SurveyBuilderPage() {
       </div>
 
       {!isDraft ? (
-        <div className="flex items-start gap-3 border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
-          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-[#7b6542]" />
+        <div className="flex items-start gap-3 border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
+          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-warning" />
           <p>
             This survey is {SURVEY_STATUS_LABELS[survey.status].toLowerCase()} — its questions are read-only.
             Versioning is not supported in v1; create a new survey to change the questions.
@@ -369,7 +369,7 @@ export default function SurveyBuilderPage() {
                   setQuestionApiErrors(undefined)
                   setQuestionOpen(true)
                 }}
-                className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                className="inline-flex cursor-pointer items-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
               >
                 <AddRoundedIcon fontSize="small" />
                 Add question
@@ -377,37 +377,37 @@ export default function SurveyBuilderPage() {
             ) : undefined
           }
         >
-          <div className="mb-4 border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-xs text-[#6a7f6d]">
+          <div className="mb-4 rounded-md border border-line bg-surface-tint px-4 py-3 text-xs text-muted-alt">
             Every survey automatically begins with a required GAD demographic block (sex, plus optional age
             group and sector). It is not editable here and is not part of the question list.
           </div>
 
           {orderedQuestions.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[#617462]">
+            <p className="py-8 text-center text-sm text-muted">
               No questions yet. Add at least one before deploying.
             </p>
           ) : (
-            <ul className="divide-y divide-[#eef2eb]">
+            <ul className="divide-y divide-row-divider">
               {orderedQuestions.map((question, index) => (
                 <li key={question.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#123524]">
+                    <p className="text-sm font-medium text-ink">
                       {index + 1}. {question.questionText}
-                      {question.required ? <span className="text-[#9f2f2f]"> *</span> : null}
+                      {question.required ? <span className="text-danger"> *</span> : null}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]">
+                      <span className="inline-flex rounded-md border border-line bg-surface-tint px-2.5 py-1 text-xs font-medium text-ink">
                         {QUESTION_TYPE_LABELS[question.questionType]}
                       </span>
-                      <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#617462]">
+                      <span className="inline-flex rounded-md border border-line bg-surface-tint px-2.5 py-1 text-xs font-medium text-muted">
                         Weight {question.weight}
                       </span>
-                      <span className="inline-flex border border-[#bfd3c0] bg-[#f3f9f2] px-2.5 py-1 text-xs font-medium text-[#1f5d3b]">
+                      <span className="inline-flex rounded-md border border-success-border bg-success-bg px-2.5 py-1 text-xs font-medium text-primary-accent">
                         {question.needCategoryName ?? 'Uncategorized'}
                       </span>
                     </div>
                     {question.options.length > 0 ? (
-                      <p className="mt-2 text-xs text-[#6a7f6d]">
+                      <p className="mt-2 text-xs text-muted-alt">
                         Options: {question.options.map((option) => option.label).join(', ')}
                       </p>
                     ) : null}
@@ -479,7 +479,7 @@ export default function SurveyBuilderPage() {
                     setMetaApiErrors(undefined)
                     setMetaOpen(true)
                   }}
-                  className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                  className="inline-flex cursor-pointer items-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
                 >
                   <EditOutlinedIcon fontSize="small" />
                   Edit
@@ -487,7 +487,7 @@ export default function SurveyBuilderPage() {
               ) : undefined
             }
           >
-            <dl className="divide-y divide-[#eef2eb]">
+            <dl className="divide-y divide-row-divider">
               {[
                 ['Community', survey.communityName],
                 ['Status', SURVEY_STATUS_LABELS[survey.status]],
@@ -496,25 +496,25 @@ export default function SurveyBuilderPage() {
                 ['Target responses', survey.targetResponses === null ? '-' : String(survey.targetResponses)],
               ].map(([label, value]) => (
                 <div key={label} className="flex items-baseline justify-between gap-3 py-3">
-                  <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">{label}</dt>
-                  <dd className="text-right text-sm text-[#123524]">{value}</dd>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-label">{label}</dt>
+                  <dd className="text-right text-sm text-ink">{value}</dd>
                 </div>
               ))}
             </dl>
             {survey.description ? (
-              <p className="mt-3 text-sm leading-6 text-[#506552]">{survey.description}</p>
+              <p className="mt-3 text-sm leading-6 text-body">{survey.description}</p>
             ) : null}
           </SectionCard>
 
           <SectionCard title="Questions per category">
             {categoryCounts.length === 0 ? (
-              <p className="py-4 text-center text-sm text-[#617462]">No questions yet.</p>
+              <p className="py-4 text-center text-sm text-muted">No questions yet.</p>
             ) : (
-              <ul className="divide-y divide-[#eef2eb]">
+              <ul className="divide-y divide-row-divider">
                 {categoryCounts.map(([name, count]) => (
                   <li key={name} className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-[#123524]">{name}</span>
-                    <span className="text-sm font-medium text-[#1f5d3b]">{count}</span>
+                    <span className="text-sm text-ink">{name}</span>
+                    <span className="text-sm font-medium text-primary-accent">{count}</span>
                   </li>
                 ))}
               </ul>
@@ -523,18 +523,18 @@ export default function SurveyBuilderPage() {
 
           {publicLink ? (
             <SectionCard title="Public link">
-              <p className="break-all border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 font-mono text-xs text-[#123524]">
+              <p className="break-all rounded-md border border-line bg-surface-tint px-3 py-2 font-mono text-xs text-ink">
                 {publicLink}
               </p>
               <button
                 type="button"
                 onClick={() => void copyLink()}
-                className="mt-3 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                className="mt-3 inline-flex cursor-pointer items-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
               >
                 <ContentCopyRoundedIcon fontSize="small" />
                 Copy link
               </button>
-              <p className="mt-2 text-xs text-[#6a7f6d]">
+              <p className="mt-2 text-xs text-muted-alt">
                 Share this link with respondents. It opens the mobile-first public form — no sign-in required.
               </p>
             </SectionCard>
@@ -601,7 +601,7 @@ export default function SurveyBuilderPage() {
         }}
         onConfirm={handleDeploy}
       >
-        <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
+        <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           Once deployed, questions can no longer be added, edited, or removed (v1 has no survey versioning).
           You can still adjust the title, dates, and target responses.
         </div>
@@ -619,7 +619,7 @@ export default function SurveyBuilderPage() {
         }}
         onConfirm={handleClose}
       >
-        <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
+        <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           The public link will show a "survey closed" message and the server will reject further submissions.
         </div>
       </ConfirmModal>

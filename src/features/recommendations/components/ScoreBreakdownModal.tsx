@@ -24,13 +24,13 @@ function SummaryRow({
   return (
     <div className="flex items-start justify-between gap-4 py-2.5">
       <div>
-        <p className={emphasis ? 'text-sm font-medium text-[#123524]' : 'text-sm text-[#445846]'}>{label}</p>
-        {hint ? <p className="mt-0.5 text-xs text-[#6a7f6d]">{hint}</p> : null}
+        <p className={emphasis ? 'text-sm font-medium text-ink' : 'text-sm text-cell'}>{label}</p>
+        {hint ? <p className="mt-0.5 text-xs text-muted-alt">{hint}</p> : null}
       </div>
       <p
         className={[
           'shrink-0 tabular-nums',
-          emphasis ? 'text-base font-semibold text-[#123524]' : 'text-sm font-medium text-[#123524]',
+          emphasis ? 'text-base font-semibold text-ink' : 'text-sm font-medium text-ink',
         ].join(' ')}
       >
         {value}
@@ -53,7 +53,7 @@ export default function ScoreBreakdownModal({ open, recommendation, onClose }: S
       header: 'Need category',
       frozen: true,
       width: 190,
-      cellClassName: 'truncate text-[#123524]',
+      cellClassName: 'truncate text-ink',
       render: (row) => row.needCategoryName,
     },
     {
@@ -88,7 +88,7 @@ export default function ScoreBreakdownModal({ open, recommendation, onClose }: S
       header: 'Contribution',
       width: 130,
       align: 'right',
-      cellClassName: 'font-medium text-[#123524]',
+      cellClassName: 'font-medium text-ink',
       render: (row) => formatDecimal(row.contribution),
     },
   ]
@@ -106,12 +106,12 @@ export default function ScoreBreakdownModal({ open, recommendation, onClose }: S
       onClose={onClose}
     >
       {!breakdown ? (
-        <p className="py-6 text-center text-sm text-[#617462]">
+        <p className="py-6 text-center text-sm text-muted">
           No score breakdown was stored for this recommendation.
         </p>
       ) : (
         <div className="space-y-5">
-          <p className="text-sm leading-6 text-[#506552]">
+          <p className="text-sm leading-6 text-body">
             Each need category the survey measured contributes its average score multiplied by the
             priority multiplier and this program type&apos;s matrix weight. The total is normalised
             against the highest score this program type could have reached on the same categories.
@@ -125,8 +125,8 @@ export default function ScoreBreakdownModal({ open, recommendation, onClose }: S
             minWidthClassName="min-w-[800px]"
           />
 
-          <div className="border border-[#d8e1d4] bg-white px-4 py-2">
-            <div className="divide-y divide-[#eef2eb]">
+          <div className="rounded-lg border border-line bg-surface px-4 py-2">
+            <div className="divide-y divide-row-divider">
               <SummaryRow
                 label="Raw score"
                 hint="Sum of the contributions above"
@@ -156,18 +156,18 @@ export default function ScoreBreakdownModal({ open, recommendation, onClose }: S
           </div>
 
           {reconcilesWithStoredScore(breakdown) ? (
-            <p className="text-xs text-[#6a7f6d]">
+            <p className="text-xs text-muted-alt">
               Recomputed from the figures above, this matches the stored score of{' '}
               {formatDecimal(breakdown.matchScore)}.
             </p>
           ) : (
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
               The stored score ({formatDecimal(breakdown.matchScore)}) does not match the figures above.
               Regenerate the recommendations for this assessment and report this if it persists.
             </div>
           )}
 
-          <p className="text-xs text-[#6a7f6d]">
+          <p className="text-xs text-muted-alt">
             Editing the scoring matrix does not rescore recommendations that already exist — this
             breakdown is the one this recommendation was generated with.
           </p>

@@ -18,10 +18,10 @@ type ProgramTypeFormModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
-const fieldErrorClassName = 'mt-1 text-xs text-[#8a2d2d]'
-const checkboxClassName = 'h-4 w-4 cursor-pointer accent-[#1f5d3b] disabled:cursor-not-allowed disabled:opacity-40'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
+const fieldErrorClassName = 'mt-1 text-xs text-danger-text'
+const checkboxClassName = 'h-4 w-4 cursor-pointer accent-primary-accent disabled:cursor-not-allowed disabled:opacity-40'
 
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -78,7 +78,7 @@ export default function ProgramTypeFormModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -86,7 +86,7 @@ export default function ProgramTypeFormModal({
             type="submit"
             form="program-type-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Saving...' : mode === 'create' ? 'Add Program Type' : 'Save Changes'}
@@ -96,7 +96,7 @@ export default function ProgramTypeFormModal({
     >
       <form id="program-type-form" onSubmit={handleSubmit} className="space-y-5">
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
 
         <div>
@@ -145,17 +145,17 @@ export default function ProgramTypeFormModal({
 
         <fieldset>
           <legend className={labelClassName}>Target sectors</legend>
-          <p className="mb-3 text-xs text-[#6a7f6d]">
+          <p className="mb-3 text-xs text-muted-alt">
             A program type earns a 10% bonus when at least one of these overlaps the assessed
             community&apos;s sectors.
           </p>
           {sectors.length === 0 ? (
-            <p className="text-sm text-[#617462]">No sectors are configured.</p>
+            <p className="text-sm text-muted">No sectors are configured.</p>
           ) : (
             <ul className="grid gap-2 sm:grid-cols-2">
               {sectors.map((sector) => (
                 <li key={sector.id}>
-                  <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-2.5 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5] rounded-md">
+                  <label className="flex cursor-pointer items-center gap-3 border border-line px-4 py-2.5 text-sm text-cell transition-colors hover:bg-hover-tint rounded-md">
                     <input
                       type="checkbox"
                       checked={sectorIds.includes(sector.id)}
@@ -171,7 +171,7 @@ export default function ProgramTypeFormModal({
           )}
         </fieldset>
 
-        <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5] rounded-md">
+        <label className="flex cursor-pointer items-center gap-3 border border-line px-4 py-3 text-sm text-cell transition-colors hover:bg-hover-tint rounded-md">
           <input
             type="checkbox"
             checked={active}
@@ -181,7 +181,7 @@ export default function ProgramTypeFormModal({
           />
           <span>
             Active
-            <span className="ml-2 text-xs text-[#6a7f6d]">
+            <span className="ml-2 text-xs text-muted-alt">
               Only active types are scored when recommendations are generated.
             </span>
           </span>

@@ -11,7 +11,7 @@ type Qf23ReportModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 /** Signatory block of the EXTN-QF-23 form; each line defaults to the role holder when left blank. */
 const SIGNATORY_FIELDS = [
@@ -67,7 +67,7 @@ export default function Qf23ReportModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -75,7 +75,7 @@ export default function Qf23ReportModal({
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Generating...' : 'Generate report'}
@@ -85,10 +85,10 @@ export default function Qf23ReportModal({
     >
       <div className="space-y-5">
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
 
-        <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
+        <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           Leave a field blank to use the current holder of that role. Every generated copy is archived —
           regenerating never overwrites an earlier version.
         </div>
@@ -96,7 +96,7 @@ export default function Qf23ReportModal({
         <div className="grid gap-4 sm:grid-cols-2">
           {SIGNATORY_FIELDS.map((field) => (
             <div key={field.key}>
-              <label htmlFor={`qf23-${field.key}`} className="mb-2 block text-sm font-medium text-[#123524]">
+              <label htmlFor={`qf23-${field.key}`} className="mb-2 block text-sm font-medium text-ink">
                 {field.label}
               </label>
               <input
@@ -110,7 +110,7 @@ export default function Qf23ReportModal({
                 }
                 className={inputClassName}
               />
-              <p className="mt-1.5 text-xs text-[#6a7f6d]">{field.hint}</p>
+              <p className="mt-1.5 text-xs text-muted-alt">{field.hint}</p>
             </div>
           ))}
         </div>

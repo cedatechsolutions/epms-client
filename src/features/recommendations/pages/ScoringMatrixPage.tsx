@@ -18,11 +18,11 @@ import {
 } from '../types'
 
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const cellInputClassName =
-  'h-10 w-full border bg-white px-3 text-right text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 w-full border bg-surface px-3 text-right text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 /** The draft grid: program type id -> need category id -> the raw input value. */
 type MatrixDraft = Record<string, Record<string, string>>
@@ -135,12 +135,12 @@ export default function ScoringMatrixPage() {
       header: 'Program type',
       frozen: true,
       width: 260,
-      cellClassName: 'truncate text-[#123524] font-medium',
+      cellClassName: 'truncate text-ink font-medium',
       render: (row) => (
         <span className="flex items-center gap-2">
           <span className="truncate">{row.programTypeName}</span>
           {row.active ? null : (
-            <span className="inline-flex shrink-0 border border-[#d8e1d4] bg-[#f7faf6] px-2 py-0.5 text-[11px] font-medium text-[#617462]">
+            <span className="inline-flex shrink-0 rounded-md border border-line bg-surface-tint px-2 py-0.5 text-[11px] font-medium text-muted">
               Inactive
             </span>
           )}
@@ -167,7 +167,7 @@ export default function ScoringMatrixPage() {
             aria-label={`${row.programTypeName} weight for ${category.name}`}
             aria-invalid={invalid}
             onChange={(event) => handleCellChange(row.programTypeId, category.id, event.target.value)}
-            className={[cellInputClassName, invalid ? 'border-[#e3c9c9] rounded-md' : 'border-[#d8e1d4]'].join(' ')}
+            className={[cellInputClassName, invalid ? 'border-danger-border rounded-md' : 'border-line'].join(' ')}
           />
         )
       },
@@ -178,7 +178,7 @@ export default function ScoringMatrixPage() {
     <div className="space-y-6">
       <Link
         to="/admin/program-types"
-        className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
       >
         <ArrowBackRoundedIcon fontSize="small" />
         Back to program library
@@ -186,11 +186,11 @@ export default function ScoringMatrixPage() {
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
             Recommendation engine
           </p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">Scoring Matrix</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Scoring Matrix</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             How strongly each program type addresses each need category, from 0.00 (not at all) to
             5.00 (its core purpose). These weights are the whole of the engine — there is no model
             behind them.
@@ -225,8 +225,8 @@ export default function ScoringMatrixPage() {
         ) : null}
       </div>
 
-      <div className="flex items-start gap-3 border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
-        <InfoOutlinedIcon fontSize="small" className="mt-0.5 shrink-0 text-[#7b6542]" />
+      <div className="flex items-start gap-3 border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
+        <InfoOutlinedIcon fontSize="small" className="mt-0.5 shrink-0 text-warning" />
         <p>
           Scores are normalised against each program type&apos;s own ceiling, so raising every one of a
           type&apos;s weights together changes nothing — what matters is the <strong>balance</strong> between
@@ -237,7 +237,7 @@ export default function ScoringMatrixPage() {
 
       {errorMessage ? (
         <div className="space-y-3">
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
           <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
             Retry
           </button>
@@ -245,25 +245,25 @@ export default function ScoringMatrixPage() {
       ) : null}
 
       {invalidCount > 0 ? (
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {invalidCount} {invalidCount === 1 ? 'weight is' : 'weights are'} empty or outside 0.00–5.00.
           Fix them before saving.
         </div>
       ) : null}
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">
+            <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">
               Program types x need categories
             </h3>
-            <p className="mt-1 text-sm text-[#617462]">
+            <p className="mt-1 text-sm text-muted">
               A weight of 0 removes the pairing entirely — the category then plays no part in that
               type&apos;s score, in either direction.
             </p>
           </div>
           {canConfigure ? null : (
-            <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+            <span className="inline-flex rounded-md border border-line bg-surface-tint px-3 py-2 text-xs font-medium text-muted">
               Read only
             </span>
           )}

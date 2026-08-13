@@ -32,7 +32,7 @@ function ButtonSpinner({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
     <span
       className={[
         'h-4 w-4 animate-spin rounded-full border-2',
-        tone === 'light' ? 'border-white/35 border-t-white' : 'border-[#d8e1d4] border-t-[#1f5d3b]',
+        tone === 'light' ? 'border-white/35 border-t-white' : 'border-line border-t-primary-accent',
       ].join(' ')}
     />
   )
@@ -91,7 +91,7 @@ export default function ResetPasswordModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Cancel
       </button>
@@ -99,7 +99,7 @@ export default function ResetPasswordModal({
         type="button"
         onClick={() => void handleConfirm()}
         disabled={loading}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         {loading ? <ButtonSpinner /> : null}
         {loading ? 'Resetting...' : 'Reset Password'}
@@ -119,24 +119,24 @@ export default function ResetPasswordModal({
     >
       <div className="space-y-4" aria-busy={loading}>
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage}
           </div>
         ) : null}
 
-        <div className="border border-[#c8e0ef] bg-[#eef8fd] px-4 py-3 text-sm leading-6 text-[#075274]">
+        <div className="border border-info-border bg-info-bg px-4 py-3 text-sm leading-6 text-info-text">
           Password must contain at least 8 characters.
         </div>
 
-        <label className="space-y-2 text-sm text-[#445846]">
-          <span className="font-medium text-[#123524]">New Password</span>
+        <label className="space-y-2 text-sm text-cell">
+          <span className="font-medium text-ink">New Password</span>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               value={values.password}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, password: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 pr-12 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Enter new password"
             />
             <button
@@ -145,16 +145,16 @@ export default function ResetPasswordModal({
               aria-pressed={showPassword}
               disabled={loading}
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
+              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
             >
               {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
             </button>
           </div>
-          {formErrors.password ? <p className="text-xs text-[#b93838]">{formErrors.password}</p> : null}
+          {formErrors.password ? <p className="text-xs text-danger-strong">{formErrors.password}</p> : null}
         </label>
 
-        <label className="space-y-2 text-sm text-[#445846]">
-          <span className="font-medium text-[#123524]">Confirm Password</span>
+        <label className="space-y-2 text-sm text-cell">
+          <span className="font-medium text-ink">Confirm Password</span>
           <div className="relative">
             <input
               type={showPasswordConfirmation ? 'text' : 'password'}
@@ -163,7 +163,7 @@ export default function ResetPasswordModal({
               onChange={(event) =>
                 setValues((current) => ({ ...current, password_confirmation: event.target.value }))
               }
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+              className="w-full border border-line px-3 py-2.5 pr-12 text-sm text-ink outline-none transition-colors placeholder:text-muted-soft focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
               placeholder="Confirm new password"
             />
             <button
@@ -172,7 +172,7 @@ export default function ResetPasswordModal({
               aria-pressed={showPasswordConfirmation}
               disabled={loading}
               onClick={() => setShowPasswordConfirmation((current) => !current)}
-              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
+              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
             >
               {showPasswordConfirmation ? (
                 <VisibilityOffRoundedIcon fontSize="small" />
@@ -182,12 +182,12 @@ export default function ResetPasswordModal({
             </button>
           </div>
           {formErrors.password_confirmation ? (
-            <p className="text-xs text-[#b93838]">{formErrors.password_confirmation}</p>
+            <p className="text-xs text-danger-strong">{formErrors.password_confirmation}</p>
           ) : null}
         </label>
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-[#617462]" role="status" aria-live="polite">
+          <div className="flex items-center gap-2 text-sm text-muted" role="status" aria-live="polite">
             <ButtonSpinner tone="dark" />
             Saving password change...
           </div>

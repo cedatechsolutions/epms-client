@@ -7,7 +7,7 @@ import { resetPassword } from '../api/authApi'
 import AuthCard from '../components/AuthCard'
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 pr-12 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
@@ -50,12 +50,12 @@ export default function ResetPasswordPage() {
         title="Reset link invalid"
         description="This password reset link is missing or malformed. Request a new one to continue."
         footer={
-          <Link to="/forgot-password" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+          <Link to="/forgot-password" className="font-medium text-primary-accent transition-colors hover:text-primary-hover">
             Request a new reset link
           </Link>
         }
       >
-        <div className="mt-4 border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="mt-4 rounded-lg border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           No reset token was provided.
         </div>
       </AuthCard>
@@ -67,18 +67,18 @@ export default function ResetPasswordPage() {
       title="Set a new password"
       description="Choose a new password for your account. It must be at least 8 characters."
       footer={
-        <Link to="/login" className="font-medium text-[#1f5d3b] transition-colors hover:text-[#18492e]">
+        <Link to="/login" className="font-medium text-primary-accent transition-colors hover:text-primary-hover">
           Back to sign in
         </Link>
       }
     >
       <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+          <div className="rounded-lg border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
 
         <div>
-          <label htmlFor="password" className="mb-2 block text-sm font-medium text-[#123524]">
+          <label htmlFor="password" className="mb-2 block text-sm font-medium text-ink">
             New password
           </label>
           <div className="relative">
@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
               aria-pressed={showPassword}
               disabled={isSubmitting}
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50 rounded-r-md"
+              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50 rounded-r-md"
             >
               {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
             </button>
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <div>
-          <label htmlFor="passwordConfirmation" className="mb-2 block text-sm font-medium text-[#123524]">
+          <label htmlFor="passwordConfirmation" className="mb-2 block text-sm font-medium text-ink">
             Confirm new password
           </label>
           <input
@@ -119,14 +119,14 @@ export default function ResetPasswordPage() {
             required
             disabled={isSubmitting}
             placeholder="Re-enter the new password"
-            className="w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
+            className="w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+          className="w-full cursor-pointer border border-primary bg-primary px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           {isSubmitting ? 'Resetting...' : 'Reset password'}
         </button>

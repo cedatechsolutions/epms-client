@@ -47,16 +47,16 @@ const defaultMeta: PaginationMeta = {
 type PaginationItem = number | 'ellipsis'
 
 const actionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const destructiveActionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-danger-border text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 cursor-pointer border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 function getPaginationItems(currentPage: number, lastPage: number): PaginationItem[] {
   const pageSet = new Set<number>([1, lastPage, currentPage - 1, currentPage, currentPage + 1])
@@ -83,14 +83,14 @@ function getPaginationItems(currentPage: number, lastPage: number): PaginationIt
 
 function SectorChips({ sectors }: { sectors: Sector[] }) {
   if (sectors.length === 0) {
-    return <span className="text-[#617462]">-</span>
+    return <span className="text-muted">-</span>
   }
   return (
     <div className="flex flex-wrap gap-1.5">
       {sectors.map((sector) => (
         <span
           key={sector.id}
-          className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]"
+          className="inline-flex rounded-md border border-line bg-surface-tint px-2.5 py-1 text-xs font-medium text-ink"
         >
           {sector.name}
         </span>
@@ -319,7 +319,7 @@ export default function CommunitiesListPage() {
           </button>
         </>
       ) : (
-        <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-3 py-2 text-xs font-medium text-[#617462]">
+        <span className="inline-flex rounded-md border border-line bg-surface-tint px-3 py-2 text-xs font-medium text-muted">
           Read only
         </span>
       )}
@@ -333,12 +333,12 @@ export default function CommunitiesListPage() {
       frozen: true,
       width: 220,
       sortKey: 'name',
-      cellClassName: 'text-[#123524]',
+      cellClassName: 'text-ink',
       render: (community) => (
         <button
           type="button"
           onClick={() => navigate(`/admin/communities/${community.id}`)}
-          className="cursor-pointer text-left font-medium text-[#1f5d3b] hover:underline rounded-md"
+          className="cursor-pointer text-left font-medium text-primary-accent hover:underline rounded-md"
         >
           {community.name}
         </button>
@@ -375,14 +375,14 @@ export default function CommunitiesListPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Master data</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">Partner communities</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Master data</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Partner communities</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             Profile partner communities with GAD-ready population data, sector tags, and supporting
             documents. Assessment and program history appear here as those records are captured.
           </p>
           {!canManage ? (
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#7b6542]">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-warning">
               Your account has read-only access here. Only administrators and extension coordinators can
               create, edit, or delete communities.
             </p>
@@ -395,7 +395,7 @@ export default function CommunitiesListPage() {
               type="button"
               onClick={openCreateModal}
               disabled={loading || formLoading}
-              className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+              className="cursor-pointer border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               Create New Community
             </button>
@@ -411,29 +411,29 @@ export default function CommunitiesListPage() {
             { label: 'Assessed this semester', value: stats?.assessedThisSemester },
           ] as const
         ).map((card) => (
-          <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
+          <div key={card.label} className="rounded-lg border border-line bg-surface px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">{card.label}</p>
             {card.value === undefined ? (
-              <span className="mt-2 block h-8 w-16 animate-pulse bg-[#edf3ea]" />
+              <span className="mt-2 block h-8 w-16 animate-pulse bg-skeleton" />
             ) : (
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524]">{card.value}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-ink">{card.value}</p>
             )}
           </div>
         ))}
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-[#123524]">Community records</p>
-            <p className="mt-1 text-sm text-[#617462]">Search and filter partner communities.</p>
+            <p className="text-sm font-medium text-ink">Community records</p>
+            <p className="mt-1 text-sm text-muted">Search and filter partner communities.</p>
           </div>
-          <p className="text-sm text-[#617462]">{countLabel}</p>
+          <p className="text-sm text-muted">{countLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(150px,auto))] md:items-end">
+        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(150px,auto))] md:items-end">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Search</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
               type="search"
               value={searchInput}
@@ -445,7 +445,7 @@ export default function CommunitiesListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Sector</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Sector</span>
             <select
               value={sectorFilter}
               disabled={loading}
@@ -465,7 +465,7 @@ export default function CommunitiesListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Classification</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Classification</span>
             <select
               value={classificationFilter}
               disabled={loading}
@@ -485,7 +485,7 @@ export default function CommunitiesListPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Rows</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Rows</span>
             <select
               value={perPage}
               disabled={loading}
@@ -504,11 +504,11 @@ export default function CommunitiesListPage() {
 
         {errorMessage ? (
           <div className="space-y-4 px-5 py-6">
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
             <button
               type="button"
               onClick={() => void loadCommunities()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               Retry
             </button>
@@ -529,8 +529,8 @@ export default function CommunitiesListPage() {
             />
 
             {meta.total > 0 ? (
-              <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-                <p className="text-sm text-[#617462]">
+              <div className="flex flex-col gap-4 border-t border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <p className="text-sm text-muted">
                   Page {meta.current_page} of {meta.last_page}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -538,13 +538,13 @@ export default function CommunitiesListPage() {
                     type="button"
                     disabled={meta.current_page <= 1}
                     onClick={() => setPage((current) => Math.max(1, current - 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Previous
                   </button>
                   {paginationItems.map((item, index) =>
                     item === 'ellipsis' ? (
-                      <span key={`ellipsis-${index}`} className="px-1 text-sm text-[#7e8d7a]">
+                      <span key={`ellipsis-${index}`} className="px-1 text-sm text-muted-faint">
                         ...
                       </span>
                     ) : (
@@ -555,8 +555,8 @@ export default function CommunitiesListPage() {
                         className={[
                           'min-w-10 border px-3 py-2 text-sm font-medium transition-colors rounded-md',
                           item === meta.current_page
-                            ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
-                            : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
+                            ? 'cursor-default border-primary bg-primary text-white'
+                            : 'cursor-pointer border-line text-ink hover:bg-hover-tint',
                         ].join(' ')}
                       >
                         {item}
@@ -567,7 +567,7 @@ export default function CommunitiesListPage() {
                     type="button"
                     disabled={meta.current_page >= meta.last_page}
                     onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                    className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Next
                   </button>

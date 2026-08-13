@@ -24,11 +24,11 @@ type CommunityFormModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const selectClassName = `${inputClassName} cursor-pointer`
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
-const fieldErrorClassName = 'mt-1 text-xs text-[#8a2d2d]'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
+const fieldErrorClassName = 'mt-1 text-xs text-danger-text'
 
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -127,7 +127,7 @@ export default function CommunityFormModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -135,7 +135,7 @@ export default function CommunityFormModal({
             type="submit"
             form="community-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Saving...' : submitLabel}
@@ -145,7 +145,7 @@ export default function CommunityFormModal({
     >
       <form id="community-form" onSubmit={handleSubmit} className="space-y-5">
         {errorMessage ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage}
           </div>
         ) : null}
@@ -236,7 +236,7 @@ export default function CommunityFormModal({
         </div>
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-label">
             Socio-economic profile
           </p>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
@@ -297,16 +297,16 @@ export default function CommunityFormModal({
               />
             </div>
           </div>
-          <p className="mt-2 text-xs text-[#6a7f6d]">
+          <p className="mt-2 text-xs text-muted-alt">
             Leave population fields blank when unknown. If both male and female are provided, a
             non-blocking notice appears when their sum differs from the estimate by more than 10%.
           </p>
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-[#123524]">Sectors served</p>
+          <p className="mb-2 text-sm font-medium text-ink">Sectors served</p>
           {activeSectors.length === 0 ? (
-            <p className="text-sm text-[#617462]">No sectors available.</p>
+            <p className="text-sm text-muted">No sectors available.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {activeSectors.map((sector) => {
@@ -321,8 +321,8 @@ export default function CommunityFormModal({
                     className={[
                       'inline-flex border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md',
                       selected
-                        ? 'border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]'
-                        : 'cursor-pointer border-[#d8e1d4] bg-[#f7faf6] text-[#617462] hover:bg-[#edf4ea]',
+                        ? 'border-success-border bg-success-bg text-primary-accent'
+                        : 'cursor-pointer border-line bg-surface-tint text-muted hover:bg-row-divider',
                     ].join(' ')}
                   >
                     {sector.name}

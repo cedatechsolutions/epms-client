@@ -22,10 +22,10 @@ export default function DistributionRow({
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-sm text-[#445846]">{label}</span>
+        <span className="text-sm text-cell">{label}</span>
         <span className="flex items-baseline gap-2">
-          <span className="text-sm font-medium tabular-nums text-[#123524]">{formatNumber(value)}</span>
-          <span className="text-xs tabular-nums text-[#6a7f6d]">{share.toFixed(1)}%</span>
+          <span className="text-sm font-medium tabular-nums text-ink">{formatNumber(value)}</span>
+          <span className="text-xs tabular-nums text-muted-alt">{share.toFixed(1)}%</span>
         </span>
       </div>
       <ScoreBar score={share} tone={tone} label={`${label} share`} />

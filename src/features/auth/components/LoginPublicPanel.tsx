@@ -53,6 +53,8 @@ export default function LoginPublicPanel() {
               spellCheck={false}
               className="w-full rounded-lg border border-white/25 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/50 focus:border-white"
             />
+            {/* Inverted control: it sits on the green panel, which is dark in both themes, so
+                white and the dark ink are literal here rather than theme tokens (§3.2). */}
             <button
               type="submit"
               disabled={surveyCode.trim() === ''}

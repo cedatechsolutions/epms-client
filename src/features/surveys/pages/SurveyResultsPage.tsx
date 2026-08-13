@@ -36,9 +36,9 @@ import {
 } from '../types'
 
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 function SectionCard({
   title,
@@ -52,11 +52,11 @@ function SectionCard({
   children: React.ReactNode
 }) {
   return (
-    <section className="border border-[#d8e1d4] bg-white">
-      <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <section className="rounded-lg overflow-hidden border border-line bg-surface">
+      <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">{title}</h3>
-          {description ? <p className="mt-1 text-sm text-[#617462]">{description}</p> : null}
+          <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">{title}</h3>
+          {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
         </div>
         {action}
       </div>
@@ -70,7 +70,7 @@ function ButtonSpinner({ tone = 'dark' }: { tone?: 'light' | 'dark' }) {
     <span
       className={[
         'h-4 w-4 animate-spin rounded-full border-2',
-        tone === 'light' ? 'border-white/35 border-t-white' : 'border-[#d8e1d4] border-t-[#1f5d3b]',
+        tone === 'light' ? 'border-white/35 border-t-white' : 'border-line border-t-primary-accent',
       ].join(' ')}
     />
   )
@@ -186,8 +186,8 @@ export default function SurveyResultsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 border border-[#d8e1d4] bg-white px-5 py-4 text-sm text-[#506552]">
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-sm text-body">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
         Loading results...
       </div>
     )
@@ -198,12 +198,12 @@ export default function SurveyResultsPage() {
       <div className="space-y-4">
         <Link
           to="/admin/surveys"
-          className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
         >
           <ArrowBackRoundedIcon fontSize="small" />
           Back to surveys
         </Link>
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage ?? 'Results not found.'}
         </div>
         <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
@@ -240,7 +240,7 @@ export default function SurveyResultsPage() {
       key: 'rank',
       header: 'Rank',
       width: 90,
-      cellClassName: 'text-[#123524] font-medium',
+      cellClassName: 'text-ink font-medium',
       render: (category) => `#${category.rank}`,
     },
     {
@@ -248,7 +248,7 @@ export default function SurveyResultsPage() {
       header: 'Need category',
       frozen: true,
       width: 260,
-      cellClassName: 'truncate text-[#123524]',
+      cellClassName: 'truncate text-ink',
       render: (category) => category.needCategoryName,
     },
     {
@@ -256,7 +256,7 @@ export default function SurveyResultsPage() {
       header: 'Weighted average',
       width: 170,
       align: 'right',
-      cellClassName: 'font-medium text-[#123524]',
+      cellClassName: 'font-medium text-ink',
       render: (category) => formatDecimal(category.avgScore),
     },
     {
@@ -280,7 +280,7 @@ export default function SurveyResultsPage() {
     <div className="space-y-6">
       <Link
         to={`/admin/surveys/${results.surveyId}/build`}
-        className="inline-flex items-center gap-1 text-sm font-medium text-[#1f5d3b] hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary-accent hover:underline"
       >
         <ArrowBackRoundedIcon fontSize="small" />
         Back to survey builder
@@ -288,9 +288,9 @@ export default function SurveyResultsPage() {
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Assessment results</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">{results.title}</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Assessment results</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">{results.title}</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             {results.communityName} · {SURVEY_STATUS_LABELS[results.status]} ·{' '}
             {results.finalized ? `Finalized ${formatDateTime(results.finalizedAt)}` : 'Live results'}
           </p>
@@ -360,15 +360,15 @@ export default function SurveyResultsPage() {
       </div>
 
       {results.finalized ? (
-        <div className="flex items-start gap-3 border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
-          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-[#7b6542]" />
+        <div className="flex items-start gap-3 border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
+          <LockOutlinedIcon fontSize="small" className="mt-0.5 text-warning" />
           <p>
             These results are finalized and no longer recomputed — they are the exact numbers cited by the
             recommendation engine and the EXTN-QF-23 report. Later responses do not change them.
           </p>
         </div>
       ) : (
-        <div className="border border-[#d8e1d4] bg-[#f7faf6] px-4 py-3 text-sm text-[#7b6542]">
+        <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           Live results, recalculated on every visit. Finalize them to lock the scores and unlock
           recommendations and the EXTN-QF-23 report. Finalizing cannot be undone.
         </div>
@@ -376,30 +376,30 @@ export default function SurveyResultsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
-          <div key={card.label} className="border border-[#d8e1d4] bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">{card.label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[#123524]">{card.value}</p>
+          <div key={card.label} className="rounded-lg border border-line bg-surface px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">{card.label}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-ink">{card.value}</p>
             {card.label === 'Female / Male' && results.undisclosedSexResponses > 0 ? (
-              <p className="mt-1 text-xs text-[#6a7f6d]">
+              <p className="mt-1 text-xs text-muted-alt">
                 {results.undisclosedSexResponses} undisclosed
               </p>
             ) : null}
             {card.label === 'Completion rate' && results.targetResponses !== null ? (
-              <p className="mt-1 text-xs text-[#6a7f6d]">Target {results.targetResponses}</p>
+              <p className="mt-1 text-xs text-muted-alt">Target {results.targetResponses}</p>
             ) : null}
           </div>
         ))}
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#123524]">Ranked needs</h3>
-            <p className="mt-1 text-sm text-[#617462]">
+            <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">Ranked needs</h3>
+            <p className="mt-1 text-sm text-muted">
               Weighted average of rating answers per need category (1.00–5.00). Only rating questions are scored.
             </p>
           </div>
-          <p className="text-sm text-[#617462]">
+          <p className="text-sm text-muted">
             {results.categories.length} {results.categories.length === 1 ? 'category' : 'categories'} ranked
           </p>
         </div>
@@ -422,21 +422,21 @@ export default function SurveyResultsPage() {
             {results.distributions.map((distribution) => {
               const optionEntries = Object.entries(distribution.optionCounts)
               return (
-                <li key={distribution.questionId} className="border border-[#d8e1d4] bg-white px-4 py-4">
-                  <p className="text-sm font-medium text-[#123524]">{distribution.questionText}</p>
-                  <p className="mt-1 text-xs text-[#6a7f6d]">
+                <li key={distribution.questionId} className="rounded-lg border border-line bg-surface px-4 py-4">
+                  <p className="text-sm font-medium text-ink">{distribution.questionText}</p>
+                  <p className="mt-1 text-xs text-muted-alt">
                     {QUESTION_TYPE_LABELS[distribution.questionType] ?? distribution.questionType}
                   </p>
 
                   {distribution.questionType === 'open_text' ? (
                     distribution.textAnswers.length === 0 ? (
-                      <p className="mt-3 text-sm text-[#617462]">No answers yet.</p>
+                      <p className="mt-3 text-sm text-muted">No answers yet.</p>
                     ) : (
-                      <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto border border-[#eef2eb] px-3 py-2">
+                      <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto rounded-md border border-row-divider px-3 py-2">
                         {distribution.textAnswers.map((answer, index) => (
                           <li
                             key={`${distribution.questionId}-${index}`}
-                            className="border-b border-[#eef2eb] pb-2 text-sm leading-6 text-[#445846] last:border-b-0 last:pb-0"
+                            className="border-b border-row-divider pb-2 text-sm leading-6 text-cell last:border-b-0 last:pb-0"
                           >
                             {answer}
                           </li>
@@ -444,13 +444,13 @@ export default function SurveyResultsPage() {
                       </ul>
                     )
                   ) : optionEntries.length === 0 ? (
-                    <p className="mt-3 text-sm text-[#617462]">No answers yet.</p>
+                    <p className="mt-3 text-sm text-muted">No answers yet.</p>
                   ) : (
-                    <ul className="mt-3 divide-y divide-[#eef2eb]">
+                    <ul className="mt-3 divide-y divide-row-divider">
                       {optionEntries.map(([label, count]) => (
                         <li key={label} className="flex items-center justify-between gap-3 py-2.5">
-                          <span className="text-sm text-[#445846]">{label}</span>
-                          <span className="text-sm font-medium text-[#1f5d3b]">{count}</span>
+                          <span className="text-sm text-cell">{label}</span>
+                          <span className="text-sm font-medium text-primary-accent">{count}</span>
                         </li>
                       ))}
                     </ul>
@@ -467,19 +467,19 @@ export default function SurveyResultsPage() {
         description="Every EXTN-QF-23 copy is archived. Regenerating adds a new version and never overwrites an earlier one."
       >
         {reports.length === 0 ? (
-          <p className="py-6 text-center text-sm text-[#617462]">
+          <p className="py-6 text-center text-sm text-muted">
             No EXTN-QF-23 report generated yet.{' '}
             {results.finalized ? 'Generate one from the button above.' : 'Finalize the results first.'}
           </p>
         ) : (
-          <ul className="divide-y divide-[#eef2eb]">
+          <ul className="divide-y divide-row-divider">
             {reports.map((report) => (
               <li key={report.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-[#123524]">
+                  <p className="truncate text-sm font-medium text-ink">
                     EXTN-QF-23 · {results.title}
                   </p>
-                  <p className="mt-0.5 text-xs text-[#6a7f6d]">
+                  <p className="mt-0.5 text-xs text-muted-alt">
                     {report.fileType.toUpperCase()} · Generated {formatDateTime(report.createdAt)}
                   </p>
                 </div>
@@ -489,7 +489,7 @@ export default function SurveyResultsPage() {
                   title="Download"
                   disabled={downloadingReportId === report.id}
                   onClick={() => void handleDownloadReport(report)}
-                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-line text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                 >
                   {downloadingReportId === report.id ? <ButtonSpinner /> : <DownloadRoundedIcon fontSize="small" />}
                 </button>
@@ -511,7 +511,7 @@ export default function SurveyResultsPage() {
         }}
         onConfirm={handleFinalize}
       >
-        <div className="border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border-soft bg-danger-bg-soft px-4 py-3 text-sm text-danger-text">
           Finalizing cannot be undone. The ranked scores are frozen exactly as shown, and any responses
           submitted afterwards will not change them. Recommendations and the EXTN-QF-23 report will cite
           these numbers.

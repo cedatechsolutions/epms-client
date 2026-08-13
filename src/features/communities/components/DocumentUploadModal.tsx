@@ -11,12 +11,12 @@ type DocumentUploadModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors file:mr-3 file:cursor-pointer file:border-0 file:bg-transparent file:text-sm file:text-[#1f5d3b] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] rounded-md'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors file:mr-3 file:cursor-pointer file:border-0 file:bg-transparent file:text-sm file:text-primary-accent focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint rounded-md'
 
 const selectClassName =
-  'w-full cursor-pointer border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] rounded-md'
+  'w-full cursor-pointer border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint rounded-md'
 
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
 
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -57,7 +57,7 @@ export default function DocumentUploadModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="cursor-pointer border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -65,7 +65,7 @@ export default function DocumentUploadModal({
             type="submit"
             form="document-upload-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Uploading...' : 'Upload'}
@@ -75,7 +75,7 @@ export default function DocumentUploadModal({
     >
       <form id="document-upload-form" onSubmit={handleSubmit} className="space-y-5">
         {errorMessage || localError ? (
-          <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+          <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
             {errorMessage ?? localError}
           </div>
         ) : null}

@@ -23,15 +23,15 @@ type UserOption = {
 }
 
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 cursor-pointer border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
+  'h-10 border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
 const skeletonRows = Array.from({ length: 5 }, (_, index) => index)
 
 function Spinner() {
-  return <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+  return <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
 }
 
 function formatMetadata(raw: string | null): string {
@@ -151,26 +151,26 @@ export default function ActivityLogPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">Audit</p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">Activity log</h4>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[#506552]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">Audit</p>
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Activity log</h4>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
             A record of logins and every create, update, and delete action across the system.
           </p>
         </div>
       </div>
 
-      <section className="border border-[#d8e1d4] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="rounded-lg overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col gap-3 border-b border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-[#123524]">Activity records</p>
-            <p className="mt-1 text-sm text-[#617462]">Filter by user, action, entity type, or date range.</p>
+            <p className="text-sm font-medium text-ink">Activity records</p>
+            <p className="mt-1 text-sm text-muted">Filter by user, action, entity type, or date range.</p>
           </div>
-          <p className="text-sm text-[#617462]">{countLabel}</p>
+          <p className="text-sm text-muted">{countLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-[#e7eee3] px-5 py-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 xl:items-end">
+        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 xl:items-end">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">User</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">User</span>
             <select
               value={userFilter}
               disabled={loading}
@@ -190,7 +190,7 @@ export default function ActivityLogPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Action</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Action</span>
             <select
               value={actionFilter}
               disabled={loading}
@@ -210,7 +210,7 @@ export default function ActivityLogPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Entity</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Entity</span>
             <select
               value={entityFilter}
               disabled={loading}
@@ -226,7 +226,7 @@ export default function ActivityLogPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">From</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">From</span>
             <input
               type="date"
               value={fromDate}
@@ -240,7 +240,7 @@ export default function ActivityLogPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">To</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">To</span>
             <input
               type="date"
               value={toDate}
@@ -254,7 +254,7 @@ export default function ActivityLogPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">Rows</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Rows</span>
             <select
               value={perPage}
               disabled={loading}
@@ -273,14 +273,14 @@ export default function ActivityLogPage() {
 
         {loading ? (
           <div aria-busy="true" aria-live="polite">
-            <div className="flex items-center gap-3 border-b border-[#e7eee3] px-5 py-3 text-sm text-[#617462]">
+            <div className="flex items-center gap-3 border-b border-divider px-5 py-3 text-sm text-muted">
               <Spinner />
               Loading activity records...
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-[1080px] table-auto border-collapse">
                 <thead>
-                  <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+                  <tr className="border-b border-divider bg-surface-tint text-left text-xs font-semibold uppercase tracking-[0.12em] text-label">
                     <th className="px-5 py-3">Timestamp</th>
                     <th className="px-5 py-3">User</th>
                     <th className="px-5 py-3">Action</th>
@@ -291,10 +291,10 @@ export default function ActivityLogPage() {
                 </thead>
                 <tbody>
                   {skeletonRows.map((row) => (
-                    <tr key={row} className="border-b border-[#eef2eb] last:border-b-0">
+                    <tr key={row} className="border-b border-row-divider last:border-b-0">
                       {Array.from({ length: 6 }, (_, cell) => (
                         <td key={cell} className="px-5 py-4">
-                          <span className="block h-4 w-full max-w-[160px] animate-pulse bg-[#edf3ea]" />
+                          <span className="block h-4 w-full max-w-[160px] animate-pulse bg-skeleton" />
                         </td>
                       ))}
                     </tr>
@@ -305,11 +305,11 @@ export default function ActivityLogPage() {
           </div>
         ) : errorMessage ? (
           <div className="space-y-4 px-5 py-6">
-            <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">{errorMessage}</div>
+            <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
             <button
               type="button"
               onClick={() => void loadLogs()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+              className="cursor-pointer border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
             >
               Retry
             </button>
@@ -319,7 +319,7 @@ export default function ActivityLogPage() {
             <div className="overflow-x-auto">
               <table className="min-w-[1080px] table-auto border-collapse">
                 <thead>
-                  <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+                  <tr className="border-b border-divider bg-surface-tint text-left text-xs font-semibold uppercase tracking-[0.12em] text-label">
                     <th className="px-5 py-3">Timestamp</th>
                     <th className="px-5 py-3">User</th>
                     <th className="px-5 py-3">Action</th>
@@ -331,7 +331,7 @@ export default function ActivityLogPage() {
                 <tbody>
                   {logs.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-5 py-12 text-center text-sm text-[#617462]">
+                      <td colSpan={6} className="px-5 py-12 text-center text-sm text-muted">
                         No activity records found.
                       </td>
                     </tr>
@@ -339,12 +339,12 @@ export default function ActivityLogPage() {
                     logs.map((log) => (
                       <tr
                         key={log.id}
-                        className="border-b border-[#eef2eb] text-sm text-[#445846] last:border-b-0 hover:bg-[#fbfdf9]"
+                        className="border-b border-row-divider text-sm text-cell last:border-b-0 hover:bg-row-hover"
                       >
-                        <td className="px-5 py-4 whitespace-nowrap text-[#123524]">{formatDateTime(log.createdAt)}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-ink">{formatDateTime(log.createdAt)}</td>
                         <td className="px-5 py-4">{log.userLabel || '-'}</td>
                         <td className="px-5 py-4">
-                          <span className="inline-flex border border-[#d8e1d4] bg-[#f7faf6] px-2.5 py-1 text-xs font-medium text-[#123524]">
+                          <span className="inline-flex rounded-md border border-line bg-surface-tint px-2.5 py-1 text-xs font-medium text-ink">
                             {ACTIVITY_ACTION_LABELS[log.action] ?? log.action}
                           </span>
                         </td>
@@ -353,7 +353,7 @@ export default function ActivityLogPage() {
                             <span>
                               {log.entityType}
                               {log.entityId ? (
-                                <span className="ml-1 font-mono text-xs text-[#5d705e]">
+                                <span className="ml-1 font-mono text-xs text-cell-strong">
                                   {log.entityId.slice(0, 8)}
                                 </span>
                               ) : null}
@@ -362,10 +362,10 @@ export default function ActivityLogPage() {
                             '-'
                           )}
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-[#5d705e]">
+                        <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-cell-strong">
                           {log.ipAddress || '-'}
                         </td>
-                        <td className="px-5 py-4 text-[#506552]">{formatMetadata(log.metadata)}</td>
+                        <td className="px-5 py-4 text-body">{formatMetadata(log.metadata)}</td>
                       </tr>
                     ))
                   )}
@@ -373,8 +373,8 @@ export default function ActivityLogPage() {
               </table>
             </div>
 
-            <div className="flex flex-col gap-4 border-t border-[#e7eee3] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-              <p className="text-sm text-[#617462]">
+            <div className="flex flex-col gap-4 border-t border-divider px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+              <p className="text-sm text-muted">
                 Page {meta.current_page} of {meta.last_page}
               </p>
 
@@ -383,14 +383,14 @@ export default function ActivityLogPage() {
                   type="button"
                   disabled={meta.current_page <= 1}
                   onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                  className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                 >
                   Previous
                 </button>
 
                 {paginationItems.map((item, index) =>
                   item === 'ellipsis' ? (
-                    <span key={`ellipsis-${index}`} className="px-1 text-sm text-[#7e8d7a]">
+                    <span key={`ellipsis-${index}`} className="px-1 text-sm text-muted-faint">
                       ...
                     </span>
                   ) : (
@@ -401,8 +401,8 @@ export default function ActivityLogPage() {
                       className={[
                         'min-w-10 border px-3 py-2 text-sm font-medium transition-colors rounded-md',
                         item === meta.current_page
-                          ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
-                          : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
+                          ? 'cursor-default border-primary bg-primary text-white'
+                          : 'cursor-pointer border-line text-ink hover:bg-hover-tint',
                       ].join(' ')}
                     >
                       {item}
@@ -414,7 +414,7 @@ export default function ActivityLogPage() {
                   type="button"
                   disabled={meta.current_page >= meta.last_page}
                   onClick={() => setPage((currentPage) => Math.min(meta.last_page, currentPage + 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
+                  className="cursor-pointer border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                 >
                   Next
                 </button>

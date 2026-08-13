@@ -18,18 +18,18 @@ import { isApiError } from '@/shared/api/http'
 import { notify } from '@/shared/toast'
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
-const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
+  'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
+const labelClassName = 'mb-2 block text-sm font-medium text-ink'
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-primary bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const destructiveButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#e3c9c9] px-4 py-2.5 text-sm font-medium text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
-const sectionClassName = 'border border-[#d8e1d4] bg-white'
-const sectionHeaderClassName = 'border-b border-[#e7eee3] px-5 py-4'
-const sectionTitleClassName = 'text-lg font-semibold tracking-[-0.02em] text-[#123524]'
-const alertClassName = 'border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-danger-border px-4 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger-bg-soft disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+const sectionClassName = 'rounded-lg overflow-hidden border border-line bg-surface'
+const sectionHeaderClassName = 'border-b border-divider px-5 py-4'
+const sectionTitleClassName = 'text-lg font-semibold tracking-[-0.02em] text-ink'
+const alertClassName = 'border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text'
 const darkSpinnerClassName = 'h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white'
 
 /** Mirrors the server-side avatar rule so an oversized or wrong-typed file never leaves the browser. */
@@ -175,13 +175,13 @@ export default function ProfileSettingsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
             Settings
           </p>
-          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">
+          <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
             Profile Settings
           </h4>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#506552]">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-body">
             Update the photo, personal information and password for your own account. Your email
             address, role and account status are managed by an administrator.
           </p>
@@ -192,7 +192,7 @@ export default function ProfileSettingsPage() {
       <section className={sectionClassName}>
         <div className={sectionHeaderClassName}>
           <h5 className={sectionTitleClassName}>Profile photo</h5>
-          <p className="mt-1 text-sm text-[#617462]">
+          <p className="mt-1 text-sm text-muted">
             Shown beside your name in the header. JPG or PNG, up to 2 MB.
           </p>
         </div>
@@ -212,8 +212,8 @@ export default function ProfileSettingsPage() {
 
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-[#123524]">{displayName}</p>
-                <p className="text-xs text-[#6a7f6d]">{roleLabel}</p>
+                <p className="text-sm font-medium text-ink">{displayName}</p>
+                <p className="text-xs text-muted-alt">{roleLabel}</p>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -251,7 +251,7 @@ export default function ProfileSettingsPage() {
                 ) : null}
               </div>
 
-              <p className="text-xs text-[#6a7f6d]">
+              <p className="text-xs text-muted-alt">
                 Without a photo, your initials are shown instead.
               </p>
             </div>
@@ -263,7 +263,7 @@ export default function ProfileSettingsPage() {
       <section className={sectionClassName}>
         <div className={sectionHeaderClassName}>
           <h5 className={sectionTitleClassName}>Personal information</h5>
-          <p className="mt-1 text-sm text-[#617462]">
+          <p className="mt-1 text-sm text-muted">
             Your name and contact number as they appear across the system.
           </p>
         </div>
@@ -362,14 +362,14 @@ export default function ProfileSettingsPage() {
                   readOnly
                   className={inputClassName}
                 />
-                <p className="mt-2 text-xs text-[#7b6542]">
+                <p className="mt-2 text-xs text-warning">
                   Your email is your sign-in identity — only an administrator can change it.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end border-t border-[#e7eee3] bg-[#fbfdf9] px-5 py-4">
+          <div className="flex justify-end border-t border-divider bg-row-hover px-5 py-4">
             <button type="submit" disabled={profileSaving} className={primaryButtonClassName}>
               {profileSaving ? <span className={darkSpinnerClassName} /> : null}
               {profileSaving ? 'Saving...' : 'Save changes'}
@@ -382,7 +382,7 @@ export default function ProfileSettingsPage() {
       <section className={sectionClassName}>
         <div className={sectionHeaderClassName}>
           <h5 className={sectionTitleClassName}>Password</h5>
-          <p className="mt-1 text-sm text-[#617462]">
+          <p className="mt-1 text-sm text-muted">
             Enter your current password to confirm, then choose a new one of at least 8 characters.
           </p>
         </div>
@@ -416,7 +416,7 @@ export default function ProfileSettingsPage() {
                   aria-pressed={showPassword}
                   disabled={passwordSaving}
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-50 rounded-r-md"
+                  className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-icon-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50 rounded-r-md"
                 >
                   {showPassword ? (
                     <VisibilityOffRoundedIcon fontSize="small" />
@@ -473,7 +473,7 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
 
-          <div className="flex justify-end border-t border-[#e7eee3] bg-[#fbfdf9] px-5 py-4">
+          <div className="flex justify-end border-t border-divider bg-row-hover px-5 py-4">
             <button type="submit" disabled={passwordSaving} className={primaryButtonClassName}>
               {passwordSaving ? <span className={darkSpinnerClassName} /> : null}
               {passwordSaving ? 'Updating...' : 'Update password'}

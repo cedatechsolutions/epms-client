@@ -22,10 +22,10 @@ import {
 import { PROGRAM_STATUS_ROWS, type DashboardOverview } from '../types'
 
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
+  'inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 function EmptyPanelMessage({ children }: { children: ReactNode }) {
-  return <p className="py-6 text-center text-sm text-[#617462]">{children}</p>
+  return <p className="py-6 text-center text-sm text-muted">{children}</p>
 }
 
 function LoadingSkeleton() {
@@ -34,19 +34,19 @@ function LoadingSkeleton() {
       <span className="sr-only">Loading dashboard figures...</span>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <section key={index} className="border border-[#d8e1d4] bg-white p-5">
-            <div className="h-4 w-28 animate-pulse bg-[#edf3ea]" />
-            <div className="mt-4 h-8 w-20 animate-pulse bg-[#edf3ea]" />
-            <div className="mt-4 h-3 w-32 animate-pulse bg-[#edf3ea]" />
+          <section key={index} className="rounded-lg border border-line bg-surface p-5">
+            <div className="h-4 w-28 animate-pulse bg-skeleton" />
+            <div className="mt-4 h-8 w-20 animate-pulse bg-skeleton" />
+            <div className="mt-4 h-3 w-32 animate-pulse bg-skeleton" />
           </section>
         ))}
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         {Array.from({ length: 2 }, (_, index) => (
-          <section key={index} className="border border-[#d8e1d4] bg-white p-5">
-            <div className="h-5 w-44 animate-pulse bg-[#edf3ea]" />
-            <div className="mt-5 h-2 w-full animate-pulse bg-[#edf3ea]" />
-            <div className="mt-4 h-4 w-56 animate-pulse bg-[#edf3ea]" />
+          <section key={index} className="rounded-lg border border-line bg-surface p-5">
+            <div className="h-5 w-44 animate-pulse bg-skeleton" />
+            <div className="mt-5 h-2 w-full animate-pulse bg-skeleton" />
+            <div className="mt-4 h-4 w-56 animate-pulse bg-skeleton" />
           </section>
         ))}
       </div>
@@ -84,10 +84,10 @@ export default function DashboardPage() {
   const header = (
     <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73856f]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
           Extension Services Center
         </p>
-        <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#123524]">
+        <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
           Extension programs overview
         </h4>
       </div>
@@ -99,14 +99,14 @@ export default function DashboardPage() {
           className={secondaryButtonClassName}
         >
           {refreshing ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-primary-accent" />
           ) : (
             <RefreshRoundedIcon fontSize="small" />
           )}
           {refreshing ? 'Refreshing...' : 'Refresh'}
         </button>
         {overview ? (
-          <p className="text-xs text-[#6a7f6d]">Updated {formatDateTime(overview.generatedAt)}</p>
+          <p className="text-xs text-muted-alt">Updated {formatDateTime(overview.generatedAt)}</p>
         ) : null}
       </div>
     </div>
@@ -125,7 +125,7 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         {header}
-        <div className="flex flex-col gap-3 border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text sm:flex-row sm:items-center sm:justify-between">
           <span>{errorMessage ?? 'Could not load the dashboard.'}</span>
           <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
             Retry
@@ -143,7 +143,7 @@ export default function DashboardPage() {
       {header}
 
       {errorMessage ? (
-        <div className="border border-[#e3c9c9] bg-[#fff5f5] px-4 py-3 text-sm text-[#8a2d2d]">
+        <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">
           {errorMessage} Showing the figures from the last successful load.
         </div>
       ) : null}
@@ -193,10 +193,10 @@ export default function DashboardPage() {
           {communities.populationFemale + communities.populationMale > 0 ? (
             <div className="space-y-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-label">
                   Total profiled population
                 </p>
-                <p className="mt-1 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-[#123524]">
+                <p className="mt-1 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-ink">
                   {formatNumber(communities.population)}
                 </p>
               </div>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                 ]}
               />
               {communities.withSexSplit < communities.total ? (
-                <p className="text-xs leading-5 text-[#7b6542]">
+                <p className="text-xs leading-5 text-warning">
                   {formatNumber(communities.total - communities.withSexSplit)} profile(s) have no
                   female/male split recorded and are excluded from the bar above.
                 </p>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
           ) : (
             <EmptyPanelMessage>
               No community population has been profiled yet.{' '}
-              <Link to="/admin/communities" className="font-medium text-[#1f5d3b] hover:underline">
+              <Link to="/admin/communities" className="font-medium text-primary-accent hover:underline">
                 Add a community
               </Link>{' '}
               to start tracking reach.
@@ -233,10 +233,10 @@ export default function DashboardPage() {
           {assessments.responses > 0 ? (
             <div className="space-y-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-label">
                   Total responses collected
                 </p>
-                <p className="mt-1 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-[#123524]">
+                <p className="mt-1 text-3xl font-semibold tracking-[-0.03em] tabular-nums text-ink">
                   {formatNumber(assessments.responses)}
                 </p>
               </div>
@@ -249,7 +249,7 @@ export default function DashboardPage() {
                   { label: 'Undisclosed', value: assessments.responsesUndisclosed, tone: 'neutral' },
                 ]}
               />
-              <p className="text-xs leading-5 text-[#6a7f6d]">
+              <p className="text-xs leading-5 text-muted-alt">
                 {formatNumber(assessments.deployed)} survey(s) currently open ·{' '}
                 {formatNumber(assessments.closed)} closed · {formatNumber(assessments.draft)} in draft
               </p>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
           ) : (
             <EmptyPanelMessage>
               No survey responses yet.{' '}
-              <Link to="/admin/surveys" className="font-medium text-[#1f5d3b] hover:underline">
+              <Link to="/admin/surveys" className="font-medium text-primary-accent hover:underline">
                 Deploy a survey
               </Link>{' '}
               to start collecting them.
@@ -275,7 +275,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto">
               <table className="min-w-[640px] table-auto border-collapse">
                 <thead>
-                  <tr className="border-b border-[#e7eee3] bg-[#f7faf6] text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6d7f6b]">
+                  <tr className="border-b border-divider bg-surface-tint text-left text-xs font-semibold uppercase tracking-[0.12em] text-label">
                     <th className="px-5 py-3">Need category</th>
                     <th className="px-5 py-3">Avg. score</th>
                     <th className="px-5 py-3">Priority</th>
@@ -287,16 +287,16 @@ export default function DashboardPage() {
                   {topNeeds.map((need) => (
                     <tr
                       key={need.needCategoryId}
-                      className="border-b border-[#eef2eb] text-sm text-[#445846] last:border-b-0 hover:bg-[#fbfdf9]"
+                      className="border-b border-row-divider text-sm text-cell last:border-b-0 hover:bg-row-hover"
                     >
-                      <td className="px-5 py-4 font-medium text-[#123524]">{need.needCategoryName}</td>
+                      <td className="px-5 py-4 font-medium text-ink">{need.needCategoryName}</td>
                       <td className="px-5 py-4 tabular-nums">{formatScore(need.avgScore)}</td>
                       <td className="px-5 py-4">
                         <PriorityBadge priority={need.priority} />
                       </td>
                       <td className="px-5 py-4 tabular-nums">
                         {formatNumber(need.responseCount)}{' '}
-                        <span className="text-[#6a7f6d]">
+                        <span className="text-muted-alt">
                           ({formatNumber(need.femaleCount)} / {formatNumber(need.maleCount)})
                         </span>
                       </td>
@@ -392,24 +392,24 @@ export default function DashboardPage() {
               {recentActivity.map((log) => (
                 <li
                   key={log.id}
-                  className="flex flex-col gap-1 border-b border-[#eef2eb] pb-4 last:border-b-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
+                  className="flex flex-col gap-1 border-b border-row-divider pb-4 last:border-b-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
                 >
                   <div className="flex min-w-0 items-baseline gap-3">
-                    <span aria-hidden="true" className="h-2 w-2 shrink-0 translate-y-1 bg-[#1f5d3b]" />
-                    <p className="text-sm leading-6 text-[#506552]">
-                      <span className="font-medium text-[#123524]">
+                    <span aria-hidden="true" className="h-2 w-2 shrink-0 translate-y-1 bg-primary" />
+                    <p className="text-sm leading-6 text-body">
+                      <span className="font-medium text-ink">
                         {ACTIVITY_ACTION_LABELS[log.action] ?? log.action}
                       </span>
                       {log.userLabel ? ` by ${log.userLabel}` : ''}
                       {log.entityType ? (
-                        <span className="text-[#6a7f6d]"> · {log.entityType}</span>
+                        <span className="text-muted-alt"> · {log.entityType}</span>
                       ) : null}
                     </p>
                   </div>
                   <time
                     dateTime={log.createdAt}
                     title={formatDateTime(log.createdAt)}
-                    className="shrink-0 text-xs text-[#6a7f6d]"
+                    className="shrink-0 text-xs text-muted-alt"
                   >
                     {formatRelativeTime(log.createdAt)}
                   </time>
