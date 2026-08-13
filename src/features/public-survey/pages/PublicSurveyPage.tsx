@@ -19,7 +19,7 @@ import {
 type PageState = 'loading' | 'ready' | 'closed' | 'notfound' | 'error' | 'submitted' | 'already'
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-base text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b]'
+  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-base text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] rounded-md'
 const selectClassName = `${inputClassName} cursor-pointer`
 const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
 
@@ -228,7 +228,7 @@ export default function PublicSurveyPage() {
           <button
             type="button"
             onClick={() => void load()}
-            className="mt-4 w-full cursor-pointer border border-[#d8e1d4] px-4 py-3 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+            className="mt-4 w-full cursor-pointer border border-[#d8e1d4] px-4 py-3 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
           >
             Try again
           </button>
@@ -263,7 +263,7 @@ export default function PublicSurveyPage() {
               {SEX_OPTIONS.map((option) => (
                 <label
                   key={option.value}
-                  className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5]"
+                  className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
                 >
                   <input
                     type="radio"
@@ -347,7 +347,7 @@ export default function PublicSurveyPage() {
             </Link>
             .
           </p>
-          <label className="mt-4 flex cursor-pointer items-start gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5]">
+          <label className="mt-4 flex cursor-pointer items-start gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md">
             <input
               type="checkbox"
               checked={consent}
@@ -368,7 +368,7 @@ export default function PublicSurveyPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-base font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-3 text-base font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           {submitting ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -414,7 +414,7 @@ function QuestionField({
                   aria-pressed={active}
                   onClick={() => onChange(question.id, String(rating))}
                   className={[
-                    'cursor-pointer border px-2 py-3 text-base font-medium transition-colors',
+                    'cursor-pointer border px-2 py-3 text-base font-medium transition-colors rounded-md',
                     active
                       ? 'border-[#1f5d3b] bg-[#1f5d3b] text-white'
                       : 'border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
@@ -437,7 +437,7 @@ function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5]"
+              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               <input
                 type="radio"
@@ -458,7 +458,7 @@ function QuestionField({
           {question.options.map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5]"
+              className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               <input
                 type="checkbox"
@@ -478,7 +478,7 @@ function QuestionField({
           rows={4}
           onChange={(event) => onChange(question.id, event.target.value)}
           placeholder="Your answer"
-          className={`mt-4 ${inputClassName}`}
+          className={`mt-4 ${inputClassName} rounded-md`}
         />
       ) : null}
     </section>

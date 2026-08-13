@@ -36,9 +36,9 @@ import {
 } from '../types'
 
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 function SectionCard({
   title,
@@ -489,7 +489,7 @@ export default function SurveyResultsPage() {
                   title="Download"
                   disabled={downloadingReportId === report.id}
                   onClick={() => void handleDownloadReport(report)}
-                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                 >
                   {downloadingReportId === report.id ? <ButtonSpinner /> : <DownloadRoundedIcon fontSize="small" />}
                 </button>

@@ -24,7 +24,7 @@ type QuestionFormModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 const selectClassName = `${inputClassName} cursor-pointer`
 const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
 
@@ -106,7 +106,7 @@ export default function QuestionFormModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -114,7 +114,7 @@ export default function QuestionFormModal({
             type="submit"
             form="question-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Saving...' : question ? 'Save Question' : 'Add Question'}
@@ -236,7 +236,7 @@ export default function QuestionFormModal({
                     title="Remove option"
                     disabled={loading || optionLabels.length <= 2}
                     onClick={() => setOptionLabels(optionLabels.filter((_, i) => i !== index))}
-                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     <CloseRoundedIcon fontSize="small" />
                   </button>
@@ -247,7 +247,7 @@ export default function QuestionFormModal({
               type="button"
               disabled={loading}
               onClick={() => setOptionLabels([...optionLabels, ''])}
-              className="mt-2 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               <AddRoundedIcon fontSize="small" />
               Add option

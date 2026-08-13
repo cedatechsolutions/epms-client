@@ -21,11 +21,11 @@ const neutralChipClassName = `${chipClassName} border-[#d8e1d4] bg-[#f7faf6] tex
 const successChipClassName = `${chipClassName} border-[#bfd3c0] bg-[#f3f9f2] text-[#1f5d3b]`
 
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const destructiveButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#e3c9c9] px-4 py-2.5 text-sm font-medium text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#e3c9c9] px-4 py-2.5 text-sm font-medium text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 type RecommendationCardProps = {
   recommendation: Recommendation

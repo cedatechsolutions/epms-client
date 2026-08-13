@@ -14,7 +14,7 @@ type DecisionModalProps = {
 }
 
 const textareaClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm leading-6 text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm leading-6 text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 const DECISION_COPY: Record<DecisionKind, { title: string; description: string; noteLabel: string; hint: string }> = {
   accept: {
@@ -83,7 +83,7 @@ export default function DecisionModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -92,7 +92,7 @@ export default function DecisionModal({
             onClick={handleSubmit}
             disabled={loading}
             className={[
-              'inline-flex cursor-pointer items-center justify-center gap-2 border px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+              'inline-flex cursor-pointer items-center justify-center gap-2 border px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md',
               destructive
                 ? 'border-[#9f2f2f] bg-[#9f2f2f] hover:bg-[#832424]'
                 : 'border-[#1f5d3b] bg-[#1f5d3b] hover:bg-[#18492e]',

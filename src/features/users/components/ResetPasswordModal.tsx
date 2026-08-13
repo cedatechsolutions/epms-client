@@ -91,7 +91,7 @@ export default function ResetPasswordModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Cancel
       </button>
@@ -99,7 +99,7 @@ export default function ResetPasswordModal({
         type="button"
         onClick={() => void handleConfirm()}
         disabled={loading}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         {loading ? <ButtonSpinner /> : null}
         {loading ? 'Resetting...' : 'Reset Password'}
@@ -136,7 +136,7 @@ export default function ResetPasswordModal({
               value={values.password}
               disabled={loading}
               onChange={(event) => setValues((current) => ({ ...current, password: event.target.value }))}
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
+              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
               placeholder="Enter new password"
             />
             <button
@@ -145,7 +145,7 @@ export default function ResetPasswordModal({
               aria-pressed={showPassword}
               disabled={loading}
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45"
+              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
             >
               {showPassword ? <VisibilityOffRoundedIcon fontSize="small" /> : <VisibilityRoundedIcon fontSize="small" />}
             </button>
@@ -163,7 +163,7 @@ export default function ResetPasswordModal({
               onChange={(event) =>
                 setValues((current) => ({ ...current, password_confirmation: event.target.value }))
               }
-              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]"
+              className="w-full border border-[#d8e1d4] px-3 py-2.5 pr-12 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#91a091] focus:border-[#1f5d3b] focus:bg-[#fbfdf9] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md"
               placeholder="Confirm new password"
             />
             <button
@@ -172,7 +172,7 @@ export default function ResetPasswordModal({
               aria-pressed={showPasswordConfirmation}
               disabled={loading}
               onClick={() => setShowPasswordConfirmation((current) => !current)}
-              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45"
+              className="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] disabled:cursor-not-allowed disabled:opacity-45 rounded-r-md"
             >
               {showPasswordConfirmation ? (
                 <VisibilityOffRoundedIcon fontSize="small" />

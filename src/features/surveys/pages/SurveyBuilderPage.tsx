@@ -63,9 +63,9 @@ function SectionCard({
 }
 
 const iconButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 const destructiveIconButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 export default function SurveyBuilderPage() {
   const { id = '' } = useParams()
@@ -311,7 +311,7 @@ export default function SurveyBuilderPage() {
           {!isDraft ? (
             <Link
               to={`/admin/surveys/${survey.id}/results`}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               <InsightsOutlinedIcon fontSize="small" />
               View results
@@ -326,7 +326,7 @@ export default function SurveyBuilderPage() {
                   onClick={() => setDeployOpen(true)}
                   disabled={orderedQuestions.length === 0}
                   title={orderedQuestions.length === 0 ? 'Add at least one question first' : undefined}
-                  className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
                 >
                   Deploy Survey
                 </button>
@@ -335,7 +335,7 @@ export default function SurveyBuilderPage() {
                 <button
                   type="button"
                   onClick={() => setCloseOpen(true)}
-                  className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                  className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
                 >
                   Close Survey
                 </button>
@@ -369,7 +369,7 @@ export default function SurveyBuilderPage() {
                   setQuestionApiErrors(undefined)
                   setQuestionOpen(true)
                 }}
-                className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
               >
                 <AddRoundedIcon fontSize="small" />
                 Add question
@@ -479,7 +479,7 @@ export default function SurveyBuilderPage() {
                     setMetaApiErrors(undefined)
                     setMetaOpen(true)
                   }}
-                  className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                  className="inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
                 >
                   <EditOutlinedIcon fontSize="small" />
                   Edit
@@ -529,7 +529,7 @@ export default function SurveyBuilderPage() {
               <button
                 type="button"
                 onClick={() => void copyLink()}
-                className="mt-3 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                className="mt-3 inline-flex cursor-pointer items-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
               >
                 <ContentCopyRoundedIcon fontSize="small" />
                 Copy link

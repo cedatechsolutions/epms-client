@@ -6,14 +6,19 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined'
+import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded'
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import PollOutlinedIcon from '@mui/icons-material/PollOutlined'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import { getPrimaryRoleLabel, getUserDisplayName, getUserInitials, hasAnyRole } from '@/features/auth/lib/access'
+import UserAvatar from '@/features/auth/components/UserAvatar'
 import { ASSESSMENT_VIEW_ROLES } from '@/features/surveys'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { USER_MANAGEMENT_ROLES } from '@/features/auth/types'
@@ -27,12 +32,25 @@ type NavItem = {
   disabled?: boolean
 }
 
+type NavGroup = {
+  id: string
+  label: string
+  Icon: typeof DashboardOutlinedIcon
+  items: NavItem[]
+}
+
+type NavNode = NavItem | NavGroup
+
+function isNavGroup(node: NavNode): node is NavGroup {
+  return 'items' in node
+}
+
 type SectionCopy = {
   eyebrow: string
 }
 
-function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessments: boolean): NavItem[] {
-  const items: NavItem[] = [
+function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessments: boolean): NavNode[] {
+  const items: NavNode[] = [
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -68,23 +86,6 @@ function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessmen
     })
   }
 
-  if (canAccessUserManagement) {
-    items.push({
-      id: 'users',
-      label: 'User Management',
-      to: '/admin/users',
-      Icon: GroupOutlinedIcon,
-      matches: (currentPathname) => currentPathname.startsWith('/admin/users'),
-    })
-    items.push({
-      id: 'activity-logs',
-      label: 'Activity Log',
-      to: '/admin/activity-logs',
-      Icon: HistoryOutlinedIcon,
-      matches: (currentPathname) => currentPathname.startsWith('/admin/activity-logs'),
-    })
-  }
-
   items.push(
     {
       id: 'projects',
@@ -112,18 +113,47 @@ function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessmen
     },
   )
 
+  if (canAccessUserManagement) {
+    items.push({
+      id: 'settings',
+      label: 'Settings',
+      Icon: SettingsOutlinedIcon,
+      items: [
+        {
+          id: 'users',
+          label: 'User Management',
+          to: '/admin/users',
+          Icon: GroupOutlinedIcon,
+          matches: (currentPathname) => currentPathname.startsWith('/admin/users'),
+        },
+        {
+          id: 'activity-logs',
+          label: 'Activity Log',
+          to: '/admin/activity-logs',
+          Icon: HistoryOutlinedIcon,
+          matches: (currentPathname) => currentPathname.startsWith('/admin/activity-logs'),
+        },
+      ],
+    })
+  }
+
   return items
 }
 
 function getSectionCopy(pathname: string): SectionCopy {
+  if (pathname.startsWith('/admin/profile')) {
+    return {
+      eyebrow: 'Settings / Profile Settings',
+    }
+  }
   if (pathname.startsWith('/admin/users')) {
     return {
-      eyebrow: 'Administration / User Management',
+      eyebrow: 'Administration / Settings / User Management',
     }
   }
   if (pathname.startsWith('/admin/activity-logs')) {
     return {
-      eyebrow: 'Administration / Activity Log',
+      eyebrow: 'Administration / Settings / Activity Log',
     }
   }
   if (pathname.startsWith('/admin/program-types') || pathname.startsWith('/admin/scoring-matrix')) {
@@ -137,12 +167,55 @@ function getSectionCopy(pathname: string): SectionCopy {
 }
 
 type SidebarProps = {
-  navigationItems: NavItem[]
+  navigationItems: NavNode[]
   pathname: string
   onNavigate: (to: string) => void
   collapsed?: boolean
   onSignOut: () => void
   signOutLoading?: boolean
+}
+
+type NavItemButtonProps = {
+  item: NavItem
+  isActive: boolean
+  collapsed: boolean
+  nested?: boolean
+  onNavigate: (to: string) => void
+}
+
+function NavItemButton({ item, isActive, collapsed, nested = false, onNavigate }: NavItemButtonProps) {
+  const Icon = item.Icon
+
+  return (
+    <button
+      type="button"
+      aria-label={collapsed ? item.label : undefined}
+      title={collapsed ? item.label : undefined}
+      aria-current={isActive ? 'page' : undefined}
+      onClick={() => {
+        if (!item.disabled) {
+          onNavigate(item.to)
+        }
+      }}
+      disabled={item.disabled}
+      className={[
+        'flex w-full items-center border-l-2 text-sm font-medium transition-colors cursor-pointer rounded-md',
+        collapsed
+          ? 'justify-center px-2 py-3'
+          : nested
+            ? 'gap-3 py-2.5 pl-8 pr-4 text-left'
+            : 'gap-3 px-4 py-3 text-left',
+        isActive
+          ? 'border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]'
+          : item.disabled
+            ? 'border-transparent text-[#8a9989]'
+            : 'border-transparent text-[#445846] hover:bg-[#f7faf6] hover:text-[#123524]',
+      ].join(' ')}
+    >
+      <Icon className="shrink-0" fontSize="small" />
+      <span className={collapsed ? 'sr-only' : 'truncate'}>{item.label}</span>
+    </button>
+  )
 }
 
 function Sidebar({
@@ -153,6 +226,16 @@ function Sidebar({
   onSignOut,
   signOutLoading = false,
 }: SidebarProps) {
+  const [groupOverrides, setGroupOverrides] = useState<Record<string, boolean>>({})
+
+  const isGroupOpen = (group: NavGroup) =>
+    groupOverrides[group.id] ?? group.items.some((item) => item.matches(pathname))
+
+  const toggleGroup = (group: NavGroup) => {
+    const open = isGroupOpen(group)
+    setGroupOverrides((current) => ({ ...current, [group.id]: !open }))
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
       <div className={['px-4 py-5', collapsed ? 'px-3' : 'px-6'].join(' ')}>
@@ -171,35 +254,64 @@ function Sidebar({
 
       <div className={['min-h-0 flex-1 overflow-y-auto py-6', collapsed ? 'px-3' : 'px-6'].join(' ')}>
         <nav className="space-y-1">
-          {navigationItems.map((item) => {
-            const isActive = item.matches(pathname)
-            const Icon = item.Icon
+          {navigationItems.map((node) => {
+            if (!isNavGroup(node)) {
+              return (
+                <NavItemButton
+                  key={node.id}
+                  item={node}
+                  isActive={node.matches(pathname)}
+                  collapsed={collapsed}
+                  onNavigate={onNavigate}
+                />
+              )
+            }
+
+            const GroupIcon = node.Icon
+            const open = isGroupOpen(node)
+            const hasActiveChild = node.items.some((item) => item.matches(pathname))
 
             return (
-              <button
-                key={item.id}
-                type="button"
-                aria-label={collapsed ? item.label : undefined}
-                title={collapsed ? item.label : undefined}
-                onClick={() => {
-                  if (!item.disabled) {
-                    onNavigate(item.to)
-                  }
-                }}
-                disabled={item.disabled}
-                className={[
-                  'flex w-full items-center border-l-2 text-sm font-medium transition-colors cursor-pointer rounded-md',
-                  collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3 text-left',
-                  isActive
-                    ? 'border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]'
-                    : item.disabled
-                      ? 'border-transparent text-[#8a9989]'
+              <div key={node.id} className="space-y-1">
+                <button
+                  type="button"
+                  aria-label={collapsed ? node.label : undefined}
+                  title={collapsed ? node.label : undefined}
+                  aria-expanded={open}
+                  aria-controls={`nav-group-${node.id}`}
+                  onClick={() => toggleGroup(node)}
+                  className={[
+                    'flex w-full items-center border-l-2 text-sm font-medium transition-colors cursor-pointer rounded-md',
+                    collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3 text-left',
+                    hasActiveChild && !open
+                      ? 'border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]'
                       : 'border-transparent text-[#445846] hover:bg-[#f7faf6] hover:text-[#123524]',
-                ].join(' ')}
-                  >
-                <Icon className="shrink-0" fontSize="small" />
-                <span className={collapsed ? 'sr-only' : 'truncate'}>{item.label}</span>
-              </button>
+                  ].join(' ')}
+                >
+                  <GroupIcon className="shrink-0" fontSize="small" />
+                  <span className={collapsed ? 'sr-only' : 'flex-1 truncate'}>{node.label}</span>
+                  {collapsed ? null : open ? (
+                    <ExpandLessRoundedIcon className="shrink-0" fontSize="small" />
+                  ) : (
+                    <ExpandMoreRoundedIcon className="shrink-0" fontSize="small" />
+                  )}
+                </button>
+
+                {open ? (
+                  <div id={`nav-group-${node.id}`} className="space-y-1">
+                    {node.items.map((item) => (
+                      <NavItemButton
+                        key={item.id}
+                        item={item}
+                        isActive={item.matches(pathname)}
+                        collapsed={collapsed}
+                        nested
+                        onNavigate={onNavigate}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             )
           })}
         </nav>
@@ -235,6 +347,7 @@ export default function AdminLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const user = useAuthStore((state) => state.user)
+  const avatarUrl = useAuthStore((state) => state.avatarUrl)
   const signOut = useAuthStore((state) => state.signOut)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -329,7 +442,7 @@ export default function AdminLayout() {
                   aria-expanded={!sidebarCollapsed}
                   aria-controls="admin-sidebar"
                   onClick={() => setSidebarCollapsed((current) => !current)}
-                  className="hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center border border-[#D7E0D5] rounded text-[#123524] transition-colors hover:bg-[#f6faf5] md:inline-flex"
+                  className="hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center border border-[#D7E0D5] text-[#123524] transition-colors hover:bg-[#f6faf5] md:inline-flex rounded-md"
                 >
                   {sidebarCollapsed ? (
                     <ChevronRightRoundedIcon fontSize="small" />
@@ -352,12 +465,11 @@ export default function AdminLayout() {
                 <div className="relative" ref={profileMenuRef}>
                   <button
                     type="button"
+                    aria-expanded={profileMenuOpen}
                     onClick={() => setProfileMenuOpen((current) => !current)}
                     className="hidden items-center gap-3 rounded-lg cursor-pointer px-3 py-2 transition-colors hover:bg-[#f6faf5] md:inline-flex"
                   >
-                    <span className="flex h-9 w-9 items-center justify-center bg-[#1f5d3b] text-sm font-semibold text-white rounded-full">
-                      {initials}
-                    </span>
+                    <UserAvatar initials={initials} imageUrl={avatarUrl} name={displayName} size="sm" />
                     <span className="text-left">
                       <span className="block text-sm font-medium text-[#123524]">{displayName}</span>
                       <span className="block text-xs text-[#6a7f6d]">{primaryRoleLabel}</span>
@@ -366,26 +478,45 @@ export default function AdminLayout() {
 
                   <button
                     type="button"
+                    aria-label="Open account menu"
+                    title="Account"
+                    aria-expanded={profileMenuOpen}
                     onClick={() => setProfileMenuOpen((current) => !current)}
-                    className="flex h-10 w-10 items-center justify-center border border-[#cad5c7] bg-white text-sm font-semibold text-[#123524] transition-colors hover:bg-[#f6faf5] md:hidden"
+                    className="flex cursor-pointer items-center justify-center transition-colors md:hidden rounded-md"
                   >
-                    {initials}
+                    <UserAvatar initials={initials} imageUrl={avatarUrl} name={displayName} size="md" />
                   </button>
 
                   {profileMenuOpen ? (
                     <div className="animate-pop-in absolute right-0 top-[calc(100%+8px)] z-20 min-w-[300px] border border-[#E5EAE3] rounded-md bg-white p-2 shadow-[0_12px_30px_rgba(18,53,36,0.08)] ">
-                      <div className="border-b border-[#eef2eb] px-3 py-3">
-                        <p className="text-sm font-medium text-[#123524]">{displayName}</p>
-                        <p className="mt-1 text-xs text-[#6a7f6d]">{user?.email}</p>
-                        <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-[#73856f]">
-                          {primaryRoleLabel}
-                        </p>
+                      <div className="flex items-center gap-3 border-b border-[#eef2eb] px-3 py-3">
+                        <UserAvatar initials={initials} imageUrl={avatarUrl} name={displayName} size="md" />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-[#123524]">{displayName}</p>
+                          <p className="mt-1 truncate text-xs text-[#6a7f6d]">{user?.email}</p>
+                          <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-[#73856f]">
+                            {primaryRoleLabel}
+                          </p>
+                        </div>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false)
+                          handleNavigate('/admin/profile')
+                        }}
+                        className="mt-2 flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
+                      >
+                        <ManageAccountsOutlinedIcon fontSize="small" />
+                        Profile Settings
+                      </button>
+
                       <button
                         type="button"
                         disabled={signOutLoading}
                         onClick={() => void handleSignOut()}
-                        className="mt-2 flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:bg-red-50 hover:text-red-600 rounded-md"
+                        className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-medium text-[#123524] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:bg-red-50 hover:text-red-600 rounded-md"
                       >
                         {signOutLoading ? (
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d8e1d4] border-t-[#1f5d3b]" />
@@ -402,7 +533,7 @@ export default function AdminLayout() {
                   type="button"
                   onClick={() => setMobileOpen(true)}
                   aria-label="Open menu"
-                  className="flex h-10 w-10 items-center justify-center border border-[#cad5c7] text-[#123524] transition-colors hover:bg-[#f6faf5] md:hidden"
+                  className="flex h-10 w-10 items-center justify-center border border-[#cad5c7] text-[#123524] transition-colors hover:bg-[#f6faf5] md:hidden rounded-md"
                 >
                   <MenuRoundedIcon fontSize="small" />
                 </button>

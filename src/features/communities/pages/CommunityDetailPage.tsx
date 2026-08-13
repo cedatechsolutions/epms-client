@@ -237,7 +237,7 @@ export default function CommunityDetailPage() {
         <button
           type="button"
           onClick={() => void loadCommunity()}
-          className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+          className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
         >
           Retry
         </button>
@@ -273,7 +273,7 @@ export default function CommunityDetailPage() {
                 setFormApiErrors(undefined)
                 setFormOpen(true)
               }}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               <EditOutlinedIcon fontSize="small" />
               Edit
@@ -281,7 +281,7 @@ export default function CommunityDetailPage() {
             <button
               type="button"
               onClick={() => setDeleteOpen(true)}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424]"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] rounded-md"
             >
               <DeleteOutlineRoundedIcon fontSize="small" />
               Delete
@@ -324,7 +324,7 @@ export default function CommunityDetailPage() {
                   setUploadErrorMessage(null)
                   setUploadOpen(true)
                 }}
-                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
               >
                 <UploadFileRoundedIcon fontSize="small" />
                 Upload
@@ -351,7 +351,7 @@ export default function CommunityDetailPage() {
                         title="Download"
                         disabled={downloadingId === document_.id}
                         onClick={() => void handleDownload(document_)}
-                        className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                       >
                         {downloadingId === document_.id ? <ButtonSpinner tone="dark" /> : <DownloadRoundedIcon fontSize="small" />}
                       </button>
@@ -362,7 +362,7 @@ export default function CommunityDetailPage() {
                           title="Delete"
                           disabled={deletingDocId === document_.id}
                           onClick={() => void handleDeleteDocument(document_.id)}
-                          className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45"
+                          className="flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                         >
                           {deletingDocId === document_.id ? <ButtonSpinner tone="dark" /> : <DeleteOutlineRoundedIcon fontSize="small" />}
                         </button>

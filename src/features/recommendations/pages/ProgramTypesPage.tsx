@@ -19,9 +19,9 @@ import { formatDecimal, getRecommendationErrorMessage } from '../lib/format'
 import { SCORING_MATRIX_ROLES, type ProgramType, type ProgramTypePayload, type Sector } from '../types'
 
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const chipClassName = 'inline-flex border px-2.5 py-1 text-xs font-medium'
 
 export default function ProgramTypesPage() {
@@ -192,7 +192,7 @@ export default function ProgramTypesPage() {
             aria-label={`Edit ${row.name}`}
             title="Edit"
             onClick={() => openEdit(row)}
-            className="ml-auto flex h-9 w-9 items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5]"
+            className="ml-auto flex h-9 w-9 items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
           >
             <EditOutlinedIcon fontSize="small" />
           </button>

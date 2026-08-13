@@ -15,12 +15,14 @@ import { DataTable, type DataTableColumn } from '@/shared/table'
 import {
   createAdminUser,
   deleteAdminUser,
+  deleteAdminUserAvatar,
   getUserStats,
   listAdminUsers,
   patchAdminUserStatus,
   printAdminUsersPdf,
   resetAdminUserPassword,
   updateAdminUser,
+  uploadAdminUserAvatar,
 } from '../api/adminUsersApi'
 import type { UserModalFormMode, UserModalFormValues } from '../components/AdminUserFormModal'
 import AdminDialog from '../components/AdminDialog'
@@ -46,16 +48,16 @@ const defaultMeta: PaginationMeta = {
 type PaginationItem = number | 'ellipsis'
 
 const actionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const destructiveActionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 function getDisplayName(user: User): string {
   return user.full_name || [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ')
@@ -261,6 +263,20 @@ export default function AdminUsersListPage() {
     setFormApiErrors(undefined)
   }
 
+  /** Applies the modal's photo choice to a saved account. Returns false if the photo call failed. */
+  const applyAvatarChange = async (userId: string, values: UserModalFormValues): Promise<boolean> => {
+    try {
+      if (values.avatarFile) {
+        await uploadAdminUserAvatar(userId, values.avatarFile)
+      } else if (values.avatarRemoved) {
+        await deleteAdminUserAvatar(userId)
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
   const handleFormSubmit = async (values: UserModalFormValues) => {
     setFormLoading(true)
     setFormErrorMessage(null)
@@ -276,14 +292,16 @@ export default function AdminUsersListPage() {
     } as const
 
     try {
+      let savedUser: User | null = null
+
       if (formMode === 'create') {
-        await createAdminUser({
+        savedUser = await createAdminUser({
           ...basePayload,
           password: values.password,
           password_confirmation: values.confirmPassword,
         })
       } else if (activeUser) {
-        await updateAdminUser(activeUser.id, {
+        savedUser = await updateAdminUser(activeUser.id, {
           ...basePayload,
           ...(values.password
             ? {
@@ -294,8 +312,20 @@ export default function AdminUsersListPage() {
         })
       }
 
+      // The photo is a second call: on create the account has to exist first. A failure here
+      // does not undo the save, so it is reported as a warning rather than a form error.
+      const photoApplied = savedUser ? await applyAvatarChange(savedUser.id, values) : true
+
       closeFormModal()
-      notify.success(formMode === 'create' ? 'User created successfully.' : 'User updated successfully.')
+      if (photoApplied) {
+        notify.success(formMode === 'create' ? 'User created successfully.' : 'User updated successfully.')
+      } else {
+        notify.warning(
+          formMode === 'create'
+            ? 'User created, but the profile photo could not be saved. Try uploading it again from Edit.'
+            : 'User updated, but the profile photo could not be saved. Try again.',
+        )
+      }
 
       if (formMode === 'create' && page !== 1) {
         setPage(1)
@@ -560,7 +590,7 @@ export default function AdminUsersListPage() {
                 type="button"
                 onClick={openCreateModal}
                 disabled={loading || formLoading}
-                className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 Create New User
               </button>
@@ -570,7 +600,7 @@ export default function AdminUsersListPage() {
                 type="button"
                 onClick={() => void handlePrintUsers()}
                 disabled={printLoading}
-                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 {printLoading ? <ButtonSpinner tone="dark" /> : <PrintRoundedIcon fontSize="small" />}
                 {printLoading ? 'Preparing...' : 'Print'}
@@ -684,7 +714,7 @@ export default function AdminUsersListPage() {
             <button
               type="button"
               onClick={() => void loadUsers()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               Retry
             </button>
@@ -711,7 +741,7 @@ export default function AdminUsersListPage() {
                   <button
                     type="button"
                     onClick={() => setBulkDeleteOpen(true)}
-                    className="inline-flex cursor-pointer items-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#832424]"
+                    className="inline-flex cursor-pointer items-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#832424] rounded-md"
                   >
                     <DeleteOutlineRoundedIcon fontSize="small" />
                     Delete selected ({ids.length})
@@ -719,7 +749,7 @@ export default function AdminUsersListPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedIds([])}
-                    className="cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+                    className="cursor-pointer border border-[#d8e1d4] bg-white px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
                   >
                     Clear
                   </button>
@@ -738,7 +768,7 @@ export default function AdminUsersListPage() {
                     type="button"
                     disabled={meta.current_page <= 1}
                     onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Previous
                   </button>
@@ -754,7 +784,7 @@ export default function AdminUsersListPage() {
                         type="button"
                         onClick={() => setPage(item)}
                         className={[
-                          'min-w-10 border px-3 py-2 text-sm font-medium transition-colors',
+                          'min-w-10 border px-3 py-2 text-sm font-medium transition-colors rounded-md',
                           item === meta.current_page
                             ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
                             : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
@@ -769,7 +799,7 @@ export default function AdminUsersListPage() {
                     type="button"
                     disabled={meta.current_page >= meta.last_page}
                     onClick={() => setPage((currentPage) => Math.min(meta.last_page, currentPage + 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Next
                   </button>
@@ -815,7 +845,7 @@ export default function AdminUsersListPage() {
               type="button"
               onClick={() => setBulkDeleteOpen(false)}
               disabled={bulkDeleteLoading}
-              className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               Cancel
             </button>
@@ -823,7 +853,7 @@ export default function AdminUsersListPage() {
               type="button"
               onClick={() => void handleBulkDelete()}
               disabled={bulkDeleteLoading}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               {bulkDeleteLoading ? <ButtonSpinner /> : null}
               {bulkDeleteLoading ? 'Deleting...' : `Delete ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`}

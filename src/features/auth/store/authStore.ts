@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getCurrentUser, login, logout } from '../api/authApi'
+import { getAvatarBlob, getCurrentUser, login, logout } from '../api/authApi'
 import {
   clearStoredTokens,
   getStoredAccessToken,
@@ -15,6 +15,8 @@ type SignInResult = {
 type AuthState = {
   accessToken: string | null
   user: AuthUser | null
+  /** Object URL for the signed-in user's photo, or null when they have none. */
+  avatarUrl: string | null
   mustChangePassword: boolean
   isBootstrapping: boolean
   isAuthenticating: boolean
@@ -23,6 +25,9 @@ type AuthState = {
   clearSession: () => void
   signOut: () => Promise<void>
   markPasswordChanged: () => void
+  /** Replaces the session user after a self-service edit, re-fetching the photo if it changed. */
+  setUser: (user: AuthUser) => void
+  refreshAvatar: () => Promise<void>
 }
 
 function toAuthUser(response: AuthResponse | AuthUser): AuthUser {
@@ -34,6 +39,7 @@ function toAuthUser(response: AuthResponse | AuthUser): AuthUser {
     middleName: response.middleName,
     contactNumber: response.contactNumber,
     roles: response.roles,
+    avatarUpdatedAt: response.avatarUpdatedAt ?? null,
     mustChangePassword: response.mustChangePassword ?? false,
   }
 }
@@ -42,15 +48,24 @@ function resetSessionState() {
   return {
     accessToken: null,
     user: null,
+    avatarUrl: null,
     mustChangePassword: false,
     isAuthenticating: false,
     isBootstrapping: false,
   }
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+/** Object URLs are leaked memory until revoked, so every replacement releases the previous one. */
+function revokeAvatarUrl(url: string | null) {
+  if (url) {
+    URL.revokeObjectURL(url)
+  }
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: getStoredAccessToken(),
   user: null,
+  avatarUrl: null,
   mustChangePassword: false,
   isBootstrapping: true,
   isAuthenticating: false,
@@ -58,6 +73,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const accessToken = getStoredAccessToken()
 
     if (!accessToken) {
+      revokeAvatarUrl(get().avatarUrl)
       set({ ...resetSessionState() })
       return
     }
@@ -65,15 +81,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ accessToken, isBootstrapping: true })
 
     try {
-      const user = await getCurrentUser()
+      const user = toAuthUser(await getCurrentUser())
       set({
         accessToken: getStoredAccessToken(),
         user,
         mustChangePassword: user.mustChangePassword ?? false,
         isBootstrapping: false,
       })
+      // Non-blocking: the shell renders with initials until the photo arrives.
+      void get().refreshAvatar()
     } catch {
       clearStoredTokens()
+      revokeAvatarUrl(get().avatarUrl)
       set({ ...resetSessionState() })
     }
   },
@@ -92,16 +111,19 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticating: false,
         isBootstrapping: false,
       })
+      void get().refreshAvatar()
 
       return { user, mustChangePassword: response.mustChangePassword }
     } catch (error) {
       clearStoredTokens()
+      revokeAvatarUrl(get().avatarUrl)
       set({ ...resetSessionState() })
       throw error
     }
   },
   clearSession: () => {
     clearStoredTokens()
+    revokeAvatarUrl(get().avatarUrl)
     set({ ...resetSessionState() })
   },
   signOut: async () => {
@@ -111,8 +133,36 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Local sign-out should still succeed even if the server call fails.
     } finally {
       clearStoredTokens()
+      revokeAvatarUrl(get().avatarUrl)
       set({ ...resetSessionState() })
     }
   },
   markPasswordChanged: () => set({ mustChangePassword: false }),
+  setUser: (user) => {
+    const previousAvatarKey = get().user?.avatarUpdatedAt ?? null
+    // Normalized here because API responses omit null fields entirely.
+    const nextUser = toAuthUser(user)
+    set({ user: nextUser, mustChangePassword: nextUser.mustChangePassword ?? false })
+
+    if (nextUser.avatarUpdatedAt !== previousAvatarKey) {
+      void get().refreshAvatar()
+    }
+  },
+  refreshAvatar: async () => {
+    if (!get().user?.avatarUpdatedAt) {
+      revokeAvatarUrl(get().avatarUrl)
+      set({ avatarUrl: null })
+      return
+    }
+
+    try {
+      const nextUrl = URL.createObjectURL(await getAvatarBlob())
+      revokeAvatarUrl(get().avatarUrl)
+      set({ avatarUrl: nextUrl })
+    } catch {
+      // A missing or unreadable photo is not a session failure — fall back to initials.
+      revokeAvatarUrl(get().avatarUrl)
+      set({ avatarUrl: null })
+    }
+  },
 }))

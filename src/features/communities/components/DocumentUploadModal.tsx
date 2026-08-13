@@ -11,10 +11,10 @@ type DocumentUploadModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors file:mr-3 file:cursor-pointer file:border-0 file:bg-transparent file:text-sm file:text-[#1f5d3b] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6]'
+  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors file:mr-3 file:cursor-pointer file:border-0 file:bg-transparent file:text-sm file:text-[#1f5d3b] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] rounded-md'
 
 const selectClassName =
-  'w-full cursor-pointer border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6]'
+  'w-full cursor-pointer border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] rounded-md'
 
 const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
 
@@ -57,7 +57,7 @@ export default function DocumentUploadModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -65,7 +65,7 @@ export default function DocumentUploadModal({
             type="submit"
             form="document-upload-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Uploading...' : 'Upload'}

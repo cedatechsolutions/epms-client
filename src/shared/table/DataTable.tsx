@@ -165,7 +165,7 @@ export default function DataTable<T>({
         onClick={() => onSortChange(column.sortKey as string)}
         aria-label={`Sort by ${typeof column.header === 'string' ? column.header : column.key}`}
         className={[
-          'inline-flex cursor-pointer items-center gap-1 uppercase tracking-[0.12em] transition-colors',
+          'inline-flex cursor-pointer items-center gap-1 uppercase tracking-[0.12em] transition-colors rounded-md',
           column.align === 'right' ? 'flex-row-reverse' : '',
           active ? 'text-[#123524]' : 'hover:text-[#123524]',
         ].join(' ')}

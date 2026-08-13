@@ -22,7 +22,7 @@ import {
 import { PROGRAM_STATUS_ROWS, type DashboardOverview } from '../types'
 
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 
 function EmptyPanelMessage({ children }: { children: ReactNode }) {
   return <p className="py-6 text-center text-sm text-[#617462]">{children}</p>

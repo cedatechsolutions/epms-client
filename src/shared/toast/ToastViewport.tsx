@@ -65,7 +65,7 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
           aria-label="Dismiss notification"
           title="Dismiss"
           onClick={onDismiss}
-          className="-mr-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524]"
+          className="-mr-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-[#60755f] transition-colors hover:text-[#123524] rounded-md"
         >
           <CloseRoundedIcon fontSize="small" />
         </button>

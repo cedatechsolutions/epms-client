@@ -47,16 +47,16 @@ const defaultMeta: PaginationMeta = {
 type PaginationItem = number | 'ellipsis'
 
 const actionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#d8e1d4] text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const destructiveActionButtonClassName =
-  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45'
+  'flex h-9 w-9 cursor-pointer items-center justify-center border border-[#e3c9c9] text-[#9f2f2f] transition-colors hover:bg-[#fff7f7] disabled:cursor-not-allowed disabled:opacity-45 rounded-md'
 
 const inputClassName =
-  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'h-10 border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 const selectClassName =
-  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'h-10 cursor-pointer border border-[#d8e1d4] bg-white px-3 text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 function getPaginationItems(currentPage: number, lastPage: number): PaginationItem[] {
   const pageSet = new Set<number>([1, lastPage, currentPage - 1, currentPage, currentPage + 1])
@@ -338,7 +338,7 @@ export default function CommunitiesListPage() {
         <button
           type="button"
           onClick={() => navigate(`/admin/communities/${community.id}`)}
-          className="cursor-pointer text-left font-medium text-[#1f5d3b] hover:underline"
+          className="cursor-pointer text-left font-medium text-[#1f5d3b] hover:underline rounded-md"
         >
           {community.name}
         </button>
@@ -395,7 +395,7 @@ export default function CommunitiesListPage() {
               type="button"
               onClick={openCreateModal}
               disabled={loading || formLoading}
-              className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
             >
               Create New Community
             </button>
@@ -508,7 +508,7 @@ export default function CommunitiesListPage() {
             <button
               type="button"
               onClick={() => void loadCommunities()}
-              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]"
+              className="cursor-pointer border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md"
             >
               Retry
             </button>
@@ -538,7 +538,7 @@ export default function CommunitiesListPage() {
                     type="button"
                     disabled={meta.current_page <= 1}
                     onClick={() => setPage((current) => Math.max(1, current - 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Previous
                   </button>
@@ -553,7 +553,7 @@ export default function CommunitiesListPage() {
                         type="button"
                         onClick={() => setPage(item)}
                         className={[
-                          'min-w-10 border px-3 py-2 text-sm font-medium transition-colors',
+                          'min-w-10 border px-3 py-2 text-sm font-medium transition-colors rounded-md',
                           item === meta.current_page
                             ? 'cursor-default border-[#1f5d3b] bg-[#1f5d3b] text-white'
                             : 'cursor-pointer border-[#d8e1d4] text-[#123524] hover:bg-[#f6faf5]',
@@ -567,7 +567,7 @@ export default function CommunitiesListPage() {
                     type="button"
                     disabled={meta.current_page >= meta.last_page}
                     onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
-                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-45 rounded-md"
                   >
                     Next
                   </button>

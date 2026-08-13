@@ -38,6 +38,8 @@ export type AuthUser = {
   middleName: string | null
   contactNumber: string | null
   roles: string[]
+  /** Set when the user has a profile photo; also the cache key for re-fetching it. */
+  avatarUpdatedAt: string | null
   mustChangePassword?: boolean
 }
 
@@ -68,4 +70,15 @@ export type ChangePasswordPayload = {
   currentPassword: string
   newPassword: string
   newPasswordConfirmation: string
+}
+
+/**
+ * Self-service profile edit. Email, role and status are deliberately absent — those stay with
+ * user management, and the API ignores them on this endpoint.
+ */
+export type UpdateProfilePayload = {
+  firstName: string
+  lastName: string
+  middleName: string
+  contactNumber: string
 }

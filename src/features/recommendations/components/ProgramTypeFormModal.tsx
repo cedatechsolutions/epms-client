@@ -18,7 +18,7 @@ type ProgramTypeFormModalProps = {
 }
 
 const inputClassName =
-  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 const labelClassName = 'mb-2 block text-sm font-medium text-[#123524]'
 const fieldErrorClassName = 'mt-1 text-xs text-[#8a2d2d]'
 const checkboxClassName = 'h-4 w-4 cursor-pointer accent-[#1f5d3b] disabled:cursor-not-allowed disabled:opacity-40'
@@ -78,7 +78,7 @@ export default function ProgramTypeFormModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             Cancel
           </button>
@@ -86,7 +86,7 @@ export default function ProgramTypeFormModal({
             type="submit"
             form="program-type-form"
             disabled={loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             {loading ? <ButtonSpinner /> : null}
             {loading ? 'Saving...' : mode === 'create' ? 'Add Program Type' : 'Save Changes'}
@@ -155,7 +155,7 @@ export default function ProgramTypeFormModal({
             <ul className="grid gap-2 sm:grid-cols-2">
               {sectors.map((sector) => (
                 <li key={sector.id}>
-                  <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-2.5 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5]">
+                  <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-2.5 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5] rounded-md">
                     <input
                       type="checkbox"
                       checked={sectorIds.includes(sector.id)}
@@ -171,7 +171,7 @@ export default function ProgramTypeFormModal({
           )}
         </fieldset>
 
-        <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5]">
+        <label className="flex cursor-pointer items-center gap-3 border border-[#d8e1d4] px-4 py-3 text-sm text-[#445846] transition-colors hover:bg-[#f6faf5] rounded-md">
           <input
             type="checkbox"
             checked={active}

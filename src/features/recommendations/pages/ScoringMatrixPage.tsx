@@ -18,11 +18,11 @@ import {
 } from '../types'
 
 const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
 const cellInputClassName =
-  'h-10 w-full border bg-white px-3 text-right text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]'
+  'h-10 w-full border bg-white px-3 text-right text-sm text-[#123524] outline-none transition-colors focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c] rounded-md'
 
 /** The draft grid: program type id -> need category id -> the raw input value. */
 type MatrixDraft = Record<string, Record<string, string>>
@@ -167,7 +167,7 @@ export default function ScoringMatrixPage() {
             aria-label={`${row.programTypeName} weight for ${category.name}`}
             aria-invalid={invalid}
             onChange={(event) => handleCellChange(row.programTypeId, category.id, event.target.value)}
-            className={[cellInputClassName, invalid ? 'border-[#e3c9c9]' : 'border-[#d8e1d4]'].join(' ')}
+            className={[cellInputClassName, invalid ? 'border-[#e3c9c9] rounded-md' : 'border-[#d8e1d4]'].join(' ')}
           />
         )
       },

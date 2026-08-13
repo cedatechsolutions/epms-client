@@ -26,7 +26,7 @@ export default function DeleteUserModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Cancel
       </button>
@@ -34,7 +34,7 @@ export default function DeleteUserModal({
         type="button"
         onClick={() => void onConfirm()}
         disabled={loading}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#9f2f2f] bg-[#9f2f2f] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#832424] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         {loading ? <ButtonSpinner /> : null}
         {loading ? 'Deleting...' : 'Delete User'}

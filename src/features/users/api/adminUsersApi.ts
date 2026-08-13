@@ -21,6 +21,7 @@ type BackendUser = {
   middleName: string | null
   contactNumber: string | null
   active: boolean
+  avatarUpdatedAt: string | null
   lastLoginAt: string | null
   createdAt: string | null
   updatedAt: string | null
@@ -32,6 +33,7 @@ type BackendManagedUserPayload = {
   password?: string
   firstName: string
   lastName: string
+  /** Optional on the API; sent as an empty string, which the server stores as null. */
   middleName: string
   contactNumber: string
   role: string
@@ -76,6 +78,7 @@ function mapBackendUser(user: BackendUser): User {
     roles: [...user.roles].sort(),
     status,
     is_active: user.active,
+    avatar_updated_at: user.avatarUpdatedAt ?? null,
     last_login_at: user.lastLoginAt,
     created_at: user.createdAt,
     updated_at: user.updatedAt,
@@ -165,6 +168,26 @@ export async function patchAdminUserStatus(id: string, status: UserStatus): Prom
   })
 
   return mapBackendUser(response)
+}
+
+// --- profile photo of a managed account ---
+// Avatar bytes are token-protected like every other upload, so the photo is fetched as a blob and
+// wrapped in an object URL rather than linked from an `<img src>` (UI guidelines §6.12).
+
+export async function uploadAdminUserAvatar(id: string, file: File): Promise<User> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await postRequest<BackendUser, FormData>(`${USERS_ENDPOINT}/${id}/avatar`, formData)
+  return mapBackendUser(response)
+}
+
+export async function deleteAdminUserAvatar(id: string): Promise<User> {
+  const response = await deleteRequest<BackendUser>(`${USERS_ENDPOINT}/${id}/avatar`)
+  return mapBackendUser(response)
+}
+
+export async function getAdminUserAvatarBlob(id: string): Promise<Blob> {
+  return getBlobRequest(`${USERS_ENDPOINT}/${id}/avatar`)
 }
 
 export async function resetAdminUserPassword(id: string, payload: ResetPasswordPayload): Promise<void> {

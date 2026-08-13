@@ -28,9 +28,10 @@ The system is a flat, sharp-cornered, institutional green theme for Cavite State
 
 Core rules:
 
-1. **No rounded corners.** Containers, buttons, inputs, tables, chips, and modals all have square edges. Never add `rounded-*` to them. The exceptions are:
+1. **Square surfaces, rounded controls.** Containers, cards, panels, modals, tables, chips, and alerts have square edges — never add `rounded-*` to them. **Interactive controls are the exception and are always rounded** (see §6.10 for the full scale):
+   - `rounded-md` on every button, text input, select and textarea, plus anything styled as one (a `<label>` acting as a file-picker button, a `<Link>` or `<a>` with button classes, bordered choice rows).
+   - `rounded-lg` on the authentication screens' controls, which are visually larger and read as a front door.
    - `rounded-full` on avatar circles and loading spinners.
-   - **Auth screens only** — form controls (text inputs and buttons) on the authentication pages use a soft `rounded-lg` radius (see §5.3 and §6.10). Containers, panels, and cards on those pages stay square. This exception does NOT extend to the admin shell, tables, modals, chips, or the public survey.
 2. **Flat surfaces, 1px borders.** Depth comes from borders and the occasional soft green-tinted shadow (section 3.4) — never from gradients or heavy elevation.
 3. **Light theme only.** `color-scheme: light` is set in `globals.css`. Do not add dark mode styling.
 4. **Whitespace over dividers.** Use `space-y-*` / `gap-*` for rhythm; borders mark container boundaries and table rows.
@@ -150,7 +151,9 @@ Conventions: headings use negative tracking; all-caps labels use wide positive t
 - Sidebar structure: campus logo block (logo `h-11 w-11`) → scrollable nav → bordered logout footer.
 - **Collapsing hides labels, never controls.** When `collapsed`, the sidebar keeps every actionable item reachable and only drops its text: nav items and the logout button center their icon (`justify-center`, padding narrows to `px-2`/`px-3`) and move their label into a `sr-only` span, gaining `aria-label` + `title` so the icon still announces itself and shows a tooltip. Do not `hidden` a control to make it fit the 88px rail — a collapsed sidebar that drops sign-out strands the user.
 - Nav items: `border-l-2` accent; active = `border-[#1f5d3b] bg-[#f1f6f0] text-[#123524]`; rest = `border-transparent text-[#445846] hover:bg-[#f7faf6] hover:text-[#123524]`; disabled = `text-[#8a9989]`.
-- **Header:** white, `border-b border-[#d8e1d4]`, `px-4 py-4`; left side = the sidebar collapse toggle followed by the eyebrow breadcrumb ("Administration / Section") over the system title; right side = profile button (avatar circle `h-9 w-9 rounded-full bg-[#1f5d3b]` with initials) and mobile menu button.
+- **Expandable nav groups** (e.g. "Settings" holding User Management + Activity Log): a group renders a header button with the group icon, label, and a trailing `ExpandLessRounded`/`ExpandMoreRounded` chevron (chevron hidden when the sidebar is collapsed). The header carries `aria-expanded` + `aria-controls` pointing at the child container; children are ordinary nav items with the same accent/active/hover styles, indented `pl-8 pr-4 py-2.5` when expanded and centered like any other item on the 88px rail. A group defaults to open when one of its children matches the route, and an explicit toggle overrides that default. While a group is closed and holds the active route, its header takes the active style so the current section is still visible. Grouped sections sit at the bottom of the nav, below the flat items.
+- **Header:** white, `border-b border-[#d8e1d4]`, `px-4 py-4`; left side = the sidebar collapse toggle followed by the eyebrow breadcrumb ("Administration / Section") over the system title; right side = profile button (a `UserAvatar`, §6.12 — photo or initials) and mobile menu button.
+- **Profile menu** (§6.7 dropdown, anchored under the profile button): an identity block at the top — `UserAvatar` at `md` beside the name, email and role — then the account actions, "Profile Settings" (`ManageAccountsOutlined`, navigates to `/admin/profile`) before "Sign out" (danger hover). Navigating closes the menu.
 - **Sidebar collapse toggle lives in the header, not the sidebar.** `hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center border border-[#cad5c7] text-[#123524] transition-colors hover:bg-[#f6faf5] md:inline-flex`, with `ChevronLeftRounded` when expanded / `ChevronRightRounded` when collapsed. It sits `md:`-only (its mobile counterpart is the menu button on the right, at the same `h-10 w-10`), and carries `aria-label` + `title` plus `aria-expanded` and `aria-controls="admin-sidebar"` pointing at the `<aside>`. The title block beside it is `min-w-0` with a `truncate` heading so a narrow header shortens the title rather than displacing the toggle.
 - All routed pages render inside the white content panel via `<Outlet />`.
 
@@ -213,9 +216,9 @@ The public needs-assessment form is the one screen served to **unauthenticated r
 - Shell: `min-h-screen bg-[#f4f7f1] px-4 py-8`, single centered column `mx-auto w-full max-w-[640px] space-y-6`. **No sidebar, no header chrome, no profile menu.**
 - A small bordered white card at the top carries the campus eyebrow + "Community Needs Assessment"; every subsequent block (intro, demographic block, each question, privacy notice) is its own `border border-[#d8e1d4] bg-white px-5 py-5` section.
 - **Touch targets are larger than in the admin UI**: body/inputs step up from `text-sm` to `text-base`, inputs use `py-3`, and radio/checkbox choices are full-width bordered rows (`flex items-center gap-3 border border-[#d8e1d4] px-4 py-3 hover:bg-[#f6faf5]`) rather than bare inputs. The primary submit is full-width (`w-full ... py-3`).
-- Rating (1–5) renders as a `grid grid-cols-5 gap-2` of square toggle buttons; the selected value is primary-filled (`border-[#1f5d3b] bg-[#1f5d3b] text-white`), with "1 — Very poor" / "5 — Very good" anchors beneath.
+- Rating (1–5) renders as a `grid grid-cols-5 gap-2` of toggle buttons (`rounded-md` like every other control, §6.10); the selected value is primary-filled (`border-[#1f5d3b] bg-[#1f5d3b] text-white`), with "1 — Very poor" / "5 — Very good" anchors beneath.
 - Terminal states (closed, not found, already responded, thank-you) render as a single centered `Notice` card with an `@mui/icons-material` icon (`fontSize="large"`), title, and one explanatory paragraph — never a toast, since the respondent has no app shell to return to.
-- Palette, square corners, and Google Sans are unchanged — this is the same design system at a larger touch scale, not a second one. **The §6.10 auth radius does not apply here** — public-survey controls stay square.
+- Palette, corner treatment, and Google Sans are unchanged — this is the same design system at a larger touch scale, not a second one. Controls take the standard `rounded-md` (§6.10), including the bordered choice rows; the cards and sections around them stay square. **The auth `rounded-lg` does not apply here.**
 - The shell is the shared `PublicShell` (`src/features/public-survey/components/PublicShell.tsx`); its `subtitle` prop names the page under the campus eyebrow. Every public page reuses it rather than re-declaring the layout — currently the survey form (`/s/:token`) and the privacy notice (`/privacy`).
 - **Public privacy notice (`/privacy`)** — required by §5.3 (RA 10173). Renders in `PublicShell` as a stack of `border border-[#d8e1d4] bg-white px-5 py-5` sections, one per topic (what we collect / how we use it / who can see it / your rights / contact), closing with a "Back to sign in" link. The survey form keeps its short inline notice above the consent checkbox and links here for the long form; the two must not contradict each other — edit both together.
 
@@ -229,7 +232,7 @@ Standard Tailwind breakpoints. Conventions: `md` = sidebar/desktop-header thresh
 
 ### 6.1 Buttons
 
-All buttons: square corners (**except on auth screens** — see §6.10), `text-sm font-medium`, `transition-colors`, `cursor-pointer`, and `disabled:cursor-not-allowed disabled:opacity-60` (icon buttons and pagination use `opacity-45`).
+All buttons: `rounded-md` (`rounded-lg` on auth screens — see §6.10), `text-sm font-medium`, `transition-colors`, `cursor-pointer`, and `disabled:cursor-not-allowed disabled:opacity-60` (icon buttons and pagination use `opacity-45`). The variant tables below omit the radius class for brevity; it is required on every one of them.
 
 | Variant | Classes |
 |---|---|
@@ -247,9 +250,10 @@ All buttons: square corners (**except on auth screens** — see §6.10), `text-s
 
 - Text input: `w-full border border-[#cad5c7] bg-white px-4 py-3 text-sm text-[#123524] outline-none transition-colors placeholder:text-[#819181] focus:border-[#1f5d3b] disabled:cursor-not-allowed disabled:bg-[#f7faf6] disabled:text-[#7d8d7c]` (compact filter variant: `h-10 px-3`, border `#d8e1d4`).
 - Selects: same as compact input plus `cursor-pointer`.
-- Corners are square **except on auth screens** — see §6.10.
+- Corners are `rounded-md` (`rounded-lg` on auth screens) — see §6.10. The class strings above omit it for brevity; it is required.
 - Focus = border color change to `#1f5d3b` only. No focus rings, no shadows.
 - Labels: block label above the field, `mb-2 text-sm font-medium text-[#123524]` (forms) or stacked `flex flex-col gap-1.5` with the uppercase `text-xs` label (filters).
+- **Optional fields say so in the label** — "Middle Name (optional)", "Password (optional)" — rather than marking required ones with an asterisk. Required is the default; the exception is the thing that gets called out. Keep the client's required/optional split identical to the API's validation, and where a field is optional, submit blank as blank and let the server store it as null.
 - Password fields: relative wrapper, `pr-12`, absolute right visibility-toggle button using MUI `VisibilityRounded`/`VisibilityOffRounded`.
 
 ### 6.3 Tables
@@ -292,6 +296,7 @@ All dialogs MUST use `src/features/users/components/AdminDialog.tsx` (or follow 
 - Structure: bordered header (title `text-lg font-semibold tracking-[-0.02em]` + description + Close button) → scrollable body `px-5 py-5 sm:px-6` → footer `border-t bg-[#fbfdf9]` with buttons right-aligned (`sm:justify-end`), Cancel (secondary) before the confirming action.
 - While an operation is in flight: disable close (`closeDisabled`), keep the modal open, show the button loading state.
 - Destructive confirmations include a warning callout: `border border-[#ead7d7] bg-[#fff7f7] px-4 py-3 text-[#8a2d2d]`.
+- **A photo inside a form modal** (e.g. the user's profile photo on Create/Edit User) sits in a tinted block at the top of the form — `border border-[#e7eee3] bg-[#fbfdf9] px-4 py-4` — with a `lg` `UserAvatar` beside the same picker controls as §6.13. The picked file previews through a local object URL and is **applied as a follow-up request after the record is saved** (on create the account has to exist first). That second call must not fail the save: report it with a warning toast that says the record was saved and the photo was not.
 
 ### 6.6 Alerts & toasts
 
@@ -320,15 +325,20 @@ For 0–100 scores (recommendation match scores, and any future normalized score
 - **Accessibility:** `role="progressbar"` with `aria-label`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-valuenow`, and an `aria-valuetext` carrying the precise value.
 - No labels, ticks, or gradients inside the meter. Where a score needs justifying, pair it with an explainer dialog (§6.5) rather than annotating the bar.
 
-### 6.10 Auth control radius
+### 6.10 Control radius
 
-On the authentication pages only, text inputs and buttons carry a soft radius so the sign-in screen reads as a welcoming front door rather than an admin grid.
+Every interactive control is rounded; every surface around it is square (§2). There are exactly two control radii, chosen by screen, never per control:
 
-- **Radius:** `rounded-lg` (0.5rem). One value only — do not mix `rounded-md`/`rounded-xl`, and do not pick a radius per control.
-- **Applies to:** text/email/password inputs and their password-visibility affordance, and buttons (primary submit, secondary, links styled as buttons). This includes the inverted controls in the login public column (§5.3.1).
-- **Does NOT apply to:** the page/columns themselves, cards, alerts, checkboxes, the reCAPTCHA widget, or anything outside the auth pages — including the public survey and privacy notice (§5.4). Everything else stays square per §2.
-- The password field's absolute visibility toggle keeps `rounded-r-lg` so it does not overhang the input's rounded corner.
-- Currently adopted on: `LoginPage`. Other auth pages keep square controls until they are migrated in a later change — when they are, update this list rather than adding a second radius.
+| Where | Radius |
+|---|---|
+| Everywhere — admin shell, modals, tables, public survey, settings pages | `rounded-md` |
+| Authentication pages (`LoginPage` and the inverted controls in the login public column, §5.3.1) | `rounded-lg` |
+
+- **Applies to:** `<button>`, text/email/password/tel/number/date inputs, `<select>`, `<textarea>`, and anything that reads as one of those — a `<label>` carrying button classes over a hidden file input (§6.13), a `<Link>`/`<a>` styled as a button, and the bordered choice rows on the public survey (§5.4).
+- **Does NOT apply to:** containers, cards, panels, modals, table shells, chips (§6.4), alerts, meters, the reCAPTCHA widget, native checkboxes and radios, or full-screen scrims rendered as `<button>` (the modal backdrop, the mobile drawer overlay) — a radius on a full-viewport overlay is meaningless.
+- **A control inside another control matches its neighbour's corner, not its own:** the password field's absolute visibility toggle takes `rounded-r-md` (`rounded-r-lg` on auth pages) so it follows the input's right corners instead of overhanging them.
+- **One radius per element.** When a control's classes come from a hoisted const, the radius lives in the const — do not add a second one at the call site (`rounded-lg` + `rounded-md` on one element is a bug; which wins depends on CSS order, not class order).
+- Buttons with no border or background of their own (a sortable table header, an icon-only dismiss) still carry the radius so a hover surface added later lands correctly.
 
 ### 6.11 Split meter (`SplitMeter`)
 
@@ -359,6 +369,25 @@ for a single 0–100 score; this one shows how a total divides.
 - Pass the page's own number formatter via `formatValue` so grouping matches the surrounding copy.
   Where part of the population has no split recorded, say so in text beside the meter rather than
   inventing a bucket for it.
+
+### 6.12 User avatar (`UserAvatar`)
+
+A person is pictured one way everywhere: the shared `UserAvatar`
+(`src/features/auth/components/UserAvatar.tsx`). Never hand-roll an initials circle.
+
+- **Photo or initials, same circle.** With a photo it renders `<img class="h-full w-full object-cover">`; without one it renders the initials on `bg-[#1f5d3b]` in white `font-semibold`. Both go in the same `rounded-full overflow-hidden` box, so the two are interchangeable in any slot and a missing photo never changes the layout. This and spinners are the only `rounded-full` in the system (§2).
+- **Sizes** are fixed by the component — `sm` `h-9 w-9 text-sm` (header profile button), `md` `h-10 w-10 text-sm` (profile menu, mobile header trigger), `lg` `h-20 w-20 text-2xl` (Profile Settings). Do not pass ad-hoc size classes.
+- **Initials come from `getUserInitials`** (first + last initial, falling back to the email) — the same helper the rest of the app uses.
+- **The photo is fetched, not linked.** Avatar bytes sit behind the bearer token like every other upload, so the auth store fetches the blob once per session and keeps an object URL in `avatarUrl`; components take that URL as a prop. The store revokes the previous URL on every replacement and on sign-out. A failed fetch is not a session error — it falls back to initials silently.
+- `alt` is `"{name} profile photo"`; the initials fallback needs no extra ARIA (the name is rendered beside it in every current use).
+
+### 6.13 Settings pages
+
+Self-service and configuration screens (currently Profile Settings, `/admin/profile`) follow §5.2 page composition with one addition: **one bordered white `<section>` per concern**, each with a `border-b border-[#e7eee3] px-5 py-4` header (title at `text-lg font-semibold tracking-[-0.02em]` + one-line description), a `px-5 py-5` body, and — where the section is a form — a right-aligned action strip `border-t border-[#e7eee3] bg-[#fbfdf9] px-5 py-4` holding its single primary button.
+
+- **Each section saves independently.** Its own submit, its own loading state, its own inline error alert (§6.6) above the fields, and a success toast on completion. Never a single page-wide Save that spans unrelated concerns.
+- **Fields the user may not edit are shown, disabled, and explained** — e.g. the email on Profile Settings renders `disabled readOnly` with a `text-xs text-[#7b6542]` note saying who can change it. Do not hide them.
+- **File pickers:** the `<input type="file">` is `sr-only` and its `<label htmlFor>` carries the button classes (§6.1 secondary); the label takes `pointer-events-none opacity-60` while the upload is in flight. Clear `event.target.value` after reading the file so re-picking the same file still fires. Validate type and size client-side against the same limits the API enforces, and show the failure in the section's alert.
 
 ---
 
@@ -392,5 +421,5 @@ for a single 0–100 score; this one shows how a total divides.
 If a change genuinely requires a new pattern (new color, component variant, layout type):
 
 1. Update this document in the same PR, adding the pattern to the relevant section.
-2. Keep it consistent with the existing language (flat, square, green palette, Google Sans).
+2. Keep it consistent with the existing language (flat, square surfaces with rounded controls, green palette, Google Sans).
 3. Never fork the system — one pattern per problem.

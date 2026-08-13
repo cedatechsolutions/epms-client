@@ -19,6 +19,8 @@ export type User = {
   roles: string[]
   status: UserStatus
   is_active: boolean
+  /** Set when the account has a profile photo; also the cache key for re-fetching it. */
+  avatar_updated_at: string | null
   last_login_at: string | null
   created_at: string | null
   updated_at: string | null

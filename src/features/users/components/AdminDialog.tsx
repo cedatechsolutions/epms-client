@@ -84,7 +84,7 @@ export default function AdminDialog({
                 type="button"
                 onClick={onClose}
                 disabled={closeDisabled}
-                className="cursor-pointer border border-[#d8e1d4] px-3 py-1.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer border border-[#d8e1d4] px-3 py-1.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
               >
                 Close
               </button>

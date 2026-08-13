@@ -16,6 +16,7 @@ import {
 import { ActivityLogPage } from '@/features/activity-logs'
 import { CommunitiesListPage, CommunityDetailPage } from '@/features/communities'
 import { DashboardPage } from '@/features/dashboard'
+import { ProfileSettingsPage } from '@/features/profile'
 import { PrivacyNoticePage, PublicSurveyPage } from '@/features/public-survey'
 import {
   ProgramTypesPage,
@@ -93,6 +94,9 @@ export default function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
+
+            {/* Every authenticated role manages their own account here. */}
+            <Route path="profile" element={<ProfileSettingsPage />} />
 
             {/* Communities are viewable by all authenticated roles; write actions are gated in-page. */}
             <Route path="communities" element={<CommunitiesListPage />} />

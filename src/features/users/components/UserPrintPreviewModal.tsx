@@ -159,7 +159,7 @@ export default function UserPrintPreviewModal({
         type="button"
         onClick={onClose}
         disabled={loading}
-        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer border border-[#d8e1d4] bg-white px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
       >
         Close
       </button>
@@ -168,7 +168,7 @@ export default function UserPrintPreviewModal({
           type="button"
           onClick={onRetry}
           disabled={loading}
-          className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="cursor-pointer border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
         >
           Retry
         </button>
@@ -179,7 +179,7 @@ export default function UserPrintPreviewModal({
             download={PDF_FILENAME}
             aria-disabled={!pdfUrl || loading}
             className={[
-              'border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5]',
+              'border border-[#d8e1d4] px-4 py-2.5 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] rounded-md',
               !pdfUrl || loading ? 'pointer-events-none cursor-not-allowed opacity-60' : 'cursor-pointer',
             ].join(' ')}
           >
@@ -189,7 +189,7 @@ export default function UserPrintPreviewModal({
             type="button"
             onClick={handlePrintPdf}
             disabled={!pdfUrl || loading}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border border-[#1f5d3b] bg-[#1f5d3b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#18492e] disabled:cursor-not-allowed disabled:opacity-60 rounded-md"
           >
             <PrintRoundedIcon fontSize="small" />
             Print PDF
@@ -232,7 +232,7 @@ export default function UserPrintPreviewModal({
                   type="button"
                   disabled={pageNumber <= 1 || rendering}
                   onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 >
                   Previous
                 </button>
@@ -240,7 +240,7 @@ export default function UserPrintPreviewModal({
                   type="button"
                   disabled={pageNumber >= pageCount || rendering}
                   onClick={() => setPageNumber((current) => Math.min(pageCount, current + 1))}
-                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="cursor-pointer border border-[#d8e1d4] px-3 py-2 text-sm font-medium text-[#123524] transition-colors hover:bg-[#f6faf5] disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 >
                   Next
                 </button>
