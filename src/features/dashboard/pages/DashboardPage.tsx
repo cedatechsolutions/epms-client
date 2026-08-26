@@ -6,11 +6,14 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { ACTIVITY_ACTION_LABELS } from '@/features/activity-logs/types'
+import { hasAnyRole } from '@/features/auth/lib/access'
+import { useAuthStore } from '@/features/auth/store/authStore'
 import PriorityBadge from '@/features/surveys/components/PriorityBadge'
 import { SplitMeter } from '@/shared/meter'
 import { getDashboardOverview } from '../api/dashboardApi'
 import DashboardSection from '../components/DashboardSection'
 import DistributionRow from '../components/DistributionRow'
+import MonitoringPanel from '../components/MonitoringPanel'
 import StatCard from '../components/StatCard'
 import {
   formatDateTime,
@@ -19,7 +22,11 @@ import {
   formatScore,
   getDashboardErrorMessage,
 } from '../lib/format'
-import { PROGRAM_STATUS_ROWS, type DashboardOverview } from '../types'
+import {
+  MONITORING_DASHBOARD_ROLES,
+  PROGRAM_STATUS_ROWS,
+  type DashboardOverview,
+} from '../types'
 
 const secondaryButtonClassName =
   'inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-hover-tint disabled:cursor-not-allowed disabled:opacity-60 rounded-md'
@@ -55,14 +62,23 @@ function LoadingSkeleton() {
 }
 
 export default function DashboardPage() {
+  const currentUser = useAuthStore((state) => state.user)
+  // The M&E payload is a separate endpoint behind a narrower permission than this screen. Gating
+  // the panel here keeps faculty and student volunteers on their personal overview rather than
+  // showing them a section that would 403 (see `Permissions.canViewMonitoringDashboard()`).
+  const canViewMonitoring = hasAnyRole(currentUser, MONITORING_DASHBOARD_ROLES)
+
   const [overview, setOverview] = useState<DashboardOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  // Bumped by Refresh so the one button reloads both payloads; the panel fetches its own.
+  const [refreshSignal, setRefreshSignal] = useState(0)
 
   const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
       setRefreshing(true)
+      setRefreshSignal((current) => current + 1)
     } else {
       setLoading(true)
     }
@@ -112,10 +128,32 @@ export default function DashboardPage() {
     </div>
   )
 
+  // Rendered on every path below, including the overview's own loading and error states: the two
+  // payloads are independent, so a failed overview must not take the M&E figures down with it.
+  const monitoringBlock = canViewMonitoring ? <MonitoringPanel refreshSignal={refreshSignal} /> : null
+
+  // The personal block only needs naming when something else sits above it.
+  const overviewHeading = canViewMonitoring ? (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
+        Your workspace
+      </p>
+      <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
+        Your extension work at a glance
+      </h4>
+      <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
+        Across every period, scoped to what you can act on — proposal counts here follow your own
+        access, unlike the campus-wide figures above.
+      </p>
+    </div>
+  ) : null
+
   if (loading && !overview) {
     return (
       <div className="space-y-6">
         {header}
+        {monitoringBlock}
+        {overviewHeading}
         <LoadingSkeleton />
       </div>
     )
@@ -125,6 +163,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         {header}
+        {monitoringBlock}
+        {overviewHeading}
         <div className="flex flex-col gap-3 border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text sm:flex-row sm:items-center sm:justify-between">
           <span>{errorMessage ?? 'Could not load the dashboard.'}</span>
           <button type="button" onClick={() => void load()} className={secondaryButtonClassName}>
@@ -141,6 +181,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {header}
+      {monitoringBlock}
+      {overviewHeading}
 
       {errorMessage ? (
         <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">

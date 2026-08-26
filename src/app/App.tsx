@@ -17,6 +17,7 @@ import { ActivityLogPage } from '@/features/activity-logs'
 import { CommunitiesListPage, CommunityDetailPage } from '@/features/communities'
 import { DashboardPage } from '@/features/dashboard'
 import { ProfileSettingsPage } from '@/features/profile'
+import { ProgramDetailPage, ProgramsListPage } from '@/features/programs'
 import { PrivacyNoticePage, PublicSurveyPage } from '@/features/public-survey'
 import {
   ProgramTypesPage,
@@ -101,6 +102,12 @@ export default function App() {
             {/* Communities are viewable by all authenticated roles; write actions are gated in-page. */}
             <Route path="communities" element={<CommunitiesListPage />} />
             <Route path="communities/:id" element={<CommunityDetailPage />} />
+
+            {/* Extension projects — viewable by every authenticated role (student volunteers see
+                the projects they help run). Authoring and the four stage actions are gated in-page
+                off the server's `availableActions`, which is narrower than route access. */}
+            <Route path="programs" element={<ProgramsListPage />} />
+            <Route path="programs/:id" element={<ProgramDetailPage />} />
 
             {/* Needs assessment + recommendations — every role except student volunteers
                 (spec §2.2). Generating, deciding and matrix edits are gated in-page, since the

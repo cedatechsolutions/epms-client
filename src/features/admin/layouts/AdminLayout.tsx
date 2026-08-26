@@ -11,7 +11,6 @@ import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
-import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
@@ -91,18 +90,9 @@ function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessmen
     {
       id: 'projects',
       label: 'Extension Projects',
-      to: '/admin/dashboard',
+      to: '/admin/programs',
       Icon: FolderOutlinedIcon,
-      matches: () => false,
-      disabled: true,
-    },
-    {
-      id: 'requests',
-      label: 'Project Requests',
-      to: '/admin/dashboard',
-      Icon: InboxOutlinedIcon,
-      matches: () => false,
-      disabled: true,
+      matches: (currentPathname) => currentPathname.startsWith('/admin/programs'),
     },
     {
       id: 'reports',
