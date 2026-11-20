@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useDepartmentOptions } from '@/features/departments/lib/useDepartmentOptions'
 import AdminDialog from '@/features/users/components/AdminDialog'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import { fromDateTimeLocal, toDateTimeLocal } from '../lib/format'
@@ -55,6 +56,23 @@ export default function SurveyFormModal({
       : String(survey.targetResponses),
   )
 
+  const [departmentId, setDepartmentId] = useState(survey?.departmentId ?? '')
+  const { isCampusWide, departments } = useDepartmentOptions()
+  // A survey filed under a since-deactivated department keeps showing it, so saving does not
+  // silently move the survey (the server keeps a re-sent current department as-is).
+  const departmentChoices =
+    survey?.departmentId && !departments.some((department) => department.id === survey.departmentId)
+      ? [
+          ...departments,
+          {
+            id: survey.departmentId,
+            code: survey.departmentCode ?? '',
+            name: `${survey.departmentName ?? 'Department'} (inactive)`,
+            active: false,
+          },
+        ]
+      : departments
+
   const fieldError = (field: string): string | undefined => apiErrors?.[field]?.[0]
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -67,6 +85,7 @@ export default function SurveyFormModal({
       opensAt: fromDateTimeLocal(opensAt),
       closesAt: fromDateTimeLocal(closesAt),
       targetResponses: parsedTarget !== null && Number.isFinite(parsedTarget) ? parsedTarget : null,
+      departmentId: isCampusWide ? departmentId || null : undefined,
     })
   }
 
@@ -145,6 +164,36 @@ export default function SurveyFormModal({
             <p className={fieldErrorClassName}>{fieldError('communityId')}</p>
           ) : null}
         </div>
+
+        {isCampusWide ? (
+          <div>
+            <label htmlFor="survey-department" className={labelClassName}>
+              Department
+            </label>
+            <select
+              id="survey-department"
+              value={departmentId}
+              disabled={loading}
+              onChange={(event) => setDepartmentId(event.target.value)}
+              className={selectClassName}
+            >
+              <option value="">Campus-level (no department)</option>
+              {departmentChoices.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.code ? `${department.code} — ${department.name}` : department.name}
+                </option>
+              ))}
+            </select>
+            {fieldError('departmentId') ? (
+              <p className={fieldErrorClassName}>{fieldError('departmentId')}</p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-alt">
+                The department's coordinator and facilitators can see a survey filed under it. A
+                campus-level survey is visible to campus-wide roles only.
+              </p>
+            )}
+          </div>
+        ) : null}
 
         <div>
           <label htmlFor="survey-description" className={labelClassName}>

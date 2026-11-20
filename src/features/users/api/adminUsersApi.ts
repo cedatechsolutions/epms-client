@@ -1,4 +1,5 @@
 import { ApiError, deleteRequest, getBlobRequest, getRequest, patchRequest, postRequest, putRequest } from '@/shared/api/http'
+import { ROLE_FACILITATOR, type Department } from '@/features/auth/types'
 import type {
   CreateUserPayload,
   PaginatedResponse,
@@ -26,6 +27,7 @@ type BackendUser = {
   createdAt: string | null
   updatedAt: string | null
   roles: string[]
+  department: Department | null
 }
 
 type BackendManagedUserPayload = {
@@ -37,6 +39,7 @@ type BackendManagedUserPayload = {
   middleName: string
   contactNumber: string
   role: string
+  departmentId: string | null
   status?: 'ACTIVE' | 'INACTIVE'
 }
 
@@ -60,7 +63,7 @@ type BackendPaginatedUsers = {
 
 // Each user is assigned exactly one domain role; take the first (roles arrive sorted).
 function mapUserRole(roles: string[]): UserRole {
-  return (roles[0] ?? 'faculty') as UserRole
+  return (roles[0] ?? ROLE_FACILITATOR) as UserRole
 }
 
 function mapBackendUser(user: BackendUser): User {
@@ -76,6 +79,7 @@ function mapBackendUser(user: BackendUser): User {
     email: user.email,
     role: mapUserRole(user.roles),
     roles: [...user.roles].sort(),
+    department: user.department ?? null,
     status,
     is_active: user.active,
     avatar_updated_at: user.avatarUpdatedAt ?? null,
@@ -95,6 +99,7 @@ function toBackendPayload(payload: CreateUserPayload | UpdateUserPayload): Backe
     middleName: payload.middle_name?.trim() ?? '',
     contactNumber: payload.contact_number?.trim() ?? '',
     role: payload.role,
+    departmentId: payload.department_id,
     ...(payload.status
       ? {
           status: payload.status === 'active' ? 'ACTIVE' : 'INACTIVE',
@@ -111,6 +116,7 @@ export async function listAdminUsers(query: UserListQuery = {}): Promise<Paginat
       search: query.search || undefined,
       role: query.role || undefined,
       status: query.status ? query.status.toUpperCase() : undefined,
+      departmentId: query.department_id || undefined,
       sort: query.sort,
       direction: query.direction,
     },

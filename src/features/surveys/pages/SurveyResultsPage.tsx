@@ -31,6 +31,7 @@ import {
   type CategoryResult,
   type ExportFormat,
   type GeneratedReport,
+  type Qf23Format,
   type SignatoryOverrides,
   type SurveyResults,
 } from '../types'
@@ -154,13 +155,13 @@ export default function SurveyResultsPage() {
     }
   }
 
-  const handleGenerateQf23 = async (overrides: SignatoryOverrides) => {
+  const handleGenerateQf23 = async (overrides: SignatoryOverrides, format: Qf23Format) => {
     if (!results) return
     setQf23Loading(true)
     setQf23Error(null)
     try {
-      const blob = await generateQf23Report(results.surveyId, overrides)
-      downloadBlob(blob, `EXTN-QF-23_${slugifyTitle(results.title)}.docx`)
+      const blob = await generateQf23Report(results.surveyId, overrides, format)
+      downloadBlob(blob, `EXTN-QF-23_${slugifyTitle(results.title)}.${format}`)
       setQf23Open(false)
       notify.success('EXTN-QF-23 report generated and archived.')
       await loadReports()
@@ -176,7 +177,7 @@ export default function SurveyResultsPage() {
     setDownloadingReportId(report.id)
     try {
       const blob = await downloadSurveyReport(results.surveyId, report.id)
-      downloadBlob(blob, `EXTN-QF-23_${slugifyTitle(results.title)}.docx`)
+      downloadBlob(blob, `EXTN-QF-23_${slugifyTitle(results.title)}.${report.fileType === 'pdf' ? 'pdf' : 'docx'}`)
     } catch (error) {
       notify.error(getSurveyErrorMessage(error))
     } finally {

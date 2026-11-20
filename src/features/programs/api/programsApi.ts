@@ -39,6 +39,7 @@ export async function listPrograms(
       programTypeId: query.programTypeId || undefined,
       facultyLeadId: query.facultyLeadId || undefined,
       periodId: query.periodId || undefined,
+      departmentId: query.departmentId || undefined,
       sort: query.sort,
       direction: query.direction,
     },

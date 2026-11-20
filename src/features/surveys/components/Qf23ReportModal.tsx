@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import AdminDialog from '@/features/users/components/AdminDialog'
-import type { SignatoryOverrides } from '../types'
+import type { Qf23Format, SignatoryOverrides } from '../types'
 
 type Qf23ReportModalProps = {
   open: boolean
   loading: boolean
   errorMessage: string | null
   onClose: () => void
-  onSubmit: (overrides: SignatoryOverrides) => void
+  onSubmit: (overrides: SignatoryOverrides, format: Qf23Format) => void
 }
 
 const inputClassName =
@@ -15,11 +15,20 @@ const inputClassName =
 
 /** Signatory block of the EXTN-QF-23 form; each line defaults to the role holder when left blank. */
 const SIGNATORY_FIELDS = [
-  { key: 'preparedBy', label: 'Prepared by', hint: 'Extension coordinator who ran the assessment' },
-  { key: 'notedBy', label: 'Noted by', hint: 'Campus extension coordinator' },
-  { key: 'recommendingApproval', label: 'Recommending approval', hint: 'Campus administrator' },
-  { key: 'approvedBy', label: 'Approved by', hint: 'Approving authority' },
+  { key: 'preparedBy', label: 'Prepared by', hint: 'Defaults to whoever created the survey' },
+  { key: 'notedBy', label: 'Noted by', hint: "Defaults to the survey department's extension coordinator" },
+  {
+    key: 'recommendingApproval',
+    label: 'Recommending approval',
+    hint: 'Defaults to the extension staff coordinator',
+  },
+  { key: 'approvedBy', label: 'Approved by', hint: 'Defaults to the campus extension coordinator' },
 ] as const
+
+const FORMAT_OPTIONS: { value: Qf23Format; label: string; hint: string }[] = [
+  { value: 'docx', label: 'Word (.docx)', hint: 'Editable — complete the narrative sections before filing.' },
+  { value: 'pdf', label: 'PDF', hint: 'Fixed layout — circulate the system-filled draft as-is.' },
+]
 
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
@@ -38,6 +47,7 @@ export default function Qf23ReportModal({
     recommendingApproval: '',
     approvedBy: '',
   })
+  const [format, setFormat] = useState<Qf23Format>('docx')
 
   const handleSubmit = () => {
     const trimmed = (key: string) => {
@@ -50,14 +60,14 @@ export default function Qf23ReportModal({
       notedBy: trimmed('notedBy'),
       recommendingApproval: trimmed('recommendingApproval'),
       approvedBy: trimmed('approvedBy'),
-    })
+    }, format)
   }
 
   return (
     <AdminDialog
       open={open}
       title="Generate EXTN-QF-23 report"
-      description="The report is pre-filled with the finalized results. Narrative sections are marked as placeholders for you to complete in Word."
+      description="The report is pre-filled with the finalized results. Narrative sections are marked as placeholders to complete in the Word copy."
       maxWidthClassName="max-w-3xl"
       closeDisabled={loading}
       onClose={onClose}
@@ -87,6 +97,35 @@ export default function Qf23ReportModal({
         {errorMessage ? (
           <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">{errorMessage}</div>
         ) : null}
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-ink">Format</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {FORMAT_OPTIONS.map((option) => {
+              const selected = format === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  disabled={loading}
+                  onClick={() => setFormat(option.value)}
+                  className={[
+                    'flex flex-col items-start gap-1 border px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md',
+                    selected
+                      ? 'border-success-border bg-success-bg'
+                      : 'cursor-pointer border-line bg-surface hover:bg-hover-tint',
+                  ].join(' ')}
+                >
+                  <span className={selected ? 'text-sm font-medium text-primary-accent' : 'text-sm font-medium text-ink'}>
+                    {option.label}
+                  </span>
+                  <span className="text-xs text-muted-alt">{option.hint}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <div className="border border-line bg-surface-tint px-4 py-3 text-sm text-warning">
           Leave a field blank to use the current holder of that role. Every generated copy is archived —

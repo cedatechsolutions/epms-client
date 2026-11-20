@@ -16,9 +16,12 @@ import {
 import { ActivityLogPage } from '@/features/activity-logs'
 import { CommunitiesListPage, CommunityDetailPage } from '@/features/communities'
 import { DashboardPage } from '@/features/dashboard'
+import { DepartmentsPage } from '@/features/departments'
+import { NotificationsPage } from '@/features/notifications'
 import { ProfileSettingsPage } from '@/features/profile'
 import { ProgramDetailPage, ProgramsListPage } from '@/features/programs'
 import { PrivacyNoticePage, PublicSurveyPage } from '@/features/public-survey'
+import { REPORT_ROLES, ReportsPage } from '@/features/reports'
 import {
   ProgramTypesPage,
   RecommendationsPage,
@@ -98,6 +101,7 @@ export default function App() {
 
             {/* Every authenticated role manages their own account here. */}
             <Route path="profile" element={<ProfileSettingsPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
 
             {/* Communities are viewable by all authenticated roles; write actions are gated in-page. */}
             <Route path="communities" element={<CommunitiesListPage />} />
@@ -108,6 +112,12 @@ export default function App() {
                 off the server's `availableActions`, which is narrower than route access. */}
             <Route path="programs" element={<ProgramsListPage />} />
             <Route path="programs/:id" element={<ProgramDetailPage />} />
+
+            {/* Reports — every role except student volunteers (spec §2.2 "Generate
+                reports/certificates"). Faculty scope and archive are narrowed server-side. */}
+            <Route element={<RequireRole allowedRoles={REPORT_ROLES} />}>
+              <Route path="reports" element={<ReportsPage />} />
+            </Route>
 
             {/* Needs assessment + recommendations — every role except student volunteers
                 (spec §2.2). Generating, deciding and matrix edits are gated in-page, since the
@@ -127,6 +137,7 @@ export default function App() {
               <Route path="users/:id" element={<Navigate to="/admin/users" replace />} />
               <Route path="users/:id/edit" element={<Navigate to="/admin/users" replace />} />
               <Route path="activity-logs" element={<ActivityLogPage />} />
+              <Route path="departments" element={<DepartmentsPage />} />
             </Route>
           </Route>
         </Route>

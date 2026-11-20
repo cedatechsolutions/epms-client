@@ -11,6 +11,7 @@ import type {
   GeneratedReport,
   NeedCategory,
   PaginatedResponse,
+  Qf23Format,
   QuestionPayload,
   SignatoryOverrides,
   Survey,
@@ -32,6 +33,7 @@ export async function listSurveys(query: SurveyListQuery = {}): Promise<Paginate
       search: query.search || undefined,
       status: query.status || undefined,
       communityId: query.communityId || undefined,
+      departmentId: query.departmentId || undefined,
       sort: query.sort,
       direction: query.direction,
     },
@@ -101,12 +103,18 @@ export async function exportSurveyResults(surveyId: string, format: ExportFormat
   return getBlobRequest(`${SURVEYS_ENDPOINT}/${surveyId}/export`, { params: { format } })
 }
 
-/** Generates and archives the EXTN-QF-23 .docx. Requires finalized results (409 otherwise). */
+/**
+ * Generates and archives the EXTN-QF-23 report as Word (.docx) or PDF. Requires finalized results
+ * (409 otherwise).
+ */
 export async function generateQf23Report(
   surveyId: string,
   overrides: SignatoryOverrides,
+  format: Qf23Format = 'docx',
 ): Promise<Blob> {
-  return postBlobRequest<SignatoryOverrides>(`${SURVEYS_ENDPOINT}/${surveyId}/report-qf23`, overrides)
+  return postBlobRequest<SignatoryOverrides>(`${SURVEYS_ENDPOINT}/${surveyId}/report-qf23`, overrides, {
+    params: { format },
+  })
 }
 
 export async function listSurveyReports(surveyId: string): Promise<GeneratedReport[]> {

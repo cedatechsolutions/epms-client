@@ -20,7 +20,10 @@ export {
 export {
   USER_MANAGEMENT_ROLES,
   ALL_ROLES,
+  COORDINATOR_ROLES,
+  DEPARTMENTAL_ROLES,
   ROLE_LABELS,
   ROLE_ADMIN,
+  isDepartmentalRole,
 } from './types'
-export type { AuthUser, UpdateProfilePayload } from './types'
+export type { AuthUser, Department, UpdateProfilePayload } from './types'

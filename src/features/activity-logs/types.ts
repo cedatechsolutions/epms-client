@@ -89,4 +89,6 @@ export const ACTIVITY_ACTION_LABELS: Record<string, string> = {
   'program.cancel': 'Proposal cancelled',
   'program.start': 'Proposal started',
   'program.complete': 'Proposal completed',
+  'report.generated': 'Report generated',
+  'report.downloaded': 'Report downloaded',
 }

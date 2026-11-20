@@ -32,7 +32,7 @@ Core rules:
    - `rounded-lg` on **surfaces**: cards, page sections, dialogs, popovers, toasts, stat cards, the public shell header, the admin content pane.
    - `rounded-md` on **inset blocks and controls**: callouts and info panels nested inside a surface, chips, preview panes, buttons, text inputs, selects, textareas, and anything styled as one (a `<label>` acting as a file-picker button, a `<Link>` or `<a>` with button classes, bordered choice rows).
    - `rounded-lg` on the authentication screens' controls **and their inset alert boxes**, which are visually larger and read as a front door.
-   - `rounded-full` on avatar circles and loading spinners.
+   - `rounded-full` on avatar circles, loading spinners and the notification count badge (§6.16).
    - **Square stays square for full-bleed chrome:** the admin sidebar, the top header bar, the mobile drawer, and full-viewport scrims have no radius — they are attached to the viewport edge, where a corner would read as a rendering fault rather than a choice.
    - **A rounded surface with edge-to-edge children needs `overflow-hidden`.** Tinted table header rows, toolbars, and `bg-row-hover` footer action strips are square and will paint over the corners otherwise. Add it to any card whose children reach its border; cards that pad their own content (`px-5 py-4`) do not need it. Do not add `overflow-hidden` to a surface containing an absolutely-positioned menu — it would clip it.
 2. **Flat surfaces, 1px borders.** Depth comes from borders and the occasional soft green-tinted shadow (section 3.4) — never from gradients or heavy elevation.
@@ -444,7 +444,7 @@ for a single 0–100 score; this one shows how a total divides.
 A person is pictured one way everywhere: the shared `UserAvatar`
 (`src/features/auth/components/UserAvatar.tsx`). Never hand-roll an initials circle.
 
-- **Photo or initials, same circle.** With a photo it renders `<img class="h-full w-full object-cover">`; without one it renders the initials on `bg-primary` in white `font-semibold`. Both go in the same `rounded-full overflow-hidden` box, so the two are interchangeable in any slot and a missing photo never changes the layout. This and spinners are the only `rounded-full` in the system (§2).
+- **Photo or initials, same circle.** With a photo it renders `<img class="h-full w-full object-cover">`; without one it renders the initials on `bg-primary` in white `font-semibold`. Both go in the same `rounded-full overflow-hidden` box, so the two are interchangeable in any slot and a missing photo never changes the layout. This, spinners and the notification count badge (§6.16) are the only `rounded-full` in the system (§2).
 - **Sizes** are fixed by the component — `sm` `h-9 w-9 text-sm` (header profile button), `md` `h-10 w-10 text-sm` (profile menu, mobile header trigger), `lg` `h-20 w-20 text-2xl` (Profile Settings). Do not pass ad-hoc size classes.
 - **Initials come from `getUserInitials`** (first + last initial, falling back to the email) — the same helper the rest of the app uses.
 - **The photo is fetched, not linked.** Avatar bytes sit behind the bearer token like every other upload, so the auth store fetches the blob once per session and keeps an object URL in `avatarUrl`; components take that URL as a prop. The store revokes the previous URL on every replacement and on sign-out. A failed fetch is not a session error — it falls back to initials silently.
@@ -474,6 +474,25 @@ left of the profile button (§5.2).
 - One toggle, one place. Do not add a second switch to public pages — those follow the stored
   preference (or the OS) already, and a respondent has no session to persist a choice into.
 
+### 6.15 Generator cards (Reports)
+
+The Reports screen (`/admin/reports`) lays out each document generator as a §6.13 section — header strip, form body, right-aligned action strip with one primary button — via `features/reports/components/GeneratorCard.tsx`. Cards sit in `grid gap-4 lg:grid-cols-2 2xl:grid-cols-3` and are `flex flex-col` so their action strips line up.
+
+- **Each card owns its loading and error state** (inline alert above its fields); one failed generation never blanks another.
+- **Generate archives, then downloads.** The success toast says the file was saved to the archive; if only the download fails, a warning toast says the file is in the archive rather than inviting a duplicate.
+- A field the chosen scope ignores is replaced by a one-line explanation, not left disabled on screen (the period select under "One program").
+- Exports that carry personal data show the info callout (`border-info-border bg-info-bg text-info-text`, `rounded-md`) naming RA 10173 and that downloads are logged.
+
+### 6.16 Notifications (`features/notifications`)
+
+Module 8's in-app feed. Two views share one row component and one store.
+
+- **Header bell (`NotificationBell`).** Sits first in the header's right-hand cluster, before `ThemeToggle`, and uses the same `h-10 w-10 rounded-md` icon-button shape (`NotificationsNoneOutlined`). Unread count badge: `absolute right-1 top-1 h-4 min-w-4 rounded-full bg-primary px-1 text-[10px] font-semibold text-white tabular-nums`, `aria-hidden`, capped at `99+`; the button's `aria-label` carries the count instead ("Notifications, 3 unread"). The badge polls `GET /notifications/unread-count` every 60 s while the tab is visible and on `visibilitychange`.
+- **Bell panel.** A §6.7 dropdown (`z-20`, outside-click + Escape) as a `rounded-lg overflow-hidden` surface, `w-[min(380px,calc(100vw-32px))]`: a header strip (title + text-style "Mark all read"), the latest 8 rows in a `max-h-[420px] overflow-y-auto divide-y divide-row-divider` list, and a full-width "View all notifications" footer link to `/admin/notifications`. Empty = "You're all caught up."; loading and error states are inline, as everywhere.
+- **Row (`NotificationItem`).** A full-width button: type chip (§6.4 — Proposal `success`, Survey `info`, Activity neutral with `text-warning`, System neutral) + relative time (`formatRelativeTime`), the title, the body (`line-clamp-2` in the panel, full on the page), then the deep link as `→ View proposal` in `text-primary-accent`. **Unread rows sit on `bg-surface-tint` with a semibold title** (plus an `sr-only` "Unread") — no dots. Opening a row marks it read and follows the link. A link whose record was deleted reads **"No longer available"** in `text-muted`, and opening it shows an info toast instead of navigating.
+- **Page (`NotificationsPage`).** The §5.2 page header with a secondary "Mark all read" button, then a section whose filter strip has type tabs (the program list's status-tab style: `aria-pressed`, active = primary-filled) and an "Unread only" checkbox. Previous/Next pagination as on the survey list.
+- **One source of truth for read state.** `useNotificationStore` holds the badge count and a `version` that every read action bumps, so the bell panel and the page refetch together; neither keeps its own unread count. The store resets when the bell unmounts (sign-out).
+
 ---
 
 ## 7. Interaction & Motion
@@ -498,6 +517,7 @@ left of the profile button (§5.2).
 - **Class strings:** static lists inline; conditional composition via array `.join(' ')`; repeated class sets hoisted to module-level `const` (e.g. `inputClassName`, `actionButtonClassName`). No `clsx`/`tailwind-merge`.
 - **Accessibility is not optional:** labels bound with `htmlFor`/`id`, `aria-label` + `title` on icon-only buttons, `aria-pressed` on toggles, `aria-busy`/`aria-live` on loading regions, `sr-only` for visually hidden text, Escape + outside-click handling on overlays.
 - Role-gate UI (`hasAnyRole`) — hide or downgrade controls the user cannot use (e.g. "Read only" chip instead of action buttons).
+- **Department scope (Department-Based Access).** Departmental roles only ever see their own department, so a *Department* filter or picker renders for campus-wide roles only (`CAMPUS_WIDE_ROLES`); get the options from `useDepartmentOptions()` (`@/features/departments`), never a page-local fetch. The filter is a plain filter-row `<select>` (§6.2) labelled "Department" with "All departments" first, options `CODE — Name`, and resets to page 1 like any filter. A list's department column is a narrow `Dept` column showing the code (`-`, or `Campus` for campus-level surveys). A form picker that can be left empty spells out what empty means (e.g. "Campus-level (no department)"). A server filter only ever narrows the caller's scope.
 
 ---
 

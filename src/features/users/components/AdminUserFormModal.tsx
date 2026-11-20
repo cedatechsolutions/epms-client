@@ -4,7 +4,7 @@ import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
 import { UserAvatar } from '@/features/auth'
-import { ALL_ROLES, ROLE_LABELS } from '@/features/auth/types'
+import { ALL_ROLES, ROLE_FACILITATOR, ROLE_LABELS, isDepartmentalRole, type Department } from '@/features/auth/types'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import { getAdminUserAvatarBlob } from '../api/adminUsersApi'
 import type { User, UserRole } from '../types'
@@ -19,6 +19,8 @@ export type UserModalFormValues = {
   contactNumber: string
   email: string
   role: UserRole
+  /** Only meaningful for departmental roles; cleared when a campus-wide role is picked. */
+  departmentId: string
   password: string
   confirmPassword: string
   /** A newly chosen photo, applied by the caller after the account is created/saved. */
@@ -37,6 +39,9 @@ type AdminUserFormModalProps = {
   mode: UserModalFormMode
   open: boolean
   user?: User | null
+  /** Active departments for the picker; an inactive one already on the account is kept selectable. */
+  departments: Department[]
+  departmentsLoading?: boolean
   loading?: boolean
   errorMessage?: string | null
   apiErrors?: ApiValidationErrors
@@ -52,7 +57,8 @@ const emptyValues: UserModalFormValues = {
   lastName: '',
   contactNumber: '',
   email: '',
-  role: 'faculty',
+  role: ROLE_FACILITATOR,
+  departmentId: '',
   password: '',
   confirmPassword: '',
   avatarFile: null,
@@ -69,6 +75,7 @@ function buildInitialValues(user?: User | null): UserModalFormValues {
     contactNumber: user.contact_number ?? '',
     email: user.email,
     role: user.role,
+    departmentId: user.department?.id ?? '',
     password: '',
     confirmPassword: '',
     avatarFile: null,
@@ -94,6 +101,8 @@ export default function AdminUserFormModal({
   mode,
   open,
   user,
+  departments,
+  departmentsLoading = false,
   loading = false,
   errorMessage,
   apiErrors,
@@ -151,6 +160,16 @@ export default function AdminUserFormModal({
     }
   }, [pickedAvatarUrl])
 
+  // Keep an inactive department that is already on the account selectable, so editing an
+  // unrelated field does not silently force a department change.
+  const departmentOptions = useMemo(() => {
+    const current = user?.department
+    if (mode === 'edit' && current && !departments.some((department) => department.id === current.id)) {
+      return [...departments, current]
+    }
+    return departments
+  }, [departments, mode, user?.department])
+
   const previewAvatarUrl = pickedAvatarUrl ?? (values.avatarRemoved ? null : existingAvatarUrl)
   const hasAvatar = Boolean(pickedAvatarUrl) || (!values.avatarRemoved && Boolean(existingAvatarKey))
 
@@ -193,6 +212,7 @@ export default function AdminUserFormModal({
       contactNumber: fieldErrors.contactNumber || apiErrors?.contact_number?.[0],
       email: fieldErrors.email || apiErrors?.email?.[0],
       role: fieldErrors.role || apiErrors?.role?.[0],
+      departmentId: fieldErrors.departmentId || apiErrors?.departmentId?.[0] || apiErrors?.department_id?.[0],
       password: fieldErrors.password || apiErrors?.password?.[0],
       confirmPassword: fieldErrors.confirmPassword || apiErrors?.password_confirmation?.[0],
     }
@@ -233,6 +253,11 @@ export default function AdminUserFormModal({
       errors.role = 'Select a valid role.'
     }
 
+    // Mirrors the server rule: departmental roles need a department, campus-wide roles carry none.
+    if (isDepartmentalRole(values.role) && !values.departmentId) {
+      errors.departmentId = 'Select the department this account belongs to.'
+    }
+
     // Password is optional on create (blank → the system emails a temporary one).
     if (values.password && values.password.length < 8) {
       errors.password = 'Password must be at least 8 characters.'
@@ -259,6 +284,7 @@ export default function AdminUserFormModal({
       contactNumber: values.contactNumber.trim(),
       email: values.email.trim(),
       role: values.role,
+      departmentId: isDepartmentalRole(values.role) ? values.departmentId : '',
       password: values.password,
       confirmPassword: values.confirmPassword,
       avatarFile: values.avatarFile,
@@ -442,6 +468,7 @@ export default function AdminUserFormModal({
                 setValues((current) => ({
                   ...current,
                   role: event.target.value as UserRole,
+                  departmentId: isDepartmentalRole(event.target.value) ? current.departmentId : '',
                 }))
               }
               className="w-full cursor-pointer border border-line bg-surface px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
@@ -453,6 +480,37 @@ export default function AdminUserFormModal({
               ))}
             </select>
             {mergedErrors.role ? <p className="text-xs text-danger-strong">{mergedErrors.role}</p> : null}
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="space-y-2 text-sm text-cell md:col-span-2">
+            <span className="font-medium text-ink">Department</span>
+            {isDepartmentalRole(values.role) ? (
+              <select
+                value={values.departmentId}
+                disabled={loading || departmentsLoading}
+                onChange={(event) => setValues((current) => ({ ...current, departmentId: event.target.value }))}
+                className="w-full cursor-pointer border border-line bg-surface px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-primary-accent focus:bg-row-hover disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md"
+              >
+                <option value="">{departmentsLoading ? 'Loading departments...' : 'Select department'}</option>
+                {departmentOptions.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                    {department.active ? '' : ' (inactive)'}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="rounded-md border border-divider bg-surface-tint px-3 py-2.5 text-sm text-muted">
+                All departments. {ROLE_LABELS[values.role] ?? 'This role'} has campus-wide access.
+              </p>
+            )}
+            {mergedErrors.departmentId ? (
+              <p className="text-xs text-danger-strong">{mergedErrors.departmentId}</p>
+            ) : isDepartmentalRole(values.role) ? (
+              <p className="text-xs text-eyebrow">This account only sees its own department&apos;s data.</p>
+            ) : null}
           </label>
         </div>
 

@@ -1,13 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import AdminDialog from '@/features/users/components/AdminDialog'
-import {
-  CLASSIFICATION_OPTIONS,
-  type Classification,
-  type Community,
-  type CommunityPayload,
-  type Sector,
-} from '../types'
+import type { Community, CommunityPayload, Sector } from '../types'
 
 export type CommunityFormMode = 'create' | 'edit'
 
@@ -26,7 +20,6 @@ type CommunityFormModalProps = {
 const inputClassName =
   'w-full border border-control-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-placeholder focus:border-primary-accent disabled:cursor-not-allowed disabled:bg-surface-tint disabled:text-muted-strong rounded-md'
 
-const selectClassName = `${inputClassName} cursor-pointer`
 const labelClassName = 'mb-2 block text-sm font-medium text-ink'
 const fieldErrorClassName = 'mt-1 text-xs text-danger-text'
 
@@ -37,6 +30,9 @@ function ButtonSpinner() {
 function toStringValue(value: number | null): string {
   return value === null || value === undefined ? '' : String(value)
 }
+
+const PHONE_LENGTH = 11
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function toNumberOrNull(value: string): number | null {
   const trimmed = value.trim()
@@ -57,12 +53,8 @@ export default function CommunityFormModal({
   onSubmit,
 }: CommunityFormModalProps) {
   const [name, setName] = useState(community?.name ?? '')
-  const [barangayCode, setBarangayCode] = useState(community?.barangayCode ?? '')
   const [municipality, setMunicipality] = useState(community?.municipality ?? '')
   const [province, setProvince] = useState(community?.province ?? 'Cavite')
-  const [classification, setClassification] = useState<Classification>(
-    community?.classification ?? 'rural',
-  )
   const [estimatedPopulation, setEstimatedPopulation] = useState(
     toStringValue(community?.estimatedPopulation ?? null),
   )
@@ -76,12 +68,16 @@ export default function CommunityFormModal({
     community?.contactPersonDesignation ?? '',
   )
   const [contactPersonPhone, setContactPersonPhone] = useState(community?.contactPersonPhone ?? '')
+  const [contactPersonEmail, setContactPersonEmail] = useState(community?.contactPersonEmail ?? '')
+  const [othersSelected, setOthersSelected] = useState(Boolean(community?.otherSector))
+  const [otherSector, setOtherSector] = useState(community?.otherSector ?? '')
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState(community?.notes ?? '')
   const [selectedSectorIds, setSelectedSectorIds] = useState<string[]>(
     community?.sectors.map((sector) => sector.id) ?? [],
   )
 
-  const fieldError = (field: string): string | undefined => apiErrors?.[field]?.[0]
+  const fieldError = (field: string): string | undefined => clientErrors[field] ?? apiErrors?.[field]?.[0]
 
   const toggleSector = (id: string) => {
     setSelectedSectorIds((current) =>
@@ -91,19 +87,39 @@ export default function CommunityFormModal({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const phone = contactPersonPhone.trim()
+    const email = contactPersonEmail.trim()
+    const other = otherSector.trim()
+    const errors: Record<string, string> = {}
+    if (phone !== '' && phone.length !== PHONE_LENGTH) {
+      errors.contactPersonPhone = `Contact number must be exactly ${PHONE_LENGTH} digits.`
+    }
+    if (email !== '' && !EMAIL_PATTERN.test(email)) {
+      errors.contactPersonEmail = 'Enter a valid email address.'
+    }
+    if (othersSelected && other === '') {
+      errors.otherSector = 'Specify the other sector.'
+    }
+    setClientErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
     onSubmit({
       name: name.trim(),
-      barangayCode: barangayCode.trim() || null,
+      // Barangay code and classification are no longer on the form; keep any existing values on edit.
+      barangayCode: community?.barangayCode ?? null,
       municipality: municipality.trim(),
       province: province.trim(),
-      classification,
+      classification: community?.classification ?? null,
       estimatedPopulation: toNumberOrNull(estimatedPopulation),
       householdCount: toNumberOrNull(householdCount),
       populationMale: toNumberOrNull(populationMale),
       populationFemale: toNumberOrNull(populationFemale),
       contactPersonName: contactPersonName.trim() || null,
       contactPersonDesignation: contactPersonDesignation.trim() || null,
-      contactPersonPhone: contactPersonPhone.trim() || null,
+      contactPersonPhone: phone || null,
+      contactPersonEmail: email || null,
+      otherSector: othersSelected ? other : null,
       notes: notes.trim() || null,
       sectorIds: selectedSectorIds,
     })
@@ -121,6 +137,7 @@ export default function CommunityFormModal({
       description="Capture partner-community profile and GAD-ready population data. Fields marked * are required."
       closeDisabled={loading}
       onClose={onClose}
+      maxWidthClassName = "max-w-screen "
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <button
@@ -164,42 +181,6 @@ export default function CommunityFormModal({
               className={inputClassName}
             />
             {fieldError('name') ? <p className={fieldErrorClassName}>{fieldError('name')}</p> : null}
-          </div>
-
-          <div>
-            <label htmlFor="community-barangay" className={labelClassName}>
-              Barangay code
-            </label>
-            <input
-              id="community-barangay"
-              value={barangayCode}
-              disabled={loading}
-              onChange={(event) => setBarangayCode(event.target.value)}
-              placeholder="Optional"
-              className={inputClassName}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="community-classification" className={labelClassName}>
-              Classification *
-            </label>
-            <select
-              id="community-classification"
-              value={classification}
-              disabled={loading}
-              onChange={(event) => setClassification(event.target.value as Classification)}
-              className={selectClassName}
-            >
-              {CLASSIFICATION_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {fieldError('classification') ? (
-              <p className={fieldErrorClassName}>{fieldError('classification')}</p>
-            ) : null}
           </div>
 
           <div>
@@ -305,11 +286,8 @@ export default function CommunityFormModal({
 
         <div>
           <p className="mb-2 text-sm font-medium text-ink">Sectors served</p>
-          {activeSectors.length === 0 ? (
-            <p className="text-sm text-muted">No sectors available.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {activeSectors.map((sector) => {
+          <div className="flex flex-wrap gap-2">
+            {activeSectors.map((sector) => {
                 const selected = selectedSectorIds.includes(sector.id)
                 return (
                   <button
@@ -329,11 +307,43 @@ export default function CommunityFormModal({
                   </button>
                 )
               })}
+              <button
+                type="button"
+                aria-pressed={othersSelected}
+                disabled={loading}
+                onClick={() => setOthersSelected((current) => !current)}
+                className={[
+                  'inline-flex border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 rounded-md',
+                  othersSelected
+                    ? 'border-success-border bg-success-bg text-primary-accent'
+                    : 'cursor-pointer border-line bg-surface-tint text-muted hover:bg-row-divider',
+                ].join(' ')}
+              >
+                Others
+              </button>
+          </div>
+          {othersSelected ? (
+            <div className="mt-3 sm:max-w-md">
+              <label htmlFor="community-other-sector" className={labelClassName}>
+                Other sector *
+              </label>
+              <input
+                id="community-other-sector"
+                value={otherSector}
+                disabled={loading}
+                maxLength={255}
+                onChange={(event) => setOtherSector(event.target.value)}
+                placeholder="e.g. Indigenous Peoples"
+                className={inputClassName}
+              />
+              {fieldError('otherSector') ? (
+                <p className={fieldErrorClassName}>{fieldError('otherSector')}</p>
+              ) : null}
             </div>
-          )}
+          ) : null}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="community-contact-name" className={labelClassName}>
               Contact person
@@ -366,9 +376,35 @@ export default function CommunityFormModal({
               id="community-contact-phone"
               value={contactPersonPhone}
               disabled={loading}
-              onChange={(event) => setContactPersonPhone(event.target.value)}
+              type="tel"
+              inputMode="numeric"
+              maxLength={PHONE_LENGTH}
+              onChange={(event) =>
+                setContactPersonPhone(event.target.value.replace(/\D/g, '').slice(0, PHONE_LENGTH))
+              }
+              placeholder="e.g. 09171234567"
               className={inputClassName}
             />
+            {fieldError('contactPersonPhone') ? (
+              <p className={fieldErrorClassName}>{fieldError('contactPersonPhone')}</p>
+            ) : null}
+          </div>
+          <div>
+            <label htmlFor="community-contact-email" className={labelClassName}>
+              Email
+            </label>
+            <input
+              id="community-contact-email"
+              type="email"
+              value={contactPersonEmail}
+              disabled={loading}
+              onChange={(event) => setContactPersonEmail(event.target.value)}
+              placeholder="e.g. contact@example.com"
+              className={inputClassName}
+            />
+            {fieldError('contactPersonEmail') ? (
+              <p className={fieldErrorClassName}>{fieldError('contactPersonEmail')}</p>
+            ) : null}
           </div>
         </div>
 

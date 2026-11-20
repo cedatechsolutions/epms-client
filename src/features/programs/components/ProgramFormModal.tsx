@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { useAuthStore } from '@/features/auth/store/authStore'
 import AdminDialog from '@/features/users/components/AdminDialog'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import type {
@@ -98,6 +99,12 @@ export default function ProgramFormModal({
   const [venue, setVenue] = useState(program?.venue ?? '')
   const [budgetRequested, setBudgetRequested] = useState(toStringValue(program?.budgetRequested))
   const [facultyLeadId, setFacultyLeadId] = useState(program?.facultyLeadId ?? '')
+  const currentUser = useAuthStore((state) => state.user)
+  // Mirrors the server (ProgramService): the department follows the lead, and a blank lead means
+  // the drafter leads it. Shown so the author knows where stage 2 will go before submitting.
+  const routedDepartment = facultyLeadId
+    ? (facultyOptions.find((option) => option.id === facultyLeadId)?.department ?? null)
+    : (currentUser?.department ?? null)
   const [selectedSectorIds, setSelectedSectorIds] = useState<string[]>(
     program?.sectors.map((sector) => sector.id) ?? [],
   )
@@ -275,7 +282,7 @@ export default function ProgramFormModal({
               <option value="">Default to me</option>
               {facultyOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name}
+                  {option.department ? `${option.name} (${option.department.code})` : option.name}
                 </option>
               ))}
             </select>
@@ -283,7 +290,10 @@ export default function ProgramFormModal({
               <p className={fieldErrorClassName}>{fieldError('facultyLeadId')}</p>
             ) : (
               <p className="mt-1 text-xs text-muted-alt">
-                Left blank, the proposal is led by whoever drafts it.
+                Left blank, the proposal is led by whoever drafts it.{' '}
+                {routedDepartment
+                  ? `It will be routed to ${routedDepartment.name}.`
+                  : 'No department yet — pick a faculty lead who belongs to one before submitting.'}
               </p>
             )}
           </div>

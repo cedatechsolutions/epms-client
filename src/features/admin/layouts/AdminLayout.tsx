@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined'
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
@@ -18,9 +19,11 @@ import PollOutlinedIcon from '@mui/icons-material/PollOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import { getPrimaryRoleLabel, getUserDisplayName, getUserInitials, hasAnyRole } from '@/features/auth/lib/access'
 import UserAvatar from '@/features/auth/components/UserAvatar'
+import { REPORT_ROLES } from '@/features/reports'
 import { ASSESSMENT_VIEW_ROLES } from '@/features/surveys'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { USER_MANAGEMENT_ROLES } from '@/features/auth/types'
+import { NotificationBell } from '@/features/notifications'
 import { ThemeToggle } from '@/shared/theme'
 
 type NavItem = {
@@ -49,7 +52,11 @@ type SectionCopy = {
   eyebrow: string
 }
 
-function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessments: boolean): NavNode[] {
+function getNavigationItems(
+  canAccessUserManagement: boolean,
+  canAccessAssessments: boolean,
+  canAccessReports: boolean,
+): NavNode[] {
   const items: NavNode[] = [
     {
       id: 'dashboard',
@@ -86,23 +93,23 @@ function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessmen
     })
   }
 
-  items.push(
-    {
-      id: 'projects',
-      label: 'Extension Projects',
-      to: '/admin/programs',
-      Icon: FolderOutlinedIcon,
-      matches: (currentPathname) => currentPathname.startsWith('/admin/programs'),
-    },
-    {
+  items.push({
+    id: 'projects',
+    label: 'Extension Projects',
+    to: '/admin/programs',
+    Icon: FolderOutlinedIcon,
+    matches: (currentPathname) => currentPathname.startsWith('/admin/programs'),
+  })
+
+  if (canAccessReports) {
+    items.push({
       id: 'reports',
       label: 'Reports',
-      to: '/admin/dashboard',
+      to: '/admin/reports',
       Icon: AssessmentOutlinedIcon,
-      matches: () => false,
-      disabled: true,
-    },
-  )
+      matches: (currentPathname) => currentPathname.startsWith('/admin/reports'),
+    })
+  }
 
   if (canAccessUserManagement) {
     items.push({
@@ -116,6 +123,13 @@ function getNavigationItems(canAccessUserManagement: boolean, canAccessAssessmen
           to: '/admin/users',
           Icon: GroupOutlinedIcon,
           matches: (currentPathname) => currentPathname.startsWith('/admin/users'),
+        },
+        {
+          id: 'departments',
+          label: 'Departments',
+          to: '/admin/departments',
+          Icon: AccountTreeOutlinedIcon,
+          matches: (currentPathname) => currentPathname.startsWith('/admin/departments'),
         },
         {
           id: 'activity-logs',
@@ -142,9 +156,24 @@ function getSectionCopy(pathname: string): SectionCopy {
       eyebrow: 'Administration / Settings / User Management',
     }
   }
+  if (pathname.startsWith('/admin/notifications')) {
+    return {
+      eyebrow: 'Notifications',
+    }
+  }
+  if (pathname.startsWith('/admin/departments')) {
+    return {
+      eyebrow: 'Administration / Settings / Departments',
+    }
+  }
   if (pathname.startsWith('/admin/activity-logs')) {
     return {
       eyebrow: 'Administration / Settings / Activity Log',
+    }
+  }
+  if (pathname.startsWith('/admin/reports')) {
+    return {
+      eyebrow: 'Administration / Reports',
     }
   }
   if (pathname.startsWith('/admin/program-types') || pathname.startsWith('/admin/scoring-matrix')) {
@@ -347,13 +376,14 @@ export default function AdminLayout() {
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const canAccessUserManagement = hasAnyRole(user, USER_MANAGEMENT_ROLES)
   const canAccessAssessments = hasAnyRole(user, ASSESSMENT_VIEW_ROLES)
+  const canAccessReports = hasAnyRole(user, REPORT_ROLES)
   const displayName = getUserDisplayName(user)
   const primaryRoleLabel = getPrimaryRoleLabel(user)
   const initials = getUserInitials(user)
 
   const navigationItems = useMemo(
-    () => getNavigationItems(canAccessUserManagement, canAccessAssessments),
-    [canAccessUserManagement, canAccessAssessments],
+    () => getNavigationItems(canAccessUserManagement, canAccessAssessments, canAccessReports),
+    [canAccessUserManagement, canAccessAssessments, canAccessReports],
   )
   const sectionCopy = useMemo(() => getSectionCopy(location.pathname), [location.pathname])
 
@@ -453,6 +483,7 @@ export default function AdminLayout() {
               </div>
 
               <div className="flex items-center gap-1">
+                <NotificationBell />
                 <ThemeToggle />
 
                 <div className="relative" ref={profileMenuRef}>

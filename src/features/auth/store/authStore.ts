@@ -39,6 +39,7 @@ function toAuthUser(response: AuthResponse | AuthUser): AuthUser {
     middleName: response.middleName,
     contactNumber: response.contactNumber,
     roles: response.roles,
+    department: response.department ?? null,
     avatarUpdatedAt: response.avatarUpdatedAt ?? null,
     mustChangePassword: response.mustChangePassword ?? false,
   }

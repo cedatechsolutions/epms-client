@@ -1,6 +1,8 @@
 // Domain types for Module 5a — Extension Projects (proposals) and the four-stage approval chain.
 // Field names mirror the backend JSON (camelCase) so no request/response remapping is needed.
 
+import { ALL_ROLES, type Department } from '@/features/auth/types'
+
 /** Every status `programs.status` can hold (backend `Program.STATUS_*`). */
 export type ProgramStatus =
   | 'draft'
@@ -23,13 +25,8 @@ export type ProgramAction = 'edit' | 'submit' | 'note' | 'recommend' | 'approve'
 /** `program_approvals.action` — one row of the audit trail. */
 export type ApprovalAction = 'submitted' | 'noted' | 'recommended' | 'approved' | 'returned'
 
-/** Roles permitted to author proposals (backend `Permissions.canCreatePrograms`). */
-export const PROGRAM_AUTHOR_ROLES = [
-  'admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-  'faculty',
-] as const
+/** Roles permitted to author proposals (backend `Permissions.canCreatePrograms`): every role. */
+export const PROGRAM_AUTHOR_ROLES = ALL_ROLES
 
 export const PROGRAM_STATUS_LABELS: Record<ProgramStatus, string> = {
   draft: 'Draft',
@@ -71,15 +68,20 @@ export type ProgramStatusTab = '' | 'draft' | 'under_review' | 'returned' | 'app
  * server decides what may actually happen. `reachedAt` is derived from the approval trail.
  */
 export const APPROVAL_STAGES = [
-  { stage: 1, label: 'Submitted', role: 'faculty', roleLabel: 'Extension Project Leader' },
-  { stage: 2, label: 'Coordinator Review', role: 'extension_coordinator', roleLabel: 'Extension Coordinator' },
+  { stage: 1, label: 'Submitted', role: 'facilitator', roleLabel: 'Extension Project Leader' },
+  {
+    stage: 2,
+    label: 'Coordinator Review',
+    role: 'dept_extension_coordinator',
+    roleLabel: 'Dept. Extension Coordinator',
+  },
   {
     stage: 3,
     label: 'Recommending Approval',
-    role: 'campus_extension_coordinator',
-    roleLabel: 'Campus Extension Coordinator',
+    role: 'extension_staff_coordinator',
+    roleLabel: 'Extension Staff Coordinator',
   },
-  { stage: 4, label: 'Approved', role: 'campus_admin', roleLabel: 'Campus Administrator' },
+  { stage: 4, label: 'Approved', role: 'campus_extension_coordinator', roleLabel: 'Campus Extension Coordinator' },
 ] as const
 
 /** Status → how many stages of the chain are complete. Drives the stepper's filled state. */
@@ -162,6 +164,8 @@ export type ProgramSummary = {
   programTypeName: string | null
   facultyLeadId: string | null
   facultyLeadName: string | null
+  /** Department the proposal is routed to (follows the faculty lead). Null until one is derived. */
+  departmentCode: string | null
   status: ProgramStatus
   proposedDate: string | null
   createdAt: string | null
@@ -187,6 +191,10 @@ export type Program = {
   budgetApproved: number | null
   facultyLeadId: string | null
   facultyLeadName: string | null
+  /** Department the proposal was routed to at its last submit; null on never-submitted drafts. */
+  departmentId: string | null
+  departmentCode: string | null
+  departmentName: string | null
   status: ProgramStatus
   createdBy: string | null
   createdAt: string | null
@@ -245,6 +253,8 @@ export type ProgramListQuery = {
    * KPI count equal the number of rows the click opens.
    */
   periodId?: string
+  /** Narrows the list to one department; the server still applies the caller's own scope first. */
+  departmentId?: string
   sort?: 'title' | 'status' | 'proposedDate' | 'createdAt' | 'updatedAt'
   direction?: 'asc' | 'desc'
 }
@@ -262,6 +272,8 @@ export type UserOption = {
   name: string
   email: string
   roles: string[]
+  /** Null for campus-wide accounts. A proposal's department follows its faculty lead's. */
+  department: Department | null
 }
 
 // --- Module 5b: activities, attendance, evaluations ---

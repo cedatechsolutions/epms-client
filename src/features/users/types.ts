@@ -1,10 +1,6 @@
-export type UserRole =
-  | 'admin'
-  | 'campus_admin'
-  | 'campus_extension_coordinator'
-  | 'extension_coordinator'
-  | 'faculty'
-  | 'student_volunteer'
+import type { Department, RoleCode } from '@/features/auth/types'
+
+export type UserRole = RoleCode
 export type UserStatus = 'active' | 'inactive'
 
 export type User = {
@@ -17,6 +13,8 @@ export type User = {
   email: string
   role: UserRole
   roles: string[]
+  /** Null for campus-wide accounts. */
+  department: Department | null
   status: UserStatus
   is_active: boolean
   /** Set when the account has a profile photo; also the cache key for re-fetching it. */
@@ -56,6 +54,7 @@ export type UserListQuery = {
   search?: string
   role?: UserRole | ''
   status?: UserStatus | ''
+  department_id?: string
   sort?: 'lastName' | 'firstName' | 'middleName' | 'email' | 'contactNumber' | 'createdAt' | 'lastLoginAt' | 'active'
   direction?: 'asc' | 'desc'
 }
@@ -69,6 +68,8 @@ export type CreateUserPayload = {
   password: string
   password_confirmation?: string
   role: UserRole
+  /** Required for departmental roles, null for campus-wide ones. */
+  department_id: string | null
   status?: UserStatus
 }
 
@@ -81,6 +82,8 @@ export type UpdateUserPayload = {
   password?: string
   password_confirmation?: string
   role: UserRole
+  /** Required for departmental roles, null for campus-wide ones. */
+  department_id: string | null
   status?: UserStatus
 }
 

@@ -6,6 +6,12 @@ type ProgramDocumentUploadModalProps = {
   open: boolean
   loading: boolean
   errorMessage: string | null
+  /**
+   * Once a proposal is approved its attachments are frozen, but session photos are still being
+   * taken — the server accepts `photo` uploads during delivery. In that mode the type is fixed and
+   * only images are offered.
+   */
+  photosOnly?: boolean
   onClose: () => void
   onSubmit: (file: File, docType: ProgramDocType) => void
 }
@@ -29,11 +35,12 @@ export default function ProgramDocumentUploadModal({
   open,
   loading,
   errorMessage,
+  photosOnly = false,
   onClose,
   onSubmit,
 }: ProgramDocumentUploadModalProps) {
   const [file, setFile] = useState<File | null>(null)
-  const [docType, setDocType] = useState<ProgramDocType>('letter_request')
+  const [docType, setDocType] = useState<ProgramDocType>(photosOnly ? 'photo' : 'letter_request')
   const [localError, setLocalError] = useState<string | null>(null)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -55,8 +62,12 @@ export default function ProgramDocumentUploadModal({
   return (
     <AdminDialog
       open={open}
-      title="Attach document"
-      description="Accepted types: PDF, DOCX, XLSX, JPG, PNG. Maximum size 10 MB."
+      title={photosOnly ? 'Attach session photo' : 'Attach document'}
+      description={
+        photosOnly
+          ? 'JPG or PNG, up to 10 MB. Photos can be included in the accomplishment report.'
+          : 'Accepted types: PDF, DOCX, XLSX, JPG, PNG. Maximum size 10 MB.'
+      }
       maxWidthClassName="max-w-xl"
       closeDisabled={loading}
       onClose={onClose}
@@ -89,24 +100,31 @@ export default function ProgramDocumentUploadModal({
           </div>
         ) : null}
 
-        <div>
-          <label htmlFor="program-document-type" className={labelClassName}>
-            Document type
-          </label>
-          <select
-            id="program-document-type"
-            value={docType}
-            disabled={loading}
-            onChange={(event) => setDocType(event.target.value as ProgramDocType)}
-            className={selectClassName}
-          >
-            {PROGRAM_DOC_TYPE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {photosOnly ? (
+          <p className="text-sm leading-6 text-body">
+            This proposal is approved, so its attachments are final. You can still add photos of its
+            sessions.
+          </p>
+        ) : (
+          <div>
+            <label htmlFor="program-document-type" className={labelClassName}>
+              Document type
+            </label>
+            <select
+              id="program-document-type"
+              value={docType}
+              disabled={loading}
+              onChange={(event) => setDocType(event.target.value as ProgramDocType)}
+              className={selectClassName}
+            >
+              {PROGRAM_DOC_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label htmlFor="program-document-file" className={labelClassName}>
@@ -115,7 +133,7 @@ export default function ProgramDocumentUploadModal({
           <input
             id="program-document-file"
             type="file"
-            accept=".pdf,.docx,.xlsx,.jpg,.jpeg,.png"
+            accept={photosOnly ? '.jpg,.jpeg,.png' : '.pdf,.docx,.xlsx,.jpg,.jpeg,.png'}
             disabled={loading}
             onChange={(event) => {
               setFile(event.target.files?.[0] ?? null)

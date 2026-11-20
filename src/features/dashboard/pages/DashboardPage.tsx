@@ -98,12 +98,12 @@ export default function DashboardPage() {
   }, [load])
 
   const header = (
-    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between border-b border-line pb-2">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
           Extension Services Center
         </p>
-        <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
+        <h4 className="text-xl font-semibold tracking-[-0.03em] text-ink">
           Extension programs overview
         </h4>
       </div>
@@ -135,16 +135,16 @@ export default function DashboardPage() {
   // The personal block only needs naming when something else sits above it.
   const overviewHeading = canViewMonitoring ? (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow ">
         Your workspace
       </p>
-      <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
+      <h4 className="text-xl font-semibold tracking-[-0.03em] text-ink">
         Your extension work at a glance
       </h4>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
+      {/* <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
         Across every period, scoped to what you can act on — proposal counts here follow your own
         access, unlike the campus-wide figures above.
-      </p>
+      </p> */}
     </div>
   ) : null
 

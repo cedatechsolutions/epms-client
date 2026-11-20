@@ -312,6 +312,7 @@ export default function CommunityDetailPage() {
               <InfoRow label="Contact person" value={community.contactPersonName} />
               <InfoRow label="Designation" value={community.contactPersonDesignation} />
               <InfoRow label="Contact number" value={community.contactPersonPhone} />
+              <InfoRow label="Email" value={community.contactPersonEmail} />
               <InfoRow label="Notes" value={community.notes} />
             </div>
           </SectionCard>
@@ -378,7 +379,7 @@ export default function CommunityDetailPage() {
         <div className="space-y-6">
           <SectionCard title="Socio-economic profile">
             <div className="divide-y divide-row-divider">
-              <InfoRow label="Classification" value={CLASSIFICATION_LABELS[community.classification]} />
+              <InfoRow label="Classification" value={community.classification ? CLASSIFICATION_LABELS[community.classification] : null} />
               <InfoRow label="Estimated population" value={formatNumber(community.estimatedPopulation)} />
               <InfoRow label="Household count" value={formatNumber(community.householdCount)} />
               <InfoRow label="Male population" value={formatNumber(community.populationMale)} />
@@ -386,7 +387,7 @@ export default function CommunityDetailPage() {
             </div>
             <div className="mt-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-label">Sectors served</p>
-              {community.sectors.length === 0 ? (
+              {community.sectors.length === 0 && !community.otherSector ? (
                 <p className="text-sm text-muted">No sectors tagged.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -398,6 +399,11 @@ export default function CommunityDetailPage() {
                       {sector.name}
                     </span>
                   ))}
+                  {community.otherSector ? (
+                    <span className="inline-flex rounded-md border border-success-border bg-success-bg px-2.5 py-1 text-xs font-medium text-primary-accent">
+                      Others: {community.otherSector}
+                    </span>
+                  ) : null}
                 </div>
               )}
             </div>

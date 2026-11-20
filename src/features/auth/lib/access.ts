@@ -41,5 +41,7 @@ export function getPrimaryRoleLabel(user: AuthUser | null | undefined): string {
   }
 
   const [primaryRole] = [...user.roles].sort()
-  return ROLE_LABELS[primaryRole] ?? primaryRole
+  const roleLabel = ROLE_LABELS[primaryRole] ?? primaryRole
+  // Departmental accounts only see their department's data, so the label says which one.
+  return user.department ? `${roleLabel} · ${user.department.code}` : roleLabel
 }

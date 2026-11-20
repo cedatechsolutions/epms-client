@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 import { hasAnyRole } from '@/features/auth/lib/access'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { listCommunities } from '@/features/communities/api/communitiesApi'
+import { useDepartmentOptions } from '@/features/departments/lib/useDepartmentOptions'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import { isApiError } from '@/shared/api/http'
 import { DataTable, type DataTableColumn } from '@/shared/table'
@@ -69,6 +70,8 @@ export default function SurveysListPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<SurveyStatus | ''>('')
+  const [departmentFilter, setDepartmentFilter] = useState('')
+  const { isCampusWide, departments } = useDepartmentOptions()
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -89,6 +92,7 @@ export default function SurveysListPage() {
         per_page: meta.per_page,
         search,
         status: statusFilter,
+        departmentId: departmentFilter,
         sort: 'createdAt',
         direction: 'desc',
       } satisfies SurveyListQuery)
@@ -102,7 +106,7 @@ export default function SurveysListPage() {
     }
     // meta.per_page is a stable page-size preference, not a reactive input.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, search, statusFilter])
+  }, [departmentFilter, page, search, statusFilter])
 
   useEffect(() => {
     void loadSurveys()
@@ -184,6 +188,12 @@ export default function SurveysListPage() {
       ),
     },
     { key: 'community', header: 'Community', width: 200, render: (survey) => survey.communityName },
+    {
+      key: 'department',
+      header: 'Dept',
+      width: 100,
+      render: (survey) => survey.departmentCode ?? 'Campus',
+    },
     { key: 'status', header: 'Status', width: 130, render: (survey) => <StatusBadge status={survey.status} /> },
     { key: 'questions', header: 'Questions', width: 110, align: 'right', render: (survey) => survey.questionCount },
     { key: 'responses', header: 'Responses', width: 110, align: 'right', render: (survey) => survey.responseCount },
@@ -275,7 +285,14 @@ export default function SurveysListPage() {
           <p className="text-sm text-muted">{countLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_minmax(150px,auto)] md:items-end">
+        <div
+          className={[
+            'grid gap-3 border-b border-divider px-5 py-4 md:items-end',
+            isCampusWide
+              ? 'md:grid-cols-[minmax(220px,1fr)_repeat(2,minmax(150px,auto))]'
+              : 'md:grid-cols-[minmax(220px,1fr)_minmax(150px,auto)]',
+          ].join(' ')}
+        >
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
@@ -305,6 +322,28 @@ export default function SurveysListPage() {
               <option value="closed">Closed</option>
             </select>
           </label>
+
+          {isCampusWide ? (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Department</span>
+              <select
+                value={departmentFilter}
+                disabled={loading}
+                onChange={(event) => {
+                  setDepartmentFilter(event.target.value)
+                  setPage(1)
+                }}
+                className={selectClassName}
+              >
+                <option value="">All departments</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.code} — {department.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
         </div>
 
         {errorMessage ? (

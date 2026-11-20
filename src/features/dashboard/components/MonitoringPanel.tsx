@@ -145,19 +145,14 @@ export default function MonitoringPanel({ refreshSignal }: { refreshSignal: numb
   const periodLabel = dashboard?.period?.label ?? 'All periods'
 
   const header = (
-    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div className="flex flex-col gap-4 xl:flex-row xl:justify-between">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-eyebrow">
           Monitoring and evaluation
         </p>
-        <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
+        <h4 className="text-xl font-semibold tracking-[-0.03em] text-ink">
           Campus-wide extension performance
         </h4>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-body">
-          Every figure below is scoped to one academic period — a program belongs to the period its
-          proposed date falls in, and its beneficiaries are counted with it. Open a count to see the
-          list behind it.
-        </p>
       </div>
 
       <div className="flex flex-col items-start gap-3 xl:items-end">

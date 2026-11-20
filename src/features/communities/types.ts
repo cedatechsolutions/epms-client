@@ -1,15 +1,16 @@
 // Domain types for Module 2 — Community Profiling. Field names mirror the backend JSON
 // (camelCase) so no request/response remapping is needed.
 
+import { COORDINATOR_ROLES } from '@/features/auth/types'
+
 export type Classification = 'urban_poor' | 'rural' | 'urban' | 'coastal' | 'other'
 export type DocType = 'moa' | 'certification' | 'photo' | 'other'
 
-/** Roles permitted to create/update/delete communities (spec §2.2 — must match backend Permissions). */
-export const COMMUNITY_MANAGE_ROLES = [
-  'admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-] as const
+/**
+ * Roles permitted to create/update/delete communities (spec §2.2 — must match backend
+ * `canManageCommunities`). Communities are shared across departments.
+ */
+export const COMMUNITY_MANAGE_ROLES = COORDINATOR_ROLES
 
 export const CLASSIFICATION_LABELS: Record<Classification, string> = {
   urban_poor: 'Urban Poor',
@@ -66,7 +67,8 @@ export type Community = {
   barangayCode: string | null
   municipality: string
   province: string
-  classification: Classification
+  /** No longer captured on the form — null for communities created after V14. */
+  classification: Classification | null
   estimatedPopulation: number | null
   householdCount: number | null
   populationMale: number | null
@@ -74,6 +76,9 @@ export type Community = {
   contactPersonName: string | null
   contactPersonDesignation: string | null
   contactPersonPhone: string | null
+  contactPersonEmail: string | null
+  /** Free-text "Others" sector when none of the seeded sectors fit. */
+  otherSector: string | null
   notes: string | null
   sectors: Sector[]
   documents: CommunityDocument[]
@@ -112,7 +117,8 @@ export type CommunityPayload = {
   barangayCode: string | null
   municipality: string
   province: string
-  classification: Classification
+  /** No longer captured on the form — null for communities created after V14. */
+  classification: Classification | null
   estimatedPopulation: number | null
   householdCount: number | null
   populationMale: number | null
@@ -120,6 +126,9 @@ export type CommunityPayload = {
   contactPersonName: string | null
   contactPersonDesignation: string | null
   contactPersonPhone: string | null
+  contactPersonEmail: string | null
+  /** Free-text "Others" sector when none of the seeded sectors fit. */
+  otherSector: string | null
   notes: string | null
   sectorIds: string[]
 }

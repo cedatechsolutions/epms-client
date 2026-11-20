@@ -1,25 +1,16 @@
 // Domain types for Module 3 — Needs Assessment (Pass A: survey builder).
 // Field names mirror the backend JSON (camelCase) so no remapping is needed.
 
+import { ALL_ROLES } from '@/features/auth/types'
+
 export type SurveyStatus = 'draft' | 'deployed' | 'closed'
 export type QuestionType = 'rating' | 'multiple_choice' | 'checkbox' | 'open_text'
 
 /** Roles permitted to create/manage surveys (spec §2.2 — must match backend canCreateSurveys). */
-export const SURVEY_MANAGE_ROLES = [
-  'admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-  'faculty',
-] as const
+export const SURVEY_MANAGE_ROLES = ALL_ROLES
 
-/** Roles permitted to view surveys/assessments — everyone except student volunteers (spec §2.2). */
-export const ASSESSMENT_VIEW_ROLES = [
-  'admin',
-  'campus_admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-  'faculty',
-] as const
+/** Roles permitted to view surveys/assessments — every role (spec §2.2). */
+export const ASSESSMENT_VIEW_ROLES = ALL_ROLES
 
 export const SURVEY_STATUS_LABELS: Record<SurveyStatus, string> = {
   draft: 'Draft',
@@ -78,6 +69,10 @@ export type Survey = {
   questionCount: number
   questions: SurveyQuestion[]
   createdBy: string | null
+  /** Department the survey belongs to (Phase C scoping); null = campus-level. */
+  departmentId: string | null
+  departmentCode: string | null
+  departmentName: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -93,6 +88,7 @@ export type SurveySummary = {
   opensAt: string | null
   closesAt: string | null
   createdAt: string | null
+  departmentCode: string | null
 }
 
 export type SurveyListQuery = {
@@ -101,6 +97,8 @@ export type SurveyListQuery = {
   search?: string
   status?: SurveyStatus | ''
   communityId?: string
+  /** Narrows the list to one department; the server still applies the caller's own scope first. */
+  departmentId?: string
   sort?: 'createdAt' | 'title' | 'status' | 'updatedAt'
   direction?: 'asc' | 'desc'
 }
@@ -112,6 +110,11 @@ export type SurveyPayload = {
   opensAt: string | null
   closesAt: string | null
   targetResponses: number | null
+  /**
+   * Honoured for campus-wide users only (null = campus-level). A departmental user's survey always
+   * belongs to their own department, whatever is sent.
+   */
+  departmentId?: string | null
 }
 
 export type QuestionPayload = {
@@ -194,6 +197,9 @@ export type GeneratedReport = {
 }
 
 export type ExportFormat = 'xlsx' | 'pdf'
+
+/** EXTN-QF-23 renderings: Word to complete the narrative, PDF to circulate the filled draft. */
+export type Qf23Format = 'docx' | 'pdf'
 
 export type PaginationMeta = {
   current_page: number

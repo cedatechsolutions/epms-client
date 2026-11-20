@@ -1,6 +1,7 @@
 // Domain types for Module 4 — Recommendation Engine.
 // Field names mirror the backend JSON (camelCase) so no remapping is needed.
 
+import { COORDINATOR_ROLES, ROLE_ADMIN, ROLE_CAMPUS_EXTENSION_COORDINATOR } from '@/features/auth/types'
 import type { NeedPriority } from '@/features/surveys/types'
 
 export type RecommendationStatus = 'pending' | 'accepted' | 'modified' | 'rejected'
@@ -14,19 +15,15 @@ export const RECOMMENDATION_STATUS_LABELS: Record<RecommendationStatus, string> 
 
 /**
  * Roles permitted to generate recommendations and rule on them (spec §2.2 — must match backend
- * `canDecideRecommendations`). Narrower than SURVEY_MANAGE_ROLES: faculty may view but not decide.
+ * `canDecideRecommendations`). Narrower than SURVEY_MANAGE_ROLES: facilitators may view but not decide.
  */
-export const RECOMMENDATION_DECIDE_ROLES = [
-  'admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-] as const
+export const RECOMMENDATION_DECIDE_ROLES = COORDINATOR_ROLES
 
 /**
  * Roles permitted to edit the program-type library and the scoring matrix (spec §2.2 — must match
- * backend `canConfigureScoringMatrix`). Narrower still: extension coordinators are excluded.
+ * backend `canConfigureScoringMatrix`). Narrower still: staff and department coordinators are excluded.
  */
-export const SCORING_MATRIX_ROLES = ['admin', 'campus_extension_coordinator'] as const
+export const SCORING_MATRIX_ROLES = [ROLE_ADMIN, ROLE_CAMPUS_EXTENSION_COORDINATOR] as const
 
 /** Matrix weights are bounded 0.00–5.00 server-side; 0 removes the cell. */
 export const MIN_MATRIX_WEIGHT = 0

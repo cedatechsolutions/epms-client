@@ -7,6 +7,7 @@ import { hasAnyRole } from '@/features/auth/lib/access'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { listCommunities } from '@/features/communities/api/communitiesApi'
 import { listAcademicPeriods, type AcademicPeriod } from '@/features/dashboard'
+import { useDepartmentOptions } from '@/features/departments/lib/useDepartmentOptions'
 import { listProgramTypes, listSectors } from '@/features/recommendations/api/recommendationsApi'
 import { listSurveys } from '@/features/surveys/api/surveysApi'
 import type { ApiValidationErrors } from '@/shared/api/http'
@@ -108,7 +109,7 @@ function getPaginationItems(currentPage: number, lastPage: number): PaginationIt
  * so a toast is the honest place for it — the form has already closed on a successful save.
  */
 /** The filters the dashboard's drill-downs arrive with; kept in the URL so a view is shareable. */
-const URL_FILTER_PARAMS = ['status', 'periodId', 'communityId', 'programTypeId'] as const
+const URL_FILTER_PARAMS = ['status', 'periodId', 'communityId', 'programTypeId', 'departmentId'] as const
 
 const STATUS_TAB_VALUES = STATUS_TABS.map((tab) => tab.value)
 
@@ -149,6 +150,8 @@ export default function ProgramsListPage() {
     () => searchParams.get('programTypeId') ?? '',
   )
   const [periodFilter, setPeriodFilter] = useState(() => searchParams.get('periodId') ?? '')
+  const [departmentFilter, setDepartmentFilter] = useState(() => searchParams.get('departmentId') ?? '')
+  const { isCampusWide, departments } = useDepartmentOptions()
   const [sort, setSort] = useState<NonNullable<ProgramListQuery['sort']>>('createdAt')
   const [direction, setDirection] = useState<NonNullable<ProgramListQuery['direction']>>('desc')
   const [loading, setLoading] = useState(true)
@@ -186,6 +189,7 @@ export default function ProgramsListPage() {
         communityId: communityFilter,
         programTypeId: programTypeFilter,
         periodId: periodFilter,
+        departmentId: departmentFilter,
         sort,
         direction,
       })
@@ -205,6 +209,7 @@ export default function ProgramsListPage() {
     }
   }, [
     communityFilter,
+    departmentFilter,
     direction,
     page,
     perPage,
@@ -229,6 +234,7 @@ export default function ProgramsListPage() {
       periodId: periodFilter,
       communityId: communityFilter,
       programTypeId: programTypeFilter,
+      departmentId: departmentFilter,
     }
     URL_FILTER_PARAMS.forEach((param) => {
       if (values[param]) {
@@ -240,7 +246,15 @@ export default function ProgramsListPage() {
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true })
     }
-  }, [communityFilter, periodFilter, programTypeFilter, searchParams, setSearchParams, statusTab])
+  }, [
+    communityFilter,
+    departmentFilter,
+    periodFilter,
+    programTypeFilter,
+    searchParams,
+    setSearchParams,
+    statusTab,
+  ])
 
   // The period calendar is open to every role, so it loads regardless of who may author a proposal.
   useEffect(() => {
@@ -268,7 +282,7 @@ export default function ProgramsListPage() {
         setSurveys(response.data.map((survey) => ({ id: survey.id, label: survey.title }))),
       )
       .catch(() => setSurveys([]))
-    listUserOptions('faculty')
+    listUserOptions('facilitator')
       .then(setFacultyOptions)
       .catch(() => setFacultyOptions([]))
     listSectors()
@@ -501,6 +515,12 @@ export default function ProgramsListPage() {
       render: (program) => program.facultyLeadName ?? '-',
     },
     {
+      key: 'department',
+      header: 'Dept',
+      width: 100,
+      render: (program) => program.departmentCode ?? '-',
+    },
+    {
       key: 'status',
       header: 'Status',
       width: 190,
@@ -611,7 +631,14 @@ export default function ProgramsListPage() {
           })}
         </div>
 
-        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,auto))] md:items-end">
+        <div
+          className={[
+            'grid gap-3 border-b border-divider px-5 py-4 md:items-end',
+            isCampusWide
+              ? 'md:grid-cols-[minmax(220px,1fr)_repeat(5,minmax(150px,auto))]'
+              : 'md:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,auto))]',
+          ].join(' ')}
+        >
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
@@ -685,6 +712,28 @@ export default function ProgramsListPage() {
               ))}
             </select>
           </label>
+
+          {isCampusWide ? (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Department</span>
+              <select
+                value={departmentFilter}
+                disabled={loading}
+                onChange={(event) => {
+                  setDepartmentFilter(event.target.value)
+                  setPage(1)
+                }}
+                className={selectClassName}
+              >
+                <option value="">All departments</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.code} — {department.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Rows</span>

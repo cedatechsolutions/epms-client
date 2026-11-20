@@ -7,7 +7,8 @@ import PrintRoundedIcon from '@mui/icons-material/PrintRounded'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { hasAnyRole } from '@/features/auth/lib/access'
 import { useAuthStore } from '@/features/auth/store/authStore'
-import { ALL_ROLES, ROLE_LABELS, USER_MANAGEMENT_ROLES } from '@/features/auth/types'
+import { ALL_ROLES, ROLE_LABELS, USER_MANAGEMENT_ROLES, isDepartmentalRole, type Department } from '@/features/auth/types'
+import { listDepartments } from '@/features/departments/api/departmentsApi'
 import type { ApiValidationErrors } from '@/shared/api/http'
 import { isApiError } from '@/shared/api/http'
 import { notify } from '@/shared/toast'
@@ -123,6 +124,9 @@ export default function AdminUsersListPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<UserRole | ''>('')
   const [statusFilter, setStatusFilter] = useState<UserStatus | ''>('')
+  const [departmentFilter, setDepartmentFilter] = useState('')
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [departmentsLoading, setDepartmentsLoading] = useState(true)
   const [sort, setSort] = useState<NonNullable<UserListQuery['sort']>>('lastName')
   const [direction, setDirection] = useState<NonNullable<UserListQuery['direction']>>('asc')
   const [loading, setLoading] = useState(true)
@@ -163,6 +167,7 @@ export default function AdminUsersListPage() {
         search,
         role: roleFilter,
         status: statusFilter,
+        department_id: departmentFilter,
         sort,
         direction,
       })
@@ -180,11 +185,30 @@ export default function AdminUsersListPage() {
     } finally {
       setLoading(false)
     }
-  }, [direction, page, perPage, roleFilter, search, sort, statusFilter])
+  }, [departmentFilter, direction, page, perPage, roleFilter, search, sort, statusFilter])
 
   useEffect(() => {
     void loadUsers()
   }, [loadUsers])
+
+  // Departments fill the filter and the form picker. A failure leaves both empty rather than
+  // blocking the table; the form then reports the missing department on submit.
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const loaded = await listDepartments()
+        if (!cancelled) setDepartments(loaded)
+      } catch {
+        if (!cancelled) setDepartments([])
+      } finally {
+        if (!cancelled) setDepartmentsLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const usersCountLabel = useMemo(() => {
     if (!meta.total) return 'No user records available'
@@ -289,6 +313,7 @@ export default function AdminUsersListPage() {
       contact_number: values.contactNumber,
       email: values.email,
       role: values.role,
+      department_id: isDepartmentalRole(values.role) && values.departmentId ? values.departmentId : null,
     } as const
 
     try {
@@ -546,6 +571,13 @@ export default function AdminUsersListPage() {
       ),
     },
     {
+      key: 'department',
+      header: 'Department',
+      width: 200,
+      cellClassName: 'truncate',
+      render: (user) => (user.department ? user.department.name : 'All departments'),
+    },
+    {
       key: 'status',
       header: 'Status',
       width: 120,
@@ -640,7 +672,7 @@ export default function AdminUsersListPage() {
           <p className="text-sm text-muted">{usersCountLabel}</p>
         </div>
 
-        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(130px,auto))] md:items-end">
+        <div className="grid gap-3 border-b border-divider px-5 py-4 md:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(130px,auto))] md:items-end">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Search</span>
             <input
@@ -668,6 +700,26 @@ export default function AdminUsersListPage() {
               {ALL_ROLES.map((role) => (
                 <option key={role} value={role}>
                   {ROLE_LABELS[role]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-label">Department</span>
+            <select
+              value={departmentFilter}
+              disabled={loading || departmentsLoading}
+              onChange={(event) => {
+                setDepartmentFilter(event.target.value)
+                setPage(1)
+              }}
+              className={selectClassName}
+            >
+              <option value="">All departments</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.code}
                 </option>
               ))}
             </select>
@@ -815,6 +867,8 @@ export default function AdminUsersListPage() {
         open={formOpen}
         mode={formMode}
         user={activeUser}
+        departments={departments}
+        departmentsLoading={departmentsLoading}
         loading={formLoading}
         errorMessage={formErrorMessage}
         apiErrors={formApiErrors}

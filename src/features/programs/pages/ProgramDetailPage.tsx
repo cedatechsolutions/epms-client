@@ -179,7 +179,7 @@ export default function ProgramDetailPage() {
     listSurveys({ per_page: 100, sort: 'title', direction: 'asc' })
       .then((response) => setSurveys(response.data.map((survey) => ({ id: survey.id, label: survey.title }))))
       .catch(() => setSurveys([]))
-    listUserOptions('faculty')
+    listUserOptions('facilitator')
       .then(setFacultyOptions)
       .catch(() => setFacultyOptions([]))
   }, [canEdit])
@@ -490,6 +490,7 @@ export default function ProgramDetailPage() {
               <InfoRow label="Partner community" value={program.communityName} />
               <InfoRow label="Program type" value={program.programTypeName} />
               <InfoRow label="Faculty lead" value={program.facultyLeadName} />
+              <InfoRow label="Department" value={program.departmentName} />
               <InfoRow label="Target beneficiaries" value={formatNumber(program.targetBeneficiaries)} />
               <InfoRow label="Proposed start date" value={formatDate(program.proposedDate)} />
               <InfoRow label="End date" value={formatDate(program.endDate)} />
@@ -534,7 +535,7 @@ export default function ProgramDetailPage() {
           <SectionCard
             title="Attachments"
             action={
-              program.canEdit ? (
+              program.canEdit || program.canRecordDelivery ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -544,7 +545,7 @@ export default function ProgramDetailPage() {
                   className="inline-flex cursor-pointer items-center justify-center gap-2 border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-hover-tint rounded-md"
                 >
                   <UploadFileRoundedIcon fontSize="small" />
-                  Attach
+                  {program.canEdit ? 'Attach' : 'Add photo'}
                 </button>
               ) : undefined
             }
@@ -585,7 +586,8 @@ export default function ProgramDetailPage() {
                             <DownloadRoundedIcon fontSize="small" />
                           )}
                         </button>
-                        {program.canEdit ? (
+                        {program.canEdit ||
+                        (program.canRecordDelivery && document_.docType === 'photo') ? (
                           <button
                             type="button"
                             aria-label={`Remove ${document_.originalFilename}`}
@@ -682,6 +684,7 @@ export default function ProgramDetailPage() {
         open={uploadOpen}
         loading={uploadLoading}
         errorMessage={uploadErrorMessage}
+        photosOnly={!program.canEdit}
         onClose={() => {
           if (!uploadLoading) setUploadOpen(false)
         }}

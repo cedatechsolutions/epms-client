@@ -1,3 +1,4 @@
+import { COORDINATOR_ROLES } from '@/features/auth/types'
 import type { ActivityLog } from '@/features/activity-logs/types'
 import type { ProgramStatus } from '@/features/programs/types'
 import type { NeedPriority } from '@/features/surveys/types'
@@ -158,15 +159,10 @@ export type MonitoringDashboard = {
 export type DashboardExportFormat = 'xlsx' | 'pdf'
 
 /**
- * Mirrors `Permissions.canViewMonitoringDashboard()`. Faculty and student volunteers keep the
- * personal overview only — the completion table names programs they cannot open.
+ * Mirrors `Permissions.canViewMonitoringDashboard()`. Facilitators keep the personal overview
+ * only — the completion table names programs they cannot open.
  */
-export const MONITORING_DASHBOARD_ROLES = [
-  'admin',
-  'campus_admin',
-  'campus_extension_coordinator',
-  'extension_coordinator',
-] as const
+export const MONITORING_DASHBOARD_ROLES = COORDINATOR_ROLES
 
 /** Sentinel for the "All periods" option — the server treats a blank `periodId` as every period. */
 export const ALL_PERIODS = ''
