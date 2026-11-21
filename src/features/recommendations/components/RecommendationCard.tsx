@@ -6,6 +6,7 @@ import {
   type Recommendation,
   type RecommendationStatus,
 } from '../types'
+import AiDraftPanel from './AiDraftPanel'
 import ScoreBar from './ScoreBar'
 
 /** Status chip tones — the §6.4 chip set, matched to the priority-chip weights. */
@@ -32,6 +33,9 @@ type RecommendationCardProps = {
   canDecide: boolean
   onDecide: (recommendation: Recommendation, decision: DecisionKind) => void
   onExplain: (recommendation: Recommendation) => void
+  /** True while a "Draft proposal" / "Regenerate" request for this card is in flight. */
+  requestingDraft: boolean
+  onRequestDraft: (recommendation: Recommendation) => void
 }
 
 export default function RecommendationCard({
@@ -39,6 +43,8 @@ export default function RecommendationCard({
   canDecide,
   onDecide,
   onExplain,
+  requestingDraft,
+  onRequestDraft,
 }: RecommendationCardProps) {
   const breakdown = recommendation.breakdown
   const decided = recommendation.status !== 'pending'
@@ -126,6 +132,13 @@ export default function RecommendationCard({
             </ul>
           )}
         </div>
+
+        <AiDraftPanel
+          recommendation={recommendation}
+          canRequest={canDecide && !decided}
+          requesting={requestingDraft}
+          onRequest={onRequestDraft}
+        />
 
         {decided ? (
           <div className="rounded-md border border-line bg-surface-tint px-4 py-3">

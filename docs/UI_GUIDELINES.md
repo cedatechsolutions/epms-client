@@ -493,6 +493,18 @@ Module 8's in-app feed. Two views share one row component and one store.
 - **Page (`NotificationsPage`).** The §5.2 page header with a secondary "Mark all read" button, then a section whose filter strip has type tabs (the program list's status-tab style: `aria-pressed`, active = primary-filled) and an "Unread only" checkbox. Previous/Next pagination as on the survey list.
 - **One source of truth for read state.** `useNotificationStore` holds the badge count and a `version` that every read action bumps, so the bell panel and the page refetch together; neither keeps its own unread count. The store resets when the bell unmounts (sign-out).
 
+### 6.17 AI-drafted text (`features/recommendations`)
+
+Anything a model wrote is labelled as such, kept visibly apart from what people wrote, and never presented as a decision. Today that is the proposal drafts on recommendations (spec Module 4 AI layer); reuse this pattern for any future AI text (e.g. QF-23 narratives).
+
+- **Badge (`AiDraftBadge`).** `AutoAwesomeOutlined` (14 px) + "AI-generated draft — review before submitting" in the **informational** chip tone — `rounded-md border border-info-border bg-info-bg px-2.5 py-1 text-xs font-medium text-info-text`. Never the success/decision tones of §6.4: AI text is not an approval or a status. It sits directly above the AI-written title, every time.
+- **Card block (`AiDraftPanel`).** An inset block (`rounded-md border border-line bg-surface-tint px-4 py-4`, §6.10) between the score/sector sections and the decision note, eyebrow "Proposal draft", `aria-live="polite"`. Four states: *none* ("No AI draft for this recommendation yet." + **Draft proposal**), *pending* (spinner + "Drafting the proposal text..."), *failed/refused* (the server's `message` in `text-muted` + **Try again**), *ready* (badge, title, "N objectives · M activities · duration" meta, **Show draft** toggle with `aria-expanded`/`aria-controls`, **Regenerate**). Action buttons are the compact secondary size (`px-3 py-2 text-xs`), never primary — the card's primary action stays Accept. Request buttons render only for decide roles on undecided recommendations; the whole block renders nothing when `draftingAvailable` is false (a ready draft on a decided card still shows, read-only).
+- **Details (`AiDraftDetails`).** One read-only layout shared by the card and the program page, so they never drift: uppercase `text-label` headings, `text-body` paragraphs (`whitespace-pre-line`), numbered objectives/activities, neutral `rounded-md` chips for partner departments and needs. Empty fields render `-`.
+- **Polling.** While any card's draft is `pending`, the page re-reads the list every `DRAFT_POLL_MS` (3 s) — silently; a failed poll is ignored, not toasted. The server turns a lost pending draft into `failed` after 10 minutes, so polling always ends.
+- **Before it is used.** The Accept / Accept-with-changes dialog says what the proposal will start from: an info callout (same tone as the badge) naming the draft title and counts when ready, or a `text-warning` note when it is still pending. Reject shows neither.
+- **After it is used.** A program spawned from a drafted recommendation shows a §6.13-style section **"AI draft (reference)"** under its documents: badge, title, collapsible details, and the line that editing the proposal never changes it. It renders nothing if there was no ready draft or the viewer can't see the source assessment (403/404); other load errors show the inline alert with Retry.
+- The scoring page's callout states that drafts use summary figures only and never change a score, so the ranking's explainability (§6.9) is never in doubt.
+
 ---
 
 ## 7. Interaction & Motion

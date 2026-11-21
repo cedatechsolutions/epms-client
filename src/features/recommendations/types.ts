@@ -70,7 +70,54 @@ export type Recommendation = {
   decisionNote: string | null
   createdAt: string | null
   breakdown: ScoreBreakdown | null
+  /** The proposal this recommendation spawned when accepted/modified; null otherwise. */
+  spawnedProgramId: string | null
+  /** The current AI-drafted proposal text; null when none was requested (spec Module 4 AI layer). */
+  draft: RecommendationDraft | null
+  /** Whether AI drafting is switched on server-side — hides every draft control when false. */
+  draftingAvailable: boolean
 }
+
+export type DraftStatus = 'pending' | 'ready' | 'failed' | 'refused'
+
+export type SuggestedActivity = {
+  name: string
+  description: string | null
+}
+
+/**
+ * AI-written proposal text. Text only — it never affects rank, score or breakdown. Accepting a
+ * recommendation with a ready draft pre-fills the proposal's title, objectives and target
+ * beneficiaries; the rest is reference for the person writing the proposal.
+ */
+export type ProposalDraftContent = {
+  title: string
+  rationale: string | null
+  objectives: string[]
+  targetBeneficiaries: string | null
+  estimatedBeneficiaries: number | null
+  gadConsiderations: string | null
+  activities: SuggestedActivity[]
+  expectedOutputs: string[]
+  suggestedDuration: string | null
+  partnerDepartments: string[]
+  needsAddressed: string[]
+}
+
+export type RecommendationDraft = {
+  id: string
+  status: DraftStatus
+  /** Present only when `status` is `ready`. */
+  content: ProposalDraftContent | null
+  model: string
+  createdAt: string | null
+  completedAt: string | null
+  /** Why a failed/refused draft has no content. */
+  message: string | null
+}
+
+/** How often the recommendations page re-reads the list while any draft is still being written. */
+export const DRAFT_POLL_MS = 3000
 
 /** The three rulings a coordinator can make; each maps to its own endpoint. */
 export type DecisionKind = 'accept' | 'modify' | 'reject'

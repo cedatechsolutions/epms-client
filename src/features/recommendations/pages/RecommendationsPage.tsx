@@ -8,12 +8,18 @@ import { useAuthStore } from '@/features/auth/store/authStore'
 import { getSurveyResults } from '@/features/surveys/api/surveysApi'
 import type { SurveyResults } from '@/features/surveys/types'
 import { notify } from '@/shared/toast'
-import { decideRecommendation, generateRecommendations, listRecommendations } from '../api/recommendationsApi'
+import {
+  decideRecommendation,
+  generateRecommendations,
+  listRecommendations,
+  regenerateRecommendationDraft,
+} from '../api/recommendationsApi'
 import DecisionModal from '../components/DecisionModal'
 import RecommendationCard from '../components/RecommendationCard'
 import ScoreBreakdownModal from '../components/ScoreBreakdownModal'
 import { formatDateTime, getRecommendationErrorMessage } from '../lib/format'
 import {
+  DRAFT_POLL_MS,
   RECOMMENDATION_DECIDE_ROLES,
   type DecisionKind,
   type Recommendation,
@@ -51,6 +57,7 @@ export default function RecommendationsPage() {
   const [decisionKind, setDecisionKind] = useState<DecisionKind>('accept')
   const [decisionLoading, setDecisionLoading] = useState(false)
   const [decisionError, setDecisionError] = useState<string | null>(null)
+  const [requestingDraftId, setRequestingDraftId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -74,14 +81,44 @@ export default function RecommendationsPage() {
     void load()
   }, [load])
 
+  // AI drafts are written off-thread; while any is pending, re-read the list quietly until they
+  // settle (the server reports a lost draft as failed after 10 minutes, so this always ends).
+  const hasPendingDraft = recommendations.some((item) => item.draft?.status === 'pending')
+  useEffect(() => {
+    if (!id || !hasPendingDraft) return undefined
+    const timer = window.setTimeout(() => {
+      listRecommendations(id)
+        .then(setRecommendations)
+        .catch(() => {
+          // A missed poll is harmless; the next state change (or a reload) catches up.
+        })
+    }, DRAFT_POLL_MS)
+    return () => window.clearTimeout(timer)
+  }, [id, hasPendingDraft, recommendations])
+
+  const handleRequestDraft = async (recommendation: Recommendation) => {
+    setRequestingDraftId(recommendation.id)
+    try {
+      const updated = await regenerateRecommendationDraft(recommendation.id)
+      setRecommendations((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+      notify.success(`Drafting a proposal for ${updated.programTypeName}. It appears here when ready.`)
+    } catch (error) {
+      notify.error(getRecommendationErrorMessage(error))
+    } finally {
+      setRequestingDraftId(null)
+    }
+  }
+
   const handleGenerate = async () => {
     if (!id) return
     setGenerating(true)
     try {
       const generated = await generateRecommendations(id)
       setRecommendations(generated)
+      const drafting = generated.filter((item) => item.draft?.status === 'pending').length
       notify.success(
-        `${generated.length} program ${generated.length === 1 ? 'type' : 'types'} scored against this assessment.`,
+        `${generated.length} program ${generated.length === 1 ? 'type' : 'types'} scored against this assessment.` +
+          (drafting > 0 ? ` Drafting proposal text for the top ${drafting}.` : ''),
       )
     } catch (error) {
       notify.error(getRecommendationErrorMessage(error))
@@ -194,7 +231,7 @@ export default function RecommendationsPage() {
               ? 'Scoring...'
               : recommendations.length === 0
                 ? 'Generate Recommendations'
-                : 'Regenerate'}
+                : 'Regenerate recommendations'}
           </button>
         ) : null}
       </div>
@@ -206,6 +243,9 @@ export default function RecommendationsPage() {
             Scores come from a transparent weighting matrix, not a prediction model — every one can be
             traced back to the assessment figures through &quot;Why this score?&quot;. Regenerating replaces
             entries still awaiting a decision and leaves decided ones untouched.
+            {recommendations.some((item) => item.draftingAvailable)
+              ? ' Proposal drafts are written by AI from the summary figures only — never individual answers — and never change a score.'
+              : null}
           </p>
         </div>
       ) : (
@@ -247,6 +287,8 @@ export default function RecommendationsPage() {
               canDecide={canDecide}
               onDecide={openDecision}
               onExplain={setExplained}
+              requestingDraft={requestingDraftId === recommendation.id}
+              onRequestDraft={(item) => void handleRequestDraft(item)}
             />
           ))}
         </ul>

@@ -37,6 +37,32 @@ const DECISION_COPY: Record<DecisionKind, { title: string; description: string; 
   },
 }
 
+/** Tells the decider what the spawned proposal will start from (UI guidelines §6.17). */
+function DraftPrefillNote({ recommendation }: { recommendation: Recommendation }) {
+  const draft = recommendation.draft
+  if (!draft) return null
+  if (draft.status === 'ready' && draft.content) {
+    const { title, objectives, estimatedBeneficiaries } = draft.content
+    return (
+      <div className="rounded-md border border-info-border bg-info-bg px-4 py-3 text-sm leading-6 text-info-text">
+        The proposal will start from the AI draft: <span className="font-medium">{title}</span>, with{' '}
+        {objectives.length} objectives
+        {estimatedBeneficiaries !== null ? ` and ${estimatedBeneficiaries.toLocaleString('en-US')} target beneficiaries` : ''}.
+        Review and edit everything before you submit it.
+      </div>
+    )
+  }
+  if (draft.status === 'pending') {
+    return (
+      <div className="rounded-md border border-line bg-surface-tint px-4 py-3 text-sm leading-6 text-warning">
+        The AI draft is still being written. Deciding now starts the proposal from the program type
+        instead — wait for the draft if you want it pre-filled.
+      </div>
+    )
+  }
+  return null
+}
+
 function ButtonSpinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
 }
@@ -113,6 +139,8 @@ export default function DecisionModal({
             </p>
           </div>
         ) : null}
+
+        {recommendation && decision !== 'reject' ? <DraftPrefillNote recommendation={recommendation} /> : null}
 
         {errorMessage ? (
           <div className="border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger-text">

@@ -44,6 +44,15 @@ export async function decideRecommendation(
   )
 }
 
+/**
+ * Queues a fresh AI draft of the proposal text for one undecided recommendation (202). The card
+ * comes back with `draft.status = 'pending'`; the page polls the list until it settles. 409 when
+ * decided or already drafting, 429 past the user's daily limit, 503 when AI drafting is off.
+ */
+export async function regenerateRecommendationDraft(recommendationId: string): Promise<Recommendation> {
+  return postRequest<Recommendation>(`${RECOMMENDATIONS_ENDPOINT}/${recommendationId}/draft`)
+}
+
 // --- program-type library (spec Module 4 §4) ---
 
 export async function listProgramTypes(): Promise<ProgramType[]> {

@@ -7,6 +7,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { listCommunities } from '@/features/communities/api/communitiesApi'
+import { ProgramAiDraftReference } from '@/features/recommendations'
 import { listProgramTypes, listSectors } from '@/features/recommendations/api/recommendationsApi'
 import { listSurveys } from '@/features/surveys/api/surveysApi'
 import type { ApiValidationErrors } from '@/shared/api/http'
@@ -505,7 +506,7 @@ export default function ProgramDetailPage() {
             <div className="mt-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-label">Objectives</p>
               {program.objectives ? (
-                <p className="text-sm leading-7 text-body">{program.objectives}</p>
+                <p className="whitespace-pre-line text-sm leading-7 text-body">{program.objectives}</p>
               ) : (
                 <p className="text-sm text-muted">No objectives recorded yet.</p>
               )}
@@ -610,6 +611,10 @@ export default function ProgramDetailPage() {
               </ul>
             )}
           </SectionCard>
+
+          {program.recommendationId && program.surveyId ? (
+            <ProgramAiDraftReference recommendationId={program.recommendationId} surveyId={program.surveyId} />
+          ) : null}
         </div>
 
         <div className="space-y-6">
